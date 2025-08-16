@@ -1,3 +1,6 @@
+# Python related
+*.pyc
+
 # Package Management
 poetry.lock
 
