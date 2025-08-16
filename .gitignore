@@ -6,3 +6,5 @@ poetry.lock
 
 # Personal
 .snippet/
+log
+logs/
