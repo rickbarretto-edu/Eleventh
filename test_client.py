@@ -1,14 +1,14 @@
 
 import asyncio
 
-from quickapi.tcp import TcpClient
+from quickapi.tcp import Client
 
 async def run_demo():
     host = "127.0.0.1"
     port = 8080
 
     async def client_task(msg: str):
-        async with TcpClient(host, port) as client:
+        async with Client(host, port) as client:
             await client.send(msg + "\n")
             data = await client.receive()
             print("Client received:", data.rstrip())

@@ -9,8 +9,8 @@ from typing import Awaitable, Callable
 import attrs
 
 __all__ = [
-    "TcpClient",
-    "TcpServer",
+    "Client",
+    "Server",
 ]
 
 
@@ -58,7 +58,7 @@ class Connection(ContextManager):
 
 
 @attrs.frozen
-class TcpClient(ContextManager):
+class Client(ContextManager):
     host: str
     port: int
     timeout: float | None = None
@@ -71,7 +71,7 @@ class TcpClient(ContextManager):
         socket.setblocking(False)
         return socket
 
-    async def __aenter__(self) -> "TcpClient":
+    async def __aenter__(self) -> "Client":
         try:
             connect = self._loop.sock_connect(self.socket, (self.host, self.port))
             if self.timeout is not None:
@@ -108,7 +108,7 @@ async def default_handler(connection: Connection) -> None:
 
 
 @attrs.define
-class TcpServer(ContextManager):
+class Server(ContextManager):
     host: str = "127.0.0.1"
     port: int = 0
     backlog: int = 100
@@ -138,7 +138,7 @@ class TcpServer(ContextManager):
             while True:
                 await asyncio.sleep(3600)
 
-    async def __aenter__(self) -> "TcpServer":
+    async def __aenter__(self) -> "Server":
         self._accept_task = self._loop.create_task(self._accept_loop())
         return self
 

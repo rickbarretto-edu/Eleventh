@@ -1,10 +1,10 @@
 
 import asyncio
 
-from quickapi.tcp import TcpServer
+from quickapi.tcp import Server
 
 async def run_demo():
-    async with TcpServer("127.0.0.1", 8080) as server:
+    async with Server("127.0.0.1", 8080) as server:
         print(f"Server listening on {server.address}")
         await server.forever()
 
