@@ -3,10 +3,8 @@ import asyncio
 from quickapi.tcp import Client
 
 async def listen(client: Client):
-    while True:
-        if not (msg := await client.receive()):
-            break
-        print(msg)
+    while (message := await client.receive()):
+        print(message)
 
 async def talk(client: Client):
     loop = asyncio.get_event_loop()
