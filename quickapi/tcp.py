@@ -72,6 +72,9 @@ class Client(ContextManager):
     @classmethod
     def to_localhost(cls, at: int) -> Self:
         return cls.to("localhost", at)
+    
+    def with_timeout(self, of: float) -> Self:
+        return attrs.evolve(self, timeout=of)
 
     @cached_property
     def socket(self) -> Socket:
