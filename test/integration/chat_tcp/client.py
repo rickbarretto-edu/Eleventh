@@ -12,7 +12,8 @@ async def talk(client: Client):
         msg = await loop.run_in_executor(None, input, "")
         await client.send(msg)
 
-async def main():
+
+async def open_chat_group():
     async with Client.to_localhost(at=5000) as client:
         print("Connected to chat server.")
         await asyncio.gather(
@@ -21,4 +22,4 @@ async def main():
         )
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(open_chat_group())
