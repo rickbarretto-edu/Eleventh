@@ -127,6 +127,17 @@ class Server(ContextManager):
     _client_tasks: set[asyncio.Task] = set()
     _accept_task: asyncio.Task | None = None
 
+    @classmethod
+    def at(cls, host: str, port: int) -> Self:
+        return cls(host=host, port=port)
+
+    @classmethod
+    def localhost_at(cls, port: int) -> Self:
+        return cls.at("localhost", port)
+    
+    def handles(self, action: Handler) -> Self:
+        return attrs.evolve(self, handles=action)
+
     @cached_property
     def socket(self) -> Socket:
         socket = Socket(socket_api.AF_INET, socket_api.SOCK_STREAM)
