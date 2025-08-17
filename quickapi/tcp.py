@@ -132,7 +132,7 @@ class Server(ContextManager):
         return cls(host=host, port=port)
 
     @classmethod
-    def localhost_at(cls, port: int) -> Self:
+    def local_at(cls, port: int) -> Self:
         return cls.at("localhost", port)
     
     def handles(self, action: Handler) -> Self:
