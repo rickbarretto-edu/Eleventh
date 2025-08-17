@@ -2,23 +2,25 @@ import asyncio
 
 from quickapi.tcp import Server, Connection
 
-clients: set[Connection] = set()
+Chat = Connection
 
-async def chat(conn: Connection) -> None:
-    async with conn:
-        clients.add(conn)
-        print(f"[+] {conn.address} connected")
+clients: set[Chat] = set()
+
+async def chat(current: Connection) -> None:
+    async with current:
+        clients.add(current)
+        print(f"[+] {current.address} connected")
         try:
             while True:
-                if not (msg := await conn.receive()):
+                if not (msg := await current.receive()):
                     break
                 # Broadcast to others
                 for c in clients:
-                    if c is not conn:
-                        await c.send(f"{conn.address}: {msg}")
+                    if c is not current:
+                        await c.send(f"{current.address}: {msg}")
         finally:
-            clients.remove(conn)
-            print(f"[-] {conn.address} disconnected")
+            clients.remove(current)
+            print(f"[-] {current.address} disconnected")
 
 async def main():
     async with Server.local_at(port=5000).handles(chat) as server:
