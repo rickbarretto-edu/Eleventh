@@ -15,7 +15,7 @@ async def talk(client: Client):
         await client.send(msg)
 
 async def main():
-    async with Client("127.0.0.1", 5000) as client:
+    async with Client.to_localhost(at=5000) as client:
         print("Connected to chat server.")
         await asyncio.gather(
             listen(client),
