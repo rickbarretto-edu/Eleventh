@@ -1,24 +1,31 @@
 import asyncio
 
+import attrs
+
 from quickapi.tcp import Client
 
-async def listen(client: Client):
-    while (message := await client.receive()):
-        print(message)
+@attrs.define
+class Chat:
+    client: Client
 
-async def talk(client: Client):
-    loop = asyncio.get_event_loop()
-    while True:
-        msg = await loop.run_in_executor(None, input, "")
-        await client.send(msg)
+    async def listen(self) -> None:
+        while (message := await self.client.receive()):
+            print(message)
+
+    async def talk(self):
+        loop = asyncio.get_event_loop()
+        while True:
+            message = await loop.run_in_executor(None, input, "")
+            await self.client.send(message)
 
 
 async def open_chat_group():
     async with Client.to_localhost(at=5000) as client:
         print("Connected to chat server.")
+        chat = Chat(client)
         await asyncio.gather(
-            listen(client),
-            talk(client),
+            chat.listen(),
+            chat.talk(),
         )
 
 if __name__ == "__main__":
