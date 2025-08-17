@@ -1,4 +1,5 @@
 import asyncio
+import contextlib as ctx
 
 from quickapi.tcp import Server, Connection
 
@@ -23,13 +24,12 @@ async def broadcast_others(self: Chat, message: str):
 async def chat(current: Chat) -> None:
     async with current:
         connect(current)
-        try:
-            while True:
-                if not (msg := await current.receive()):
-                    break
-                await broadcast_others(current, msg)
-        finally:
-            disconnect(current)
+
+        with ctx.suppress(Exception):
+            while (message := await current.receive()):
+                await broadcast_others(current, message)
+
+        disconnect(current)
 
 
 async def main():
