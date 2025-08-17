@@ -112,8 +112,8 @@ class Server(ContextManager):
     host: str = "127.0.0.1"
     port: int = 0
     backlog: int = 100
+    _handler: Handler = attrs.field(default=default_handler, alias="handles")
 
-    _handler: Handler = default_handler
     _loop: EventLoop = attrs.field(factory=asyncio.get_event_loop)
 
     _client_tasks: set[asyncio.Task] = set()

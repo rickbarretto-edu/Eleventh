@@ -4,7 +4,7 @@ from quickapi.tcp import Server, Connection
 
 clients: set[Connection] = set()
 
-async def chat_handler(conn: Connection) -> None:
+async def chat(conn: Connection) -> None:
     async with conn:
         clients.add(conn)
         print(f"[+] {conn.address} connected")
@@ -21,8 +21,7 @@ async def chat_handler(conn: Connection) -> None:
             print(f"[-] {conn.address} disconnected")
 
 async def main():
-    async with Server(host="127.0.0.1", port=5000) as server:
-        server._handler = chat_handler
+    async with Server(host="127.0.0.1", port=5000, handles=chat) as server:
         print(f"Server running on {server.address}")
         await server.forever()
 
