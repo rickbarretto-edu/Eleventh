@@ -4,7 +4,7 @@ import asyncio
 import socket as socket_api
 import contextlib as ctx
 from functools import cached_property
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Self
 
 import attrs
 
@@ -48,7 +48,7 @@ class Connection(ContextManager):
     async def send(self, data: str) -> None:
         await self._loop.sock_sendall(self.socket, data.encode())
 
-    async def __aenter__(self) -> "Connection":
+    async def __aenter__(self) -> Self:
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
@@ -71,7 +71,7 @@ class Client(ContextManager):
         socket.setblocking(False)
         return socket
 
-    async def __aenter__(self) -> "Client":
+    async def __aenter__(self) -> Self:
         try:
             connect = self._loop.sock_connect(self.socket, (self.host, self.port))
             if self.timeout is not None:
@@ -138,7 +138,7 @@ class Server(ContextManager):
             while True:
                 await asyncio.sleep(3600)
 
-    async def __aenter__(self) -> "Server":
+    async def __aenter__(self) -> Self:
         self._accept_task = self._loop.create_task(self._accept_loop())
         return self
 
