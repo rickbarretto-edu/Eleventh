@@ -6,7 +6,7 @@ Chat = Connection
 
 clients: set[Chat] = set()
 
-async def chat(current: Connection) -> None:
+async def chat(current: Chat) -> None:
     async with current:
         clients.add(current)
         print(f"[+] {current.address} connected")
