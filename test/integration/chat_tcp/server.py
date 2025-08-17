@@ -21,7 +21,7 @@ async def chat(conn: Connection) -> None:
             print(f"[-] {conn.address} disconnected")
 
 async def main():
-    async with Server(host="127.0.0.1", port=5000, handles=chat) as server:
+    async with Server.local_at(port=5000).handles(chat) as server:
         print(f"Server running on {server.address}")
         await server.forever()
 
