@@ -85,10 +85,10 @@ class Client(ContextManager):
     async def __aenter__(self) -> Self:
         try:
             connect = self._loop.sock_connect(self.socket, (self.host, self.port))
-            if self.timeout is not None:
-                await asyncio.wait_for(connect, self.timeout)
-            else:
+            if self.timeout:
                 await connect
+            else:
+                await asyncio.wait_for(connect, self.timeout)
         except Exception:
             with ctx.suppress(OSError):
                 self.socket.close()
