@@ -65,6 +65,14 @@ class Client(ContextManager):
 
     _loop: EventLoop = attrs.field(factory=asyncio.get_event_loop)
 
+    @classmethod
+    def to(cls, host: str, at: int) -> Self:
+        return cls(host=host, port=at)
+
+    @classmethod
+    def to_localhost(cls, at: int) -> Self:
+        return cls.to("localhost", at)
+
     @cached_property
     def socket(self) -> Socket:
         socket = Socket(socket_api.AF_INET, socket_api.SOCK_STREAM)
