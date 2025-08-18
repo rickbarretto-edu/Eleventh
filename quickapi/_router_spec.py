@@ -67,3 +67,38 @@ async def test_not_found():
 
     assert response.status == Status.NotFound
     assert response.body.content == "404 Not Found"
+
+
+@pytest.mark.asyncio
+async def test_merged_routes():
+    players = Routes()
+
+    @players.get("/player/007")
+    async def get_player(req):
+        return Response(Status.Ok, body=PlainText("James Bond"))
+
+    missions = Routes()
+
+    @missions.put("/mission/1")
+    async def new_mission(req):
+        return Response(Status.Ok, body=PlainText("Mission Created!"))
+
+    app = players | missions
+
+    # Test player endpoint
+    player_request = Request(Method("GET"), Path("/player/007"))
+    player_response = await app(player_request)
+    assert player_response.status == Status.Ok
+    assert player_response.body.content == "James Bond"
+
+    # Test mission endpoint
+    mission_request = Request(Method("PUT"), Path("/mission/1"))
+    mission_response = await app(mission_request)
+    assert mission_response.status == Status.Ok
+    assert mission_response.body.content == "Mission Created!"
+
+    # Test Missing endpoint
+    req_missing = Request(Method("GET"), Path("/missing"))
+    resp_missing = await app(req_missing)
+    assert resp_missing.status == Status.NotFound
+    assert resp_missing.body.content == "404 Not Found"
