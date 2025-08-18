@@ -2,7 +2,7 @@ import pytest
 
 from quickapi.rtp.request import Request, Method, Path
 from quickapi.rtp.response import Response, Status, PlainText
-from quickapi.rtp.router import Endpoints, Routes
+from quickapi.router import Endpoints, Routes
 
 
 @pytest.mark.asyncio
