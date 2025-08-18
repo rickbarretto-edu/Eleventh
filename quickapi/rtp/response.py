@@ -11,11 +11,19 @@ class Response:
 
     def __str__(self) -> str:
         return "\n".join([
-            f"RTP {self.status}",
-            f"size: {len(self.body)}",
+            "{version} {code} {reason}",
+            "size: {size}",
+            "type: {type}",
             "",
-            f"{self.body}"
-        ])
+            "{body}"
+        ]).format(
+            version="RTP/1.0",
+            code=self.status.code,
+            reason=self.status.reason,
+            size=len(self.body),
+            type=self.body.type,
+            body=self.body,
+        )
 
 
 class Status(enum.Enum, tuple):

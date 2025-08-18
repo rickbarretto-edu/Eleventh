@@ -12,12 +12,19 @@ class Request:
 
     def __str__(self) -> str:
         return "\n".join([
-            f"{self.method} {self.path} RTP",
-            f"size: {len(self.body)}",
-            f"type: {self.body.type}"
+            "{method} {path} {version}",
+            "size: {size}",
+            "type: {type}"
             "",
-            str(self.body)
-        ])
+            "{body}"
+        ]).format(
+            version="RTP/1.0",
+            method=self.method,
+            path=self.path,
+            size=len(self.body),
+            type=self.body.type,
+            body=self.body,
+        )
 
 @attrs.frozen
 class Path:
