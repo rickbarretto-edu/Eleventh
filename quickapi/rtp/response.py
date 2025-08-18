@@ -11,9 +11,8 @@ class Response:
 
     def __str__(self) -> str:
         return "\n".join([
-            str(self.status),
+            f"RTP {self.status}",
             f"size: {len(self.body)}",
-            "",
             "",
             f"{self.body}"
         ])
@@ -42,6 +41,7 @@ class Status(enum.Enum, tuple):
 @attrs.frozen
 class Body:
     content: str
+    type: str
 
     @property
     def bytes(self) -> int:
@@ -58,13 +58,29 @@ class Body:
 
 
 class Html(Body):
-    pass
+    content: str
+
+    @property
+    def type(self) -> str:
+        return "html"
 
 class Json(Body):
-    pass
+    content: str
+
+    @property
+    def type(self) -> str:
+        return "json"
 
 class PlainText(Body):
-    pass
+    content: str
+
+    @property
+    def type(self) -> str:
+        return "text"
 
 class Xml(Body):
-    pass
+    content: str
+
+    @property
+    def type(self) -> str:
+        return "xml"

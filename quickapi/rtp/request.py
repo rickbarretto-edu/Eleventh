@@ -12,9 +12,9 @@ class Request:
 
     def __str__(self) -> str:
         return "\n".join([
-            f"{self.method} {self.path}",
-            f"size: {len(self.body)}"
-            "",
+            f"{self.method} {self.path} RTP",
+            f"size: {len(self.body)}",
+            f"type: {self.body.type}"
             "",
             str(self.body)
         ])
@@ -30,6 +30,7 @@ class Method(enum.StrEnum):
 @attrs.frozen
 class Body:
     content: str
+    type: str
 
     @property
     def bytes(self) -> int:
@@ -46,10 +47,22 @@ class Body:
 
 
 class Json(Body):
-    pass
+    content: str
+
+    @property
+    def type(self) -> str:
+        return "json"
 
 class PlainText(Body):
-    pass
+    content: str
+
+    @property
+    def type(self) -> str:
+        return "text"
 
 class Xml(Body):
-    pass
+    content: str
+
+    @property
+    def type(self) -> str:
+        return "xml"
