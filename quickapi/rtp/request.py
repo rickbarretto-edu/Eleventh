@@ -30,6 +30,9 @@ class Request:
 class Path:
     value: str
 
+    def __str__(self) -> str:
+        return self.value
+
 class Method(enum.StrEnum):
     Get = "GET"
     Post = "POST"
