@@ -1,5 +1,6 @@
 from __future__ import annotations
 import enum
+from typing import Final, Self
 
 import attrs
 
@@ -33,9 +34,18 @@ class Path:
     def __str__(self) -> str:
         return self.value
 
-class Method(enum.StrEnum):
-    Get = "GET"
-    Post = "POST"
+
+class _MethodMeta(type):
+    def __getattr__(cls, name: str) -> "Method":
+        return cls(name)
+
+
+class Method(metaclass=_MethodMeta):
+    def __init__(self, value: str) -> None:
+        self.value: Final[str] = value.upper()
+
+    def __str__(self) -> str:
+        return self.value
 
 @attrs.frozen
 class Body:

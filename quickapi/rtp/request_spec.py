@@ -56,11 +56,6 @@ def test_path():
 
 
 def test_method():
-    assert "GET" == Method.Get
-    assert "POST" == Method.Post
-
-    assert "GET" == Method.Get.value
-    assert "POST" == Method.Post.value
-
-    assert "GET" == str(Method.Get)
+    assert "GET" == str(Method.get)
     assert "POST" == str(Method.Post)
+    assert "BUY" == str(Method("Buy"))
