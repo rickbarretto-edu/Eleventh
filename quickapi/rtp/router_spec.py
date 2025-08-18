@@ -1,4 +1,3 @@
-import asyncio
 import pytest
 
 from quickapi.rtp.request import Request, Method, Path
@@ -7,7 +6,7 @@ from quickapi.rtp.router import Endpoints, Routes
 
 
 @pytest.mark.asyncio
-async def test_endpoints_add_and_of():
+async def test_manual_routing():
     endpoints = Endpoints()
 
     async def sample_action(req):
@@ -27,7 +26,7 @@ async def test_endpoints_add_and_of():
 
 
 @pytest.mark.asyncio
-async def test_routes_decorator_and_call():
+async def test_at_routing():
     endpoints = Endpoints()
     routes = Routes(endpoints)
 
@@ -37,12 +36,13 @@ async def test_routes_decorator_and_call():
 
     request = Request(Method.GET, Path("/hello"))
     response = await routes(request)
+
     assert response.status == Status.Ok
     assert response.body.content == "hello"
 
 
 @pytest.mark.asyncio
-async def test_routes_dynamic_method():
+async def test_dynamic_routing():
     endpoints = Endpoints()
     routes = Routes(endpoints)
 
@@ -52,16 +52,18 @@ async def test_routes_dynamic_method():
 
     request = Request(Method.Post, Path("/submit"))
     response = await routes(request)
+
     assert response.status == Status.Ok
     assert response.body.content == "submitted"
 
 
 @pytest.mark.asyncio
-async def test_routes_not_found():
+async def test_not_found():
     endpoints = Endpoints()
     routes = Routes(endpoints)
 
     request = Request(Method.Get, Path("/missing"))
     response = await routes(request)
+
     assert response.status == Status.NotFound
     assert response.body.content == "404 Not Found"
