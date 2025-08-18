@@ -17,3 +17,9 @@ dependencies = [
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+python_files = "*_spec.py"
+python_classes = "Describe*"
+python_functions = ["test_*", "it_*"]
