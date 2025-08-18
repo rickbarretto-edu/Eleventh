@@ -54,22 +54,13 @@ class Body:
 
 
 class Json(Body):
-    content: str
-
-    @property
-    def type(self) -> str:
-        return "json"
+    def __init__(self, content: str):
+        super().__init__(content, "json")
 
 class PlainText(Body):
-    content: str
-
-    @property
-    def type(self) -> str:
-        return "text"
+    def __init__(self, content: str):
+        super().__init__(content, "text")
 
 class Xml(Body):
-    content: str
-
-    @property
-    def type(self) -> str:
-        return "xml"
+    def __init__(self, content: str):
+        super().__init__(content, "xml")

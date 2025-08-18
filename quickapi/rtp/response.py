@@ -66,29 +66,18 @@ class Body:
 
 
 class Html(Body):
-    content: str
-
-    @property
-    def type(self) -> str:
-        return "html"
+    def __init__(self, content: str):
+        super().__init__(content, "html")
 
 class Json(Body):
-    content: str
-
-    @property
-    def type(self) -> str:
-        return "json"
+    def __init__(self, content: str):
+        super().__init__(content, "json")
 
 class PlainText(Body):
-    content: str
+    def __init__(self, content: str):
+        super().__init__(content, "text")
 
-    @property
-    def type(self) -> str:
-        return "text"
-
+@attrs.frozen
 class Xml(Body):
-    content: str
-
-    @property
-    def type(self) -> str:
-        return "xml"
+    def __init__(self, content: str):
+        super().__init__(content, "xml")
