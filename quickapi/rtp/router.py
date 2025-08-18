@@ -2,7 +2,6 @@
 
 
 from typing import Awaitable, Callable
-from weakref import KeyedRef
 import attrs
 
 from quickapi.rtp.request import Request, Method, Path
