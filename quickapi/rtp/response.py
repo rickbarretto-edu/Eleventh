@@ -26,7 +26,7 @@ class Response:
         )
 
 
-class Status(enum.Enum, tuple):
+class Status(tuple, enum.Enum):
     Ok       = (200, "Ok")
     NotFound = (400, "Not Found")
 
