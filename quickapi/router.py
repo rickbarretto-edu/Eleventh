@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import Awaitable, Callable, Self
 import attrs
 
+from quickapi.rtp.body import PlainText
 from quickapi.rtp.request import Request, Method, Path
-from quickapi.rtp.response import PlainText, Response, Status
+from quickapi.rtp.response import Response, Status
 
 
 type Action = Callable[[Request], Awaitable[Response]]
