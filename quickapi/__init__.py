@@ -38,7 +38,7 @@ class QuickAPI:
                 to_send = response.alived if request.keep else response
                 await connection.send(str(to_send))
 
-                if response.should_keep:
+                if request.should_keep:
                     await connection.send(str(response.alived))
                 else:
                     await connection.send(str(response))
