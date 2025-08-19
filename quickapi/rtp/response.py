@@ -7,8 +7,9 @@ import attrs
 from quickapi.rtp.body import Body
 
 class Status(tuple, enum.Enum):
-    Ok       = (200, "Ok")
-    NotFound = (400, "Not Found")
+    Ok          = (200, "Ok")
+    NotFound    = (400, "Not Found")
+    ServerError = (500, "Internal Server Error")
 
     @property
     def code(self) -> int:

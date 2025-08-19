@@ -33,7 +33,7 @@ class QuickAPI:
                 try:
                     response = self.app(request)
                 except Exception:
-                    response = Response(Status.500)  
+                    response = Response(Status.ServerError)  
 
                 to_send = response.alived if request.keep else response
                 await connection.send(str(to_send))
