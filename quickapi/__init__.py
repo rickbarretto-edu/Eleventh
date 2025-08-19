@@ -35,13 +35,8 @@ class QuickAPI:
                 except Exception:
                     response = Response(Status.ServerError)  
 
-                to_send = response.alived if request.keep else response
-                await connection.send(str(to_send))
-
-                if request.should_keep:
-                    await connection.send(str(response.alived))
-                else:
-                    await connection.send(str(response))
+                await connection.send(str(response.with_connection(
+                    "close" if request.should_close else "keep-alive"
+                )))
+                if request.should_close:
                     return
-
-
