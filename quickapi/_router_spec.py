@@ -1,7 +1,8 @@
 import pytest
 
+from quickapi.rtp.body import PlainText
 from quickapi.rtp.request import Request, Method, Path
-from quickapi.rtp.response import Response, Status, PlainText
+from quickapi.rtp.response import Response, Status
 from quickapi.router import Endpoints, Routes
 
 
