@@ -1,7 +1,7 @@
-# test_request.py
 import pytest
-from .request import Body, Request, Path, Method, Json, PlainText, Xml
 
+from quickapi.rtp.body import Body, Json, PlainText, Xml
+from quickapi.rtp.request import Request, Path, Method
 
 def test_request_format():
     body = Json(

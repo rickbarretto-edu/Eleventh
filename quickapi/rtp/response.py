@@ -4,27 +4,7 @@ import enum
 
 import attrs
 
-@attrs.frozen
-class Response:
-    status: Status
-    body: Body
-
-    def __str__(self) -> str:
-        return "\n".join([
-            "{version} {code} {reason}",
-            "size: {size}",
-            "type: {type}",
-            "",
-            "{body}"
-        ]).format(
-            version="RTP/1.0",
-            code=self.status.code,
-            reason=self.status.reason,
-            size=len(self.body),
-            type=self.body.type,
-            body=self.body,
-        )
-
+from quickapi.rtp.body import Body
 
 class Status(tuple, enum.Enum):
     Ok       = (200, "Ok")
@@ -47,37 +27,22 @@ class Status(tuple, enum.Enum):
 
 
 @attrs.frozen
-class Body:
-    content: str
-    type: str
-
-    @property
-    def bytes(self) -> int:
-        return len(self.as_bytes())
-
-    def as_bytes(self) -> bytes:
-        return self.content.encode("utf-8", "replace")
+class Response:
+    status: Status
+    body: Body = Body("", "none")
 
     def __str__(self) -> str:
-        return self.content
-
-    def __len__(self) -> int:
-        return self.bytes
-
-
-class Html(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "html")
-
-class Json(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "json")
-
-class PlainText(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "text")
-
-@attrs.frozen
-class Xml(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "xml")
+        return "\n".join([
+            "{version} {code} {reason}",
+            "size: {size}",
+            "type: {type}",
+            "",
+            "{body}"
+        ]).format(
+            version="RTP/1.0",
+            code=self.status.code,
+            reason=self.status.reason,
+            size=len(self.body),
+            type=self.body.type,
+            body=self.body,
+        )

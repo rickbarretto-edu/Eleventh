@@ -3,6 +3,8 @@ from typing import Final
 
 import attrs
 
+from quickapi.rtp.body import Body
+
 @attrs.frozen
 class Path:
     value: str
@@ -34,37 +36,6 @@ class Method(metaclass=_MethodMeta):
 
     def __hash__(self) -> int:
         return hash(self.value)
-
-@attrs.frozen
-class Body:
-    content: str
-    type: str
-
-    @property
-    def bytes(self) -> int:
-        return len(self.as_bytes())
-
-    def as_bytes(self) -> bytes:
-        return self.content.encode("utf-8", "replace")
-
-    def __str__(self) -> str:
-        return self.content
-
-    def __len__(self) -> int:
-        return self.bytes
-
-
-class Json(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "json")
-
-class PlainText(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "text")
-
-class Xml(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "xml")
 
 
 @attrs.frozen

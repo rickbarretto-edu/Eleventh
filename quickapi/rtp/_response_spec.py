@@ -1,6 +1,7 @@
-# test_response.py
 import pytest
-from .response import Body, Response, Status, Html, Json, PlainText, Xml
+
+from quickapi.rtp.body import Body, Html, Json, PlainText, Xml
+from quickapi.rtp.response import Response, Status
 
 
 def test_response_format():
