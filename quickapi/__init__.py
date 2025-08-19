@@ -33,10 +33,11 @@ class QuickAPI:
                 try:
                     response = await self.app(request)
                 except Exception:
-                    response = Response(Status.ServerError)  
+                    response = Response(Status.ServerError)
 
-                await connection.send(str(response.with_connection(
-                    "close" if request.should_close else "keep-alive"
-                )))
-                if request.should_close:
+                if request.should_keep_alive:
+                    await connection.send(str(response.keeping_alive()))
+                else:
+                    await connection.send(str(response))
                     return
+

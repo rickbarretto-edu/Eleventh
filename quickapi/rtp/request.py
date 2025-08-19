@@ -43,12 +43,17 @@ class Request:
     method: Method
     path: Path
     body: Body = Body("", "")
+    keep_alive: bool = False
+
+    def should_keep_alive(self) -> bool:
+        return self.keep_alive
 
     def __str__(self) -> str:
         return "\n".join([
             "{method} {path} {version}",
             "size: {size}",
-            "type: {type}"
+            "type: {type}",
+            "connection: {connection}",
             "",
             "{body}"
         ]).format(
@@ -57,5 +62,6 @@ class Request:
             path=self.path,
             size=len(self.body),
             type=self.body.type,
+            connection="keep" if self.keep_alive else "close",
             body=self.body,
         )

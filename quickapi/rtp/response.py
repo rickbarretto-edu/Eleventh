@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+from typing import Self
 
 import attrs
 
@@ -31,12 +32,17 @@ class Status(tuple, enum.Enum):
 class Response:
     status: Status
     body: Body = Body("", "none")
+    keep_alive: bool = False
+
+    def keeping_alive(self) -> Self:
+        return attrs.evolve(self, keep_alive=True)
 
     def __str__(self) -> str:
         return "\n".join([
             "{version} {code} {reason}",
             "size: {size}",
             "type: {type}",
+            "connection: {connection}",
             "",
             "{body}"
         ]).format(
@@ -45,5 +51,6 @@ class Response:
             reason=self.status.reason,
             size=len(self.body),
             type=self.body.type,
+            connection="keep" if self.keep_alive else "close",
             body=self.body,
         )
