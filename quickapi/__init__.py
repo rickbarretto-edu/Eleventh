@@ -31,7 +31,7 @@ class QuickAPI:
                     return
 
                 try:
-                    response = self.app(request)
+                    response = await self.app(request)
                 except Exception:
                     response = Response(Status.ServerError)  
 
