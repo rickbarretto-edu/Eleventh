@@ -6,6 +6,7 @@ from typing import Self
 import attrs
 
 from quickapi.rtp.body import Body
+from quickapi.rtp.shared import Version
 
 class Status(tuple, enum.Enum):
     Ok          = (200, "Ok")
@@ -33,6 +34,7 @@ class Response:
     status: Status
     body: Body = Body("", "none")
     keep_alive: bool = False
+    version: Version = Version("1.0")
 
     def keeping_alive(self) -> Self:
         return attrs.evolve(self, keep_alive=True)
@@ -46,7 +48,7 @@ class Response:
             "",
             "{body}"
         ]).format(
-            version="RTP/1.0",
+            version=self.version,
             code=self.status.code,
             reason=self.status.reason,
             size=len(self.body),

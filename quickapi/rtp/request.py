@@ -1,9 +1,10 @@
 from __future__ import annotations
-from typing import Final
+from typing import Final, Self
 
 import attrs
 
 from quickapi.rtp.body import Body
+from quickapi.rtp.shared import Version
 
 @attrs.frozen
 class Path:
@@ -44,6 +45,7 @@ class Request:
     path: Path
     body: Body = Body("", "")
     keep_alive: bool = False
+    version: Version = Version("1.0")
 
     def should_keep_alive(self) -> bool:
         return self.keep_alive
@@ -57,7 +59,7 @@ class Request:
             "",
             "{body}"
         ]).format(
-            version="RTP/1.0",
+            version=self.version,
             method=self.method,
             path=self.path,
             size=len(self.body),

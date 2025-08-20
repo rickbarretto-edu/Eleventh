@@ -26,7 +26,7 @@ class QuickAPI:
         async with connection:
             buffer = ""
             while True:
-                request, buffer = await parser.parse_rtp_request(connection, buffer)
+                request, buffer = await parser.parse_request(connection, buffer)
                 if request is None:
                     return
 
