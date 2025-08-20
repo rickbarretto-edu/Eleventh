@@ -1,7 +1,7 @@
 import pytest
 
-from quickapi.rtp.body import Body, Html, Json, PlainText, Xml
-from quickapi.rtp.response import Response, Status
+from quickapi.protocols.generic.body import Body, Html, Json, PlainText, Xml
+from quickapi.protocols.rtp.response import RTPResponse, Status
 
 
 def test_response_format():
@@ -10,7 +10,7 @@ def test_response_format():
         "    Created Protocol: <strong>Rick Transfer Protocol v1.0 (RTP/1.0)</strong>\n"
         "</section>"
     )
-    resp = Response(status=Status.Ok, body=body)
+    resp = RTPResponse(status=Status.Ok, body=body)
 
     expected = (
         "RTP/1.0 200 Ok\n"

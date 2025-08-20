@@ -1,7 +1,9 @@
 import pytest
 
-from quickapi.rtp.body import Body, Json, PlainText, Xml
-from quickapi.rtp.request import Request, Path, Method
+from quickapi.protocols.generic import Body, Json, PlainText, Xml
+from quickapi.protocols.generic.request import Path, Method
+
+from quickapi.protocols.rtp.request import RTPRequest
 
 def test_request_format():
     body = Json(
@@ -11,7 +13,7 @@ def test_request_format():
         '    "abbr": "RTP",\n'
         '}'
     )
-    req = Request(method=Method.Post, path=Path("/protocols/create"), body=body)
+    req = RTPRequest(method=Method.Post, path=Path("/protocols/create"), body=body)
 
     expected = (
         "POST /protocols/create RTP/1.0\n"

@@ -1,12 +1,15 @@
 
 
+import asyncio
 from typing import Awaitable, Callable
 import attrs
 
 from quickapi import tcp
-from quickapi.rtp.request import Request
-from quickapi.rtp.response import Response, Status
-from quickapi.rtp import parser
+from quickapi.router import Routes
+from quickapi.protocols.generic import Html, PlainText
+from quickapi.protocols.generic.request import Request
+from quickapi.protocols.generic.response import Response, Status
+from quickapi.protocols.generic import parser
 
 async def _not_found(req: Request) -> Response:
     return Response(Status.NotFound)
@@ -14,12 +17,16 @@ async def _not_found(req: Request) -> Response:
 
 @attrs.frozen
 class QuickAPI:
-    server: tcp.Server
+    server: tcp.Server = tcp.Server()
     app: Callable[[Request], Awaitable[Response]] = _not_found
+
+    async def serve(self, routes: Routes) -> None:
+        await attrs.evolve(self, app=routes).forever()
 
     async def forever(self) -> None:
         async with self.server.handles(self._connection) as server:
-            print(f"Listening on {self.server.address}")
+            host, port = self.server.address
+            print(f"Listening on rtp://{host}:{port}")
             await server.forever()
 
     async def _connection(self, connection: tcp.Connection) -> None:
@@ -40,4 +47,3 @@ class QuickAPI:
                 else:
                     await connection.send(str(response))
                     return
-

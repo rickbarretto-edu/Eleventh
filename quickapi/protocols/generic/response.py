@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import abc
 import enum
 from typing import Self
 
 import attrs
 
-from quickapi.rtp.body import Body
-from quickapi.rtp.shared import Version
+from quickapi.protocols.generic.body import Body
+from quickapi.protocols.generic.shared import Version
 
 class Status(tuple, enum.Enum):
     Ok          = (200, "Ok")
@@ -30,29 +31,14 @@ class Status(tuple, enum.Enum):
 
 
 @attrs.frozen
-class Response:
+class Response(abc.ABC):
     status: Status
-    body: Body = Body("", "none")
-    keep_alive: bool = False
-    version: Version = Version("1.0")
+    body: Body
+    keep_alive: bool
+    version: Version
 
     def keeping_alive(self) -> Self:
         return attrs.evolve(self, keep_alive=True)
 
     def __str__(self) -> str:
-        return "\n".join([
-            "{version} {code} {reason}",
-            "size: {size}",
-            "type: {type}",
-            "connection: {connection}",
-            "",
-            "{body}"
-        ]).format(
-            version=self.version,
-            code=self.status.code,
-            reason=self.status.reason,
-            size=len(self.body),
-            type=self.body.type,
-            connection="keep" if self.keep_alive else "close",
-            body=self.body,
-        )
+        raise NotImplemented

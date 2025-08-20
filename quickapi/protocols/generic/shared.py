@@ -1,11 +1,10 @@
-
-
+import abc
 import attrs
 
 
 @attrs.frozen
-class Version:
+class Version(abc.ABC):
     number: str
 
     def __str__(self) -> str:
-        return f"RTP/{self.number}"
+        raise NotImplemented
