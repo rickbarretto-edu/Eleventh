@@ -1,9 +1,9 @@
 
 
 from quickapi import tcp
-from quickapi.rtp.body import Body
-from quickapi.rtp.request import Method, Path, Request
-from quickapi.rtp.shared import Version
+from quickapi.protocols.generic.body import Body
+from quickapi.protocols.generic.request import Method, Path, Request
+from quickapi.protocols.rtp.request import RTPRequest
 
 
 class EmptyMessage(ValueError):
@@ -76,39 +76,12 @@ async def scan_large_body(connection: tcp.Connection, buffer: bytes, size: int) 
     return split_scannnig(b"".join(chunks), size)
 
 
+type Version = str
+
 def parse_request_top(line: str) -> tuple[Method, Path, Version]:
     try:
         method, path, version = line.split(" ", 2)
-        return Method(method), Path(path), Version(version.split("/", 1)[1])
+        return Method(method), Path(path), version.split("/", 1)[1]
     except ValueError:
         raise MalformedMessage(f"Syntax error at: {line}") from ValueError
-
-
-async def parse_request(connection: tcp.Connection, buffer: str) -> tuple[Request | None, str]:
-    head, tail = await scan_transference(connection, buffer)
-
-    if head is None:
-        return None, tail
-    
-    if not (lines := head.split("\r\n")):
-        raise EmptyMessage
-    
-    method, path, version = parse_request_top(lines[0])
-    metadata: dict[str, str] = scan_metadata(lines[:1])
-    body_size: int = int(metadata["size"])
-    body_type: str = metadata["type"]
-
-    if body_size > 0:
-        body, remainder = await scan_body(connection, tail, body_size)
-    else:
-        body, remainder = "", tail
-
-    return Request(
-        method=method,
-        path=path,
-        version=version,
-        body=Body(body, body_type)
-    ), remainder
-
-    
 
