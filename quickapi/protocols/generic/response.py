@@ -30,7 +30,6 @@ class Status(tuple, enum.Enum):
         return f"{self.code} {self.reason}"
 
 
-@attrs.frozen
 class Response(abc.ABC):
     status: Status
     body: Body
