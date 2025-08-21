@@ -1,19 +1,14 @@
-
-
-import asyncio
 from typing import Awaitable, Callable
 import attrs
 
 from quickapi import tcp
-from quickapi.protocols.http.response import HTTPResponse
+from quickapi.http.request import parse as request_parse
+from quickapi.http.response import Response, Status
+from quickapi.http.request import Request
 from quickapi.router import Routes
-from quickapi.protocols.generic import Html, PlainText
-from quickapi.protocols.generic.request import Request
-from quickapi.protocols.generic.response import Response, Status
-from quickapi.protocols.http import parser
 
-async def _not_found(req: Request) -> HTTPResponse:
-    return HTTPResponse(Status.NotFound)
+async def _not_found(req: Request) -> Response:
+    return Response(Status.NotFound)
 
 
 @attrs.frozen
@@ -34,14 +29,14 @@ class QuickAPI:
         async with connection:
             buffer = ""
             while True:
-                request, buffer = await parser.parse_http_request(connection, buffer)
+                request, buffer = await request_parse.from_connection(connection, buffer)
                 if request is None:
                     return
 
                 try:
                     response = await self.app(request)
                 except Exception:
-                    response = HTTPResponse(Status.ServerError)
+                    response = Response(Status.ServerError)
 
                 if request.should_keep_alive:
                     await connection.send(str(response.keeping_alive()))
