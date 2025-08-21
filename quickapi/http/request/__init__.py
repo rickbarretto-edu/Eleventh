@@ -1,3 +1,4 @@
+from typing import Self
 import attrs
 
 from quickapi.http.body import Body
@@ -23,8 +24,15 @@ class Request:
     keep_alive: bool = False
 
     @property
+    def should_keep_alive(self) -> bool:
+        return self.keep_alive
+
+    @property
     def version(self) -> Version:
         return Version("1.0")
+
+    def keeping_alive(self) -> Self:
+        return attrs.evolve(self, keep_alive=True)
 
     def __str__(self) -> str:
         headers: list[str] = [

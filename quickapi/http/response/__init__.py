@@ -1,3 +1,4 @@
+from typing import Self
 import attrs
 
 from quickapi.http.body import Body
@@ -10,6 +11,13 @@ class Response:
     status: Status
     body: Body = Body.empty()
     keep_alive: bool = False
+
+    @property
+    def should_keep_alive(self) -> bool:
+        return self.keep_alive
+    
+    def keeping_alive(self) -> Self:
+        return attrs.evolve(self, keep_alive=True)
 
     version: Version = attrs.field(default=Version("1.1"), init=False)
 
