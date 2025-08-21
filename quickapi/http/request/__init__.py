@@ -1,12 +1,15 @@
 import attrs
 
+from quickapi.http.body import Body
 from quickapi.http.request.method import Method
+from quickapi.http.request.parser import from_connection
 from quickapi.http.request.target import Target
 from quickapi.http.version import Version
-from quickapi.http.body import Body
+
 
 __all__ = [
     "Method",
+    "from_connection",
     "Request",
     "Target",
 ]
