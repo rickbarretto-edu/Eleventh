@@ -6,7 +6,7 @@ import attrs
 
 
 @attrs.frozen
-class HTTPMethod:
+class Method:
     value: str = attrs.field(converter=str.upper)
 
     def __str__(self) -> str:
