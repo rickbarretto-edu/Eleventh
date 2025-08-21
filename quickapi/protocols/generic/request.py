@@ -40,7 +40,6 @@ class Method(metaclass=_MethodMeta):
         return hash(self.value)
 
 
-@attrs.frozen
 class Request(abc.ABC):
     method: Method
     path: Path
