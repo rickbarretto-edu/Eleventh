@@ -1,10 +1,19 @@
+import abc
 import attrs
 
 
 @attrs.frozen
-class Body:
-    content: str
+class MIMEType:
     type: str
+    subtype: str
+
+    def __str__(self) -> str:
+        return f"{self.type}/{self.subtype}"
+
+
+class Body(abc.ABC):
+    content: str
+    mime: MIMEType
 
     @property
     def bytes(self) -> int:
@@ -18,21 +27,3 @@ class Body:
 
     def __len__(self) -> int:
         return self.bytes
-
-
-class Html(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "html")
-
-class Json(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "json")
-
-class PlainText(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "text")
-
-@attrs.frozen
-class Xml(Body):
-    def __init__(self, content: str):
-        super().__init__(content, "xml")
