@@ -12,10 +12,7 @@ class HTTPResponse(Response):
     status: Status
     body: Body = Body("", "")
     keep_alive: bool = False
-
-    @property
-    def version(self) -> HTTPVersion:
-        return HTTPVersion("1.1")
+    version = HTTPVersion("1.1")
 
     def __str__(self) -> str:
         headers: list[str] = [
