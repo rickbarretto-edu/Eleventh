@@ -1,16 +1,20 @@
 from typing import Self
 import attrs
 
-from quickapi.http.body import Body
+from quickapi.http.body import Body, MIMEType
 from quickapi.http.response.status import Status
 from quickapi.http.version import Version
 
 
 @attrs.frozen
 class Response:
-    status: Status
+    status: Status = Status.Ok
     body: Body = Body.empty()
     keep_alive: bool = False
+
+    @classmethod
+    def from_str(cls, content: str, status: Status = Status.Ok) -> Self:
+        return cls(status=status, body=Body(content, MIMEType("text", "plain")))
 
     @property
     def should_keep_alive(self) -> bool:
