@@ -4,7 +4,7 @@ import attrs
 
 @attrs.frozen
 class Version:
-    number: str = "1.1"
+    number: str = "1.0"
 
     @classmethod
     def from_str(cls, content: str) -> Self:
