@@ -1,3 +1,4 @@
+import textwrap
 from typing import Self
 import attrs
 
@@ -11,9 +12,9 @@ class Response:
     content: str = ""
     status: Status = Status.Ok
     mime: MIMEType = MIMEType("text", "plain")
+    version: Version = Version("1.0")
 
-    keep_alive: bool = attrs.field(default=False, init=False)
-    version: Version = attrs.field(default=Version("1.1"), init=False)
+    keep_alive: bool = False
 
     @property
     def body(self) -> Body:
@@ -27,34 +28,27 @@ class Response:
         return attrs.evolve(self, keep_alive=True)
 
     def __str__(self) -> str:
-        headers: list[str] = [
-            "{version} {code} {reason}",
-            "Content-Length: {size}",
+        new_line = "\r\n"
+
+        headers = [
+            "{version} {code} {reason}".format(
+                version=self.version,
+                code=self.status.code,
+                reason=self.status.reason
+            ),
+            "Content-Length: {size}".format(size=len(self.body)),
         ]
 
         if len(self.body) > 0:
-            headers.append("Content-Type: {type}")
+            headers.append(f"Content-Type: {self.mime}; charset=utf-8")
+        headers.append(f"Connection: {'keep-alive' if self.keep_alive else 'close'}")
 
-        headers.append("Connection: {connection}")
-        headers.append("")
-        headers.append("{body}")
-
-        return "\n".join(headers).format(
-            version=self.version,
-            code=self.status.code,
-            reason=self.status.reason,
-            size=len(self.body),
-            type=self.body.mime,
-            connection="keep-alive" if self.keep_alive else "close",
-            body=self.body,
-        )
+        return new_line.join(headers) + (new_line * 2) + str(self.body)
 
 
 @attrs.frozen
 class HtmlResponse(Response):
-    def __init__(self, content: str, status: Status = Status.Ok) -> None:
-        super().__init__(
-            content=content, 
-            status=status, 
-            mime=MIMEType("text", "html")
-        )
+
+    def __attrs_post_init__(self) -> None:
+        object.__setattr__(self, "mime", MIMEType("text", "html"))
+        object.__setattr__(self, "content", textwrap.dedent(self.content).strip())
