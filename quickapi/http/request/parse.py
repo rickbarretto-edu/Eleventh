@@ -49,9 +49,6 @@ async def from_connection(connection: tcp.Connection, buffer: str) -> tuple[Requ
     body_size = int(metadata.get("content-length", "0"))
     body_type = metadata.get("content-type", "")
 
-    if version != Version("1.1"):
-        raise ValueError("QuickAPI supports HTTP/1.1 only")
-
     if body_size > 0:
         body, remainder = await scan.body(connection, tail, body_size)
     else:
@@ -60,5 +57,6 @@ async def from_connection(connection: tcp.Connection, buffer: str) -> tuple[Requ
     return Request(
         method=method,
         target=path,
-        body=Body(body, MIMEType.from_str(body_type))
+        body=Body(body, MIMEType.from_str(body_type)),
+        version=version,
     ), remainder
