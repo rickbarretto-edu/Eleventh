@@ -6,7 +6,7 @@ from quickapi.http.request import Request
 from quickapi.router import Routes
 
 
-async def _demo() -> None:
+async def demo() -> None:
 
     app = Routes()
 
@@ -32,6 +32,6 @@ async def _demo() -> None:
 
 if __name__ == "__main__":
     try:
-        asyncio.run(_demo())
+        asyncio.run(demo())
     except KeyboardInterrupt:
         pass
