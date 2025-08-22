@@ -13,7 +13,7 @@ async def _demo() -> None:
 
     @app.get("/")
     async def root(req: Request) -> Response:
-        resp = HtmlResponse(
+        return HtmlResponse(
             f"""
             <!DOCTYPE html>
             <html>
@@ -23,8 +23,6 @@ async def _demo() -> None:
             </html>
             """
         )
-        print(resp)
-        return resp
 
     @app.post("/echo")
     async def echo(req: Request) -> Response:
