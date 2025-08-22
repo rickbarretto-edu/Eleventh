@@ -19,7 +19,7 @@ class FakeConnection:
 async def test_simple_get():
     buffer = "GET / HTTP/1.0\r\nHost: example.com\r\n\r\n"
     connection = FakeConnection([])
-    request, remainder = await from_connection(connection, buffer)
+    request, remainder = await from_connection(connection, buffer) # pyright: ignore[reportArgumentType]
 
     assert request
     assert str(request.method) == "GET"
@@ -39,7 +39,7 @@ async def test_post_with_body_inline():
         "Hello WorldExtraData"
     )
     connection = FakeConnection([])
-    request, remainder = await from_connection(connection, buffer)
+    request, remainder = await from_connection(connection, buffer) # pyright: ignore[reportArgumentType]
 
     assert request
     assert str(request.method) == "POST"
@@ -58,7 +58,7 @@ async def test_post_with_body_chunks():
         "\r\n"
     )
     connection = FakeConnection(["Hello ", "World ", "and more!"])
-    request, remainder = await from_connection(connection, head)
+    request, remainder = await from_connection(connection, head) # pyright: ignore[reportArgumentType]
     
     assert request
     assert request.body.content == "Hello World and more"
@@ -69,7 +69,7 @@ async def test_post_with_body_chunks():
 async def test_missing_content_length_defaults_zero():
     buffer = "GET /foo HTTP/1.0\r\nHost: test\r\n\r\nSOMEEXTRA"
     connection = FakeConnection([])
-    request, remainder = await from_connection(connection, buffer)
+    request, remainder = await from_connection(connection, buffer) # pyright: ignore[reportArgumentType]
     
     assert request
     assert request.body.content == ""
@@ -81,7 +81,7 @@ async def test_invalid_request_line():
     bad_request = "BADREQUEST\r\nHost: x\r\n\r\n"
     connection = FakeConnection([])
     with pytest.raises(ValueError):
-        await from_connection(connection, bad_request)
+        await from_connection(connection, bad_request) # pyright: ignore[reportArgumentType]
 
 
 @pytest.mark.asyncio
@@ -89,4 +89,4 @@ async def test_unsupported_version():
     bad_request = "GET / HTTP/2.0\r\nHost: x\r\n\r\n"
     connection = FakeConnection([])
     with pytest.raises(ValueError):
-        await from_connection(connection, bad_request)
+        await from_connection(connection, bad_request) # pyright: ignore[reportArgumentType]
