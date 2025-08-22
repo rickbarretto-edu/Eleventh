@@ -2,8 +2,11 @@ from typing import Awaitable, Callable
 import attrs
 
 from quickapi import tcp
+from quickapi.http.body import Body, MIMEType
 from quickapi.http.request import Request
 from quickapi.http.request import parse as request_parse
+from quickapi.http.request.method import Method
+from quickapi.http.request.target import Target
 from quickapi.http.response import HtmlResponse, Response, Status
 from quickapi.router import Routes
 
@@ -37,7 +40,7 @@ class QuickAPI:
         async with connection:
             buffer = ""
             while True:
-                request, buffer = await request_parse.from_connection(connection, buffer)
+                request, buffer = await _read_http_request(connection, buffer)
                 if request is None:
                     return
 

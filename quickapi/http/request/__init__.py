@@ -17,7 +17,7 @@ __all__ = [
 @attrs.frozen
 class Request:
     method: Method
-    path: Target
+    target: Target
     body: Body = Body.empty()
     keep_alive: bool = False
 
@@ -47,7 +47,7 @@ class Request:
 
         return "\n".join(headers).format(
             method=self.method,
-            path=self.path,
+            path=self.target,
             version=self.version,
             size=len(self.body),
             type=self.body.mime,

@@ -45,7 +45,7 @@ class Routes:
     async def __call__(self, request: Request) -> Response:
         print(self.endpoints.each)
         try:
-            action = self.endpoints.of(request.method, request.path)
+            action = self.endpoints.of(request.method, request.target)
             return await action(request)
         except KeyError:
             return Response("404, Not Found!", status=Status.NotFound)

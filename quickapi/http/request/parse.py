@@ -52,7 +52,7 @@ async def from_connection(connection: tcp.Connection, buffer: str) -> tuple[Requ
 
     return Request(
         method=method,
-        path=path,
+        target=path,
         body=Body(body, MIMEType.from_str(body_type))
     ), remainder
     

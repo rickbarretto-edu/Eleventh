@@ -1,6 +1,6 @@
 import asyncio
 
-from quickapi import QuickAPI
+from quickapi import QuickAPI, tcp
 from quickapi.http.response import HtmlResponse, Response
 from quickapi.http.request import Request
 from quickapi.router import Routes
@@ -12,11 +12,12 @@ async def _demo() -> None:
 
     @app.get("/")
     async def root(req: Request) -> Response:
+        print(req)
         return HtmlResponse(
             f"""
             <h1>Hello, FastAPI-like Server</h1>
             <p>Method: {req.method}</p>
-            <p>Target: {req.path}</p>
+            <p>Target: {req.target}</p>
             """
         )
 
@@ -24,7 +25,9 @@ async def _demo() -> None:
     async def echo(req: Request) -> Response:
         return Response(f"You said {req.body}")
 
-    await QuickAPI().serve(app)
+    await QuickAPI(
+        tcp.Server(port=8080)
+    ).serve(app)
 
 
 if __name__ == "__main__":
