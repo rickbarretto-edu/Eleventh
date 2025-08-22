@@ -20,14 +20,11 @@ class Request:
     target: Target
     body: Body = Body.empty()
     keep_alive: bool = False
+    version: Version = Version("1.1")
 
     @property
     def should_keep_alive(self) -> bool:
         return self.keep_alive
-
-    @property
-    def version(self) -> Version:
-        return Version("1.0")
 
     def keeping_alive(self) -> Self:
         return attrs.evolve(self, keep_alive=True)
