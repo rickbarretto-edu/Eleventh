@@ -40,7 +40,8 @@ class QuickAPI:
         async with connection:
             buffer = ""
             while True:
-                request, buffer = await _read_http_request(connection, buffer)
+                print(buffer)
+                request, buffer = await request_parse.from_connection(connection, buffer)
                 if request is None:
                     return
 

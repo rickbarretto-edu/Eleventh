@@ -7,46 +7,66 @@ __all__ = [
 ]
 
 
-async def frame(connection: tcp.Connection, current_buffer: str):
-    empty_line = "\r\n\r\n"
-    buffer = list(current_buffer)
+async def frame(connection: tcp.Connection, current_buffer: str) -> tuple[str | None, str]:
+    """Scan until the end of the headers.
 
-    while empty_line not in buffer:
+    Returns
+    -------
+        (head: str, tail: str): For complete message.
+        (head: None, buffer: str): For incomplete message.
+    """
+    end_of_header = "\r\n\r\n"
+    buffer = current_buffer
+
+    while end_of_header not in buffer:
         if (chunk := await connection.receive()):
             buffer += chunk
         else:
-            return None, "".join(buffer)
+            return None, buffer
 
-    head, tail = "".join(buffer).split(empty_line, 1)
+    head, tail = buffer.split(end_of_header, 1)
     return head, tail
 
 
-def _to_str_safe(content: bytes) -> str:
-    return content.decode("replace")
-
-
-def _split_scannnig(content: bytes, size: int): 
-    return (
-        _to_str_safe(content[:size]), 
-        _to_str_safe(content[size:])
-    )
+def _split_scanning(content: str, size: int) -> tuple[str, str]:
+    """Split body into (consumed, remainder).
+    
+    Returns
+    -------
+    (consumed: str, remainder: str)
+    """
+    return content[:size], content[size:]
 
 
 async def body(connection: tcp.Connection, prev_buffer: str, size: int) -> tuple[str, str]:
-    buffer: bytes = prev_buffer.encode()
-    if len(buffer) >= size:
-        return _split_scannnig(buffer, size)
+    """Read body of fixed size.
     
+    Returns
+    -------
+    Returns parsed tokens: (consumed, remainder)
+    """
+    buffer = prev_buffer
+    if len(buffer) >= size:
+        return _split_scanning(buffer, size)
+
     return await _large_body(connection, buffer, size)
 
 
-async def _large_body(connection: tcp.Connection, buffer: bytes, size: int) -> tuple[str, str]:
-    chunks: list[bytes] = [buffer]
-    remaining: int = size - len(buffer)
+async def _large_body(connection: tcp.Connection, buffer: str, size: int) -> tuple[str, str]:
+    """Read a body that is larger than the buffer.
     
-    while remaining:
-        if chunk := await connection.receive():
-            chunks.append(chunk.encode())
-            remaining =- 1
+    Returns
+    -------
+    Returns parsed tokens: (consumed, remainder)
+    """
+    chunks: list[str] = [buffer]
+    remaining: int = size - len(buffer)
 
-    return _split_scannnig(b"".join(chunks), size)
+    while remaining > 0:
+        if chunk := await connection.receive():
+            chunks.append(chunk)
+            remaining -= len(chunk)
+        else:
+            break
+
+    return _split_scanning("".join(chunks), size)

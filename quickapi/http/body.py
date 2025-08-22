@@ -8,13 +8,12 @@ class MIMEType:
     subtype: str
 
     @classmethod
-    def from_str(cls, content: str) -> Self:
+    def from_str(cls, content: str) -> Self | None:
         try:
-            type, subtype = content.split("/", 1)
+            type, subtype = content.split("/", 2)
             return cls(type, subtype)
-        except ValueError as error:
-            mime_format = "MIMEType should follow the format `<type>/<subtype>'"
-            raise ValueError(mime_format) from error
+        except:
+            return None
 
     def __str__(self) -> str:
         return f"{self.type}/{self.subtype}"

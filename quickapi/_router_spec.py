@@ -66,7 +66,7 @@ async def test_not_found():
     response = await routes(request)
 
     assert response.status == Status.NotFound
-    assert response.body.content == "404 Not Found"
+    assert response.body.content == "404, Not Found!"
 
 
 @pytest.mark.asyncio
@@ -101,4 +101,4 @@ async def test_merged_routes():
     req_missing = Request(Method("GET"), Target("/missing"))
     resp_missing = await app(req_missing)
     assert resp_missing.status == Status.NotFound
-    assert resp_missing.body.content == "404 Not Found"
+    assert resp_missing.body.content == "404, Not Found!"
