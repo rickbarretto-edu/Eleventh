@@ -13,14 +13,14 @@ async def _demo() -> None:
 
     @app.get("/")
     async def root(req: Request) -> Response:
-        print(req)
         resp = HtmlResponse(
-            f"""<!DOCTYPE html>
-                <html>
-                    <h1>Hello, from QuickAPI!</h1>
-                    <p>Method: <b>{req.method}</b></p>
-                    <p>Target: <b>{req.target}</b></p>
-                </html>
+            f"""
+            <!DOCTYPE html>
+            <html>
+                <h1>Hello, from QuickAPI!</h1>
+                <p>Method: <b>{req.method}</b></p>
+                <p>Target: <b>{req.target}</b></p>
+            </html>
             """
         )
         print(resp)
