@@ -34,7 +34,7 @@ class Request:
 
     def __str__(self) -> str:
         headers: list[str] = [
-            "{method} {path} RTP/{version}",
+            "{method} {path} {version}",
             "Content-Length: {size}",
         ]
 

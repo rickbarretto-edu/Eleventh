@@ -3,6 +3,7 @@ import asyncio
 from quickapi import QuickAPI, tcp
 from quickapi.http.response import HtmlResponse, Response
 from quickapi.http.request import Request
+from quickapi.http.server import HTTPServer
 from quickapi.router import Routes
 
 
@@ -26,7 +27,7 @@ async def _demo() -> None:
         return Response(f"You said {req.body}")
 
     quick = QuickAPI(
-        tcp.Server(port=8080)
+        HTTPServer(port=8080)
     )
     
     await quick.serve(app)

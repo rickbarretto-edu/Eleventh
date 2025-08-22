@@ -8,6 +8,7 @@ from quickapi.http.request import parse as request_parse
 from quickapi.http.request.method import Method
 from quickapi.http.request.target import Target
 from quickapi.http.response import HtmlResponse, Response, Status
+from quickapi.http.server import HTTPServer
 from quickapi.router import Routes
 
 async def _not_found(req: Request) -> Response:
@@ -24,16 +25,15 @@ __all__ = [
 
 @attrs.frozen
 class QuickAPI:
-    server: tcp.Server = tcp.Server()
+    server: HTTPServer = HTTPServer()
     app: Callable[[Request], Awaitable[Response]] = _not_found
 
     async def serve(self, routes: Routes) -> None:
-        await attrs.evolve(self, app=routes).forever()
+        await attrs.evolve(self, app=routes)._forever()
 
-    async def forever(self) -> None:
-        async with self.server.handles(self._connection) as server:
-            host, port = self.server.address
-            print(f"Listening on http://{host}:{port}")
+    async def _forever(self) -> None:
+        async with attrs.evolve(self.server, app=self.app) as server:
+            print("Listening on http://127.0.0.1:8080")
             await server.forever()
 
     async def _connection(self, connection: tcp.Connection) -> None:
