@@ -1,7 +1,7 @@
 import asyncio
 
 from quickapi import QuickAPI
-from quickapi.http.response import HtmlResponse, Response, Status
+from quickapi.http.response import HtmlResponse, Response
 from quickapi.http.request import Request
 from quickapi.router import Routes
 
