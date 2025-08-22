@@ -30,7 +30,7 @@ class QuickAPI:
     async def forever(self) -> None:
         async with self.server.handles(self._connection) as server:
             host, port = self.server.address
-            print(f"Listening on rtp://{host}:{port}")
+            print(f"Listening on http://{host}:{port}")
             await server.forever()
 
     async def _connection(self, connection: tcp.Connection) -> None:
