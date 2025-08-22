@@ -1,6 +1,6 @@
 import asyncio
 
-from quickapi import QuickAPI, tcp
+from quickapi import QuickAPI
 from quickapi.http.response import HtmlResponse, Response
 from quickapi.http.request import Request
 from quickapi.http.server import HTTPServer
@@ -14,13 +14,17 @@ async def _demo() -> None:
     @app.get("/")
     async def root(req: Request) -> Response:
         print(req)
-        return HtmlResponse(
-            f"""
-            <h1>Hello, FastAPI-like Server</h1>
-            <p>Method: {req.method}</p>
-            <p>Target: {req.target}</p>
+        resp = HtmlResponse(
+            f"""<!DOCTYPE html>
+                <html>
+                    <h1>Hello, from QuickAPI!</h1>
+                    <p>Method: <b>{req.method}</b></p>
+                    <p>Target: <b>{req.target}</b></p>
+                </html>
             """
         )
+        print(resp)
+        return resp
 
     @app.post("/echo")
     async def echo(req: Request) -> Response:
