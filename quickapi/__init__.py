@@ -8,7 +8,7 @@ from quickapi.http.request import Request
 from quickapi.router import Routes
 
 async def _not_found(req: Request) -> Response:
-    return Response(Status.NotFound)
+    return Response(status=Status.NotFound)
 
 
 @attrs.frozen
@@ -36,7 +36,7 @@ class QuickAPI:
                 try:
                     response = await self.app(request)
                 except Exception:
-                    response = Response(Status.ServerError)
+                    response = Response(status=Status.ServerError)
 
                 if request.should_keep_alive:
                     await connection.send(str(response.keeping_alive()))

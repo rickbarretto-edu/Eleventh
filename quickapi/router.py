@@ -3,21 +3,20 @@ from __future__ import annotations
 from typing import Awaitable, Callable, Self
 import attrs
 
-from quickapi.rtp.body import PlainText
-from quickapi.rtp.request import Request, Method, Path
-from quickapi.rtp.response import Response, Status
+from quickapi.http.request import Request, Method, Target
+from quickapi.http.response import Response, Status
 
 
 type Action = Callable[[Request], Awaitable[Response]]
 
 @attrs.frozen
 class Endpoints:
-    each: dict[tuple[Method, Path], Action] = attrs.field(factory=dict)
+    each: dict[tuple[Method, Target], Action] = attrs.field(factory=dict)
 
-    def of(self, method: Method, path: Path) -> Action:
+    def of(self, method: Method, path: Target) -> Action:
         return self.each[(method, path)]
     
-    def add(self, method: Method, path: Path, action: Action) -> None:
+    def add(self, method: Method, path: Target, action: Action) -> None:
         self.each[(method, path)] = action
 
     def __or__(self, other: Endpoints) -> Self:
@@ -30,7 +29,7 @@ class Routes:
 
     def at(self, path: str, method: str) -> Callable[[Action], Action]:
         def decorator(func: Action) -> Action:
-            self.endpoints.add(Method(method), Path(path), func)
+            self.endpoints.add(Method(method), Target(path), func)
             return func
         return decorator
 
@@ -49,5 +48,5 @@ class Routes:
             action = self.endpoints.of(request.method, request.path)
             return await action(request)
         except KeyError:
-            return Response(Status.NotFound, body=PlainText("404 Not Found"))
+            return Response("404, Not Found!", status=Status.NotFound)
     

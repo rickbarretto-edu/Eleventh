@@ -1,8 +1,7 @@
 import pytest
 
-from quickapi.rtp.body import PlainText
-from quickapi.rtp.request import Request, Method, Path
-from quickapi.rtp.response import Response, Status
+from quickapi.http.response import Response, Status
+from quickapi.http.request import Request, Method, Target
 from quickapi.router import Endpoints, Routes
 
 
@@ -11,10 +10,10 @@ async def test_manual_routing():
     endpoints = Endpoints()
 
     async def sample_action(req):
-        return Response(Status.Ok, PlainText("ok"))
+        return Response("ok")
 
     method = Method("GET")
-    path = Path("/test")
+    path = Target("/test")
 
 
     endpoints.add(method, path, sample_action)
@@ -33,9 +32,9 @@ async def test_at_routing():
 
     @routes.at("/hello", "GET")
     async def hello_action(req):
-        return Response(Status.Ok, PlainText("hello"))
+        return Response("hello")
 
-    request = Request(Method.GET, Path("/hello"))
+    request = Request(Method.get(), Target("/hello"))
     response = await routes(request)
 
     assert response.status == Status.Ok
@@ -49,9 +48,9 @@ async def test_dynamic_routing():
 
     @routes.post("/submit")
     async def submit_action(req):
-        return Response(Status.Ok, body=PlainText("submitted"))
+        return Response("submitted", Status.Ok)
 
-    request = Request(Method.Post, Path("/submit"))
+    request = Request(Method.post(), Target("/submit"))
     response = await routes(request)
 
     assert response.status == Status.Ok
@@ -63,7 +62,7 @@ async def test_not_found():
     endpoints = Endpoints()
     routes = Routes(endpoints)
 
-    request = Request(Method.Get, Path("/missing"))
+    request = Request(Method.get(), Target("/missing"))
     response = await routes(request)
 
     assert response.status == Status.NotFound
@@ -76,30 +75,30 @@ async def test_merged_routes():
 
     @players.get("/player/007")
     async def get_player(req):
-        return Response(Status.Ok, body=PlainText("James Bond"))
+        return Response("James Bond")
 
     missions = Routes()
 
     @missions.put("/mission/1")
     async def new_mission(req):
-        return Response(Status.Ok, body=PlainText("Mission Created!"))
+        return Response("Mission Created!")
 
     app = players | missions
 
     # Test player endpoint
-    player_request = Request(Method("GET"), Path("/player/007"))
+    player_request = Request(Method("GET"), Target("/player/007"))
     player_response = await app(player_request)
     assert player_response.status == Status.Ok
     assert player_response.body.content == "James Bond"
 
     # Test mission endpoint
-    mission_request = Request(Method("PUT"), Path("/mission/1"))
+    mission_request = Request(Method("PUT"), Target("/mission/1"))
     mission_response = await app(mission_request)
     assert mission_response.status == Status.Ok
     assert mission_response.body.content == "Mission Created!"
 
     # Test Missing endpoint
-    req_missing = Request(Method("GET"), Path("/missing"))
+    req_missing = Request(Method("GET"), Target("/missing"))
     resp_missing = await app(req_missing)
     assert resp_missing.status == Status.NotFound
     assert resp_missing.body.content == "404 Not Found"
