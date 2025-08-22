@@ -8,13 +8,16 @@ from quickapi.http.version import Version
 
 @attrs.frozen
 class Response:
+    content: str = ""
     status: Status = Status.Ok
-    body: Body = Body.empty()
-    keep_alive: bool = False
+    mime: MIMEType = MIMEType("text", "plain")
 
-    @classmethod
-    def from_str(cls, content: str, status: Status = Status.Ok) -> Self:
-        return cls(status=status, body=Body(content, MIMEType("text", "plain")))
+    keep_alive: bool = attrs.field(default=False, init=False)
+    version: Version = attrs.field(default=Version("1.1"), init=False)
+
+    @property
+    def body(self) -> Body:
+        return Body(self.content, self.mime)
 
     @property
     def should_keep_alive(self) -> bool:
@@ -22,8 +25,6 @@ class Response:
     
     def keeping_alive(self) -> Self:
         return attrs.evolve(self, keep_alive=True)
-
-    version: Version = attrs.field(default=Version("1.1"), init=False)
 
     def __str__(self) -> str:
         headers: list[str] = [
@@ -46,4 +47,14 @@ class Response:
             type=self.body.mime,
             connection="keep-alive" if self.keep_alive else "close",
             body=self.body,
+        )
+
+
+@attrs.frozen
+class HtmlResponse(Response):
+    def __init__(self, content: str, status: Status = Status.Ok) -> None:
+        super().__init__(
+            content=content, 
+            status=status, 
+            mime=MIMEType("text", "html")
         )
