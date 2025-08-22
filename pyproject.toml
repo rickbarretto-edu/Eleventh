@@ -1,0 +1,26 @@
+[project]
+name = "eleventh"
+version = "0.1.0"
+description = "Turn-based card game inspired by FIFA's Utimate Team cards and the strategic style of Soccer Manager."
+authors = [
+    {name = "RickBarretto",email = "78623871+RickBarretto@users.noreply.github.com"}
+]
+license = {text = "MPL 2.0"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "attrs (>=25.3.0,<26.0.0)",
+    "pytest (>=8.4.1,<9.0.0)",
+    "pytest-asyncio (>=1.1.0,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+python_files = "*_spec.py"
+python_classes = "Describe*"
+python_functions = ["test_*", "it_*"]

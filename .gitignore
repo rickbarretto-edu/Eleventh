@@ -1,2 +1,13 @@
+# Python related
+*.pyc
+
+# Package Management
+poetry.lock
+
 # Code Editors and IDEs
 .vscode/
+
+# Personal
+.snippet/
+log
+logs/
