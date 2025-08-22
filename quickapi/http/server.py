@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import Awaitable, Callable, Optional, Self
 import attrs
 from quickapi import tcp
@@ -17,26 +18,25 @@ class HTTPServer:
     backlog: int = 100
     app: Callable[[Request], Awaitable[Response]] = not_found
 
-    _tcp: tcp.Server | None = None
+    @cached_property
+    def tcp_server(self) -> tcp.Server:
+        return tcp.Server(self.host, self.port, self.backlog).handles(self._handle_connection)
 
     async def __aenter__(self) -> Self:
-        self._tcp = tcp.Server(self.host, self.port, self.backlog).handles(self._handle_connection)
-        await self._tcp.__aenter__()
+        await self.tcp_server.__aenter__()
         return self
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
-        assert self._tcp is not None
-        await self._tcp.__aexit__(exc_type, exc, tb)
+        await self.tcp_server.__aexit__(exc_type, exc, tb)
 
     async def forever(self) -> None:
-        assert self._tcp is not None
-        await self._tcp.forever()
+        await self.tcp_server.forever()
 
-    async def _handle_connection(self, conn: tcp.Connection) -> None:
-        async with conn:
+    async def _handle_connection(self, connection: tcp.Connection) -> None:
+        async with connection:
             buffer = ""
             while True:
-                request, buffer = await request_parse.from_connection(conn, buffer)
+                request, buffer = await request_parse.from_connection(connection, buffer)
 
                 if request is None:
                     break
@@ -46,7 +46,6 @@ class HTTPServer:
                 except Exception:
                     response = Response("500 Internal Server Error", Status.ServerError)
 
+                await connection.send(str(attrs.evolve(response, keep_alive=response.should_keep_alive)))
                 if response.should_keep_alive:
-                    await conn.send(str(attrs.evolve(response, keep_alive=response.should_keep_alive)))
-                else:
                     break
