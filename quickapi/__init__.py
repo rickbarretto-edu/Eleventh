@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import Awaitable, Callable
 import attrs
 
@@ -25,14 +26,21 @@ __all__ = [
 
 @attrs.frozen
 class QuickAPI:
-    server: HTTPServer = HTTPServer()
+    host: str = "127.0.0.1"
+    port: int = 8080
+    backlog: int = 100
+
     app: Callable[[Request], Awaitable[Response]] = _not_found
+
+    @cached_property
+    def http_server(self) -> HTTPServer:
+        return HTTPServer(host=self.host, port=self.port, backlog=self.backlog)
 
     async def serve(self, routes: Routes) -> None:
         await attrs.evolve(self, app=routes)._forever()
 
     async def _forever(self) -> None:
-        async with attrs.evolve(self.server, app=self.app) as server:
+        async with attrs.evolve(self.http_server, app=self.app) as server:
             print("Listening on http://127.0.0.1:8080")
             await server.forever()
 

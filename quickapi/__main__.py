@@ -30,11 +30,7 @@ async def _demo() -> None:
     async def echo(req: Request) -> Response:
         return Response(f"You said {req.body}")
 
-    quick = QuickAPI(
-        HTTPServer(port=8080)
-    )
-    
-    await quick.serve(app)
+    await QuickAPI().serve(app)
 
 
 if __name__ == "__main__":
