@@ -17,7 +17,7 @@ class FakeConnection:
 
 @pytest.mark.asyncio
 async def test_simple_get():
-    buffer = "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n"
+    buffer = "GET / HTTP/1.0\r\nHost: example.com\r\n\r\n"
     connection = FakeConnection([])
     request, remainder = await from_connection(connection, buffer)
 
@@ -31,7 +31,7 @@ async def test_simple_get():
 @pytest.mark.asyncio
 async def test_post_with_body_inline():
     buffer = (
-        "POST /submit HTTP/1.1\r\n"
+        "POST /submit HTTP/1.0\r\n"
         "Host: example.com\r\n"
         "Content-Length: 11\r\n"
         "Content-Type: text/plain\r\n"
@@ -51,7 +51,7 @@ async def test_post_with_body_inline():
 @pytest.mark.asyncio
 async def test_post_with_body_chunks():
     head = (
-        "POST /upload HTTP/1.1\r\n"
+        "POST /upload HTTP/1.0\r\n"
         "Host: example.com\r\n"
         "Content-Length: 20\r\n"
         "Content-Type: text/plain\r\n"
@@ -67,7 +67,7 @@ async def test_post_with_body_chunks():
 
 @pytest.mark.asyncio
 async def test_missing_content_length_defaults_zero():
-    buffer = "GET /foo HTTP/1.1\r\nHost: test\r\n\r\nSOMEEXTRA"
+    buffer = "GET /foo HTTP/1.0\r\nHost: test\r\n\r\nSOMEEXTRA"
     connection = FakeConnection([])
     request, remainder = await from_connection(connection, buffer)
     
