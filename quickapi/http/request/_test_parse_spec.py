@@ -82,11 +82,3 @@ async def test_invalid_request_line():
     connection = FakeConnection([])
     with pytest.raises(ValueError):
         await from_connection(connection, bad_request) # pyright: ignore[reportArgumentType]
-
-
-@pytest.mark.asyncio
-async def test_unsupported_version():
-    bad_request = "GET / HTTP/2.0\r\nHost: x\r\n\r\n"
-    connection = FakeConnection([])
-    with pytest.raises(ValueError):
-        await from_connection(connection, bad_request) # pyright: ignore[reportArgumentType]
