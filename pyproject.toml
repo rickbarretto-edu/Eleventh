@@ -8,11 +8,17 @@ authors = [
 license = {text = "MPL 2.0"}
 readme = "README.md"
 requires-python = ">=3.12"
+packages = [
+    { include = "quickapi" },
+]
 dependencies = [
     "attrs (>=25.3.0,<26.0.0)",
     "pytest (>=8.4.1,<9.0.0)",
     "pytest-asyncio (>=1.1.0,<2.0.0)"
 ]
+
+[project.scripts]
+quick-demo = "quickapi.__main__:main"
 
 
 [build-system]

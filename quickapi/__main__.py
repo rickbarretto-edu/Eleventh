@@ -30,8 +30,12 @@ async def demo() -> None:
     await QuickAPI().serve(app)
 
 
-if __name__ == "__main__":
+def main():
     try:
         asyncio.run(demo())
     except KeyboardInterrupt:
         pass
+
+
+if __name__ == "__main__":
+    main()
