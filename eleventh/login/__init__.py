@@ -2,6 +2,7 @@ import asyncio
 from quickapi import QuickAPI
 from quickapi.http.request import Request
 from quickapi.http.response import Response
+from quickapi.http.response.status import Status
 from quickapi.router import Routes
 import json
 
@@ -45,10 +46,10 @@ async def signup(req: Request):
     password = data.get("password")
 
     if username in users:
-        return json_response({
+        return JsonResponse({
             "error": f"User {username} already exists",
             "links": [{"rel": "retry", "href": "/signup", "method": "GET"}]
-        }, status=400)
+        }).bad_request()
 
     users[username] = password
     return json_response({
@@ -74,18 +75,20 @@ async def login(req: Request):
     data = req.body
     username = data.get("username")
     password = data.get("password")
-    if users.get(username) == password:
-        return json_response({
+
+    if users.by_name(username).exact().password == password:
+        return JsonResponse({
             "message": f"Welcome, {username}!",
             "links": [
                 {"rel": "self", "href": f"/users/{username}", "method": "GET"},
                 {"rel": "logout", "href": "/logout", "method": "POST"}
             ]
         })
-    return json_response({
-        "error": "Invalid credentials",
-        "links": [{"rel": "retry", "href": "/login", "method": "GET"}]
-    }, status=401)
+    else:
+        return JsonResponse({
+            "error": "Invalid credentials",
+            "links": [{"rel": "retry", "href": "/login", "method": "GET"}]
+        }).invalid_credential()
 
 
 @routes.get("/users/{username}")
@@ -93,9 +96,9 @@ async def profile(request: Request):
     username = request["username"]
 
     if users.by_name(username).some():
-        return json_response({"error": "User not found"}, status=404)
+        return JsonResponse({"error": "User not found"}).not_found()
     else:
-        return json_response({
+        return JsonResponse({
             "username": username,
             "links": [{"rel": "home", "href": "/", "method": "GET"}]
         })
