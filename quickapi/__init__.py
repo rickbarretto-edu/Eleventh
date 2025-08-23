@@ -8,17 +8,17 @@ from quickapi.http.request import Request
 from quickapi.http.request import parse as request_parse
 from quickapi.http.request.method import Method
 from quickapi.http.request.target import Target
-from quickapi.http.response import HtmlResponse, Response, Status
+from quickapi.http.response import HtmlResponse, HttpResponse, Status
 from quickapi.http.server import HTTPServer
 from quickapi.router import Routes
 
-async def _not_found(req: Request) -> Response:
-    return Response(status=Status.NotFound)
+async def _not_found(req: Request) -> HttpResponse:
+    return HttpResponse(status=Status.NotFound)
 
 __all__ = [
     "QuickAPI",
     "Request",
-    "Response",
+    "HttpResponse",
     "HtmlResponse",
     "Routes",
     "Status",
@@ -30,7 +30,7 @@ class QuickAPI:
     port: int = 8080
     backlog: int = 100
 
-    app: Callable[[Request], Awaitable[Response]] = _not_found
+    app: Callable[[Request], Awaitable[HttpResponse]] = _not_found
 
     @cached_property
     def http_server(self) -> HTTPServer:
@@ -55,7 +55,7 @@ class QuickAPI:
                 try:
                     response = await self.app(request)
                 except Exception:
-                    response = Response(status=Status.ServerError)
+                    response = HttpResponse(status=Status.ServerError)
 
                 if request.should_keep_alive:
                     await connection.send(str(response.keeping_alive()))

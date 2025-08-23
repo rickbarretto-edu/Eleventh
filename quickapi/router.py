@@ -5,9 +5,9 @@ import attrs
 from typing import Awaitable, Callable, Self
 
 from quickapi.http.request import Request, Method, Target
-from quickapi.http.response import Response, Status
+from quickapi.http.response import HttpResponse, Status
 
-type Action = Callable[[Request], Awaitable[Response]]
+type Action = Callable[[Request], Awaitable[HttpResponse]]
 
 @attrs.frozen
 class RouteEntry:
@@ -51,9 +51,9 @@ class Routes:
             return self.at(path, name.upper())
         return wrapper
 
-    async def __call__(self, request: Request) -> Response:
+    async def __call__(self, request: Request) -> HttpResponse:
         if result := self.endpoints.match(request.method, str(request.target)):
             action, params = result
             return await action(request)
 
-        return Response("404, Not Found!", status=Status.NotFound)
+        return HttpResponse("404, Not Found!", status=Status.NotFound)

@@ -1,7 +1,7 @@
 import asyncio
 from quickapi import QuickAPI
 from quickapi.http.request import Request
-from quickapi.http.response import Response
+from quickapi.http.response import HttpResponse
 from quickapi.http.response.status import Status
 from quickapi.router import Routes
 import json
@@ -9,7 +9,7 @@ import json
 users = {}
 
 def json_response(data, status=200):
-    return Response(json.dumps(data), status=status, mime_type="application/json")
+    return HttpResponse(json.dumps(data), status=status, mime_type="application/json")
 
 routes = Routes()
 

@@ -1,6 +1,6 @@
 import pytest
 
-from quickapi.http.response import Response, Status
+from quickapi.http.response import HttpResponse, Status
 from quickapi.http.request import Request, Method, Target
 from quickapi.router import Endpoints, Routes
 
@@ -10,7 +10,7 @@ async def test_manual_routing():
     endpoints = Endpoints()
 
     async def sample_action(req):
-        return Response("ok")
+        return HttpResponse("ok")
 
     method = Method("GET")
     path = Target("/test")
@@ -20,7 +20,7 @@ async def test_manual_routing():
     action = endpoints.of(method, path)
     response = await action(Request(method, path))
 
-    assert isinstance(response, Response)
+    assert isinstance(response, HttpResponse)
     assert response.status == Status.Ok
     assert response.body.content == "ok"
 
@@ -32,7 +32,7 @@ async def test_at_routing():
 
     @routes.at("/hello", "GET")
     async def hello_action(req):
-        return Response("hello")
+        return HttpResponse("hello")
 
     request = Request(Method.get(), Target("/hello"))
     response = await routes(request)
@@ -48,7 +48,7 @@ async def test_dynamic_routing():
 
     @routes.post("/submit")
     async def submit_action(req):
-        return Response("submitted", Status.Ok)
+        return HttpResponse("submitted", Status.Ok)
 
     request = Request(Method.post(), Target("/submit"))
     response = await routes(request)
@@ -75,13 +75,13 @@ async def test_merged_routes():
 
     @players.get("/player/007")
     async def get_player(req):
-        return Response("James Bond")
+        return HttpResponse("James Bond")
 
     missions = Routes()
 
     @missions.put("/mission/1")
     async def new_mission(req):
-        return Response("Mission Created!")
+        return HttpResponse("Mission Created!")
 
     app = players | missions
 

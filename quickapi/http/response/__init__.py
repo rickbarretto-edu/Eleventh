@@ -8,7 +8,7 @@ from quickapi.http.version import Version
 
 
 @attrs.frozen
-class Response:
+class HttpResponse:
     content: str = ""
     status: Status = Status.Ok
     mime: MIMEType = MIMEType("text", "plain")
@@ -47,7 +47,7 @@ class Response:
 
 
 @attrs.frozen
-class HtmlResponse(Response):
+class HtmlResponse(HttpResponse):
 
     def __attrs_post_init__(self) -> None:
         object.__setattr__(self, "mime", MIMEType("text", "html"))

@@ -1,7 +1,7 @@
 import asyncio
 
 from quickapi import QuickAPI
-from quickapi.http.response import HtmlResponse, Response
+from quickapi.http.response import HtmlResponse, HttpResponse
 from quickapi.http.request import Request
 from quickapi.router import Routes
 
@@ -11,7 +11,7 @@ async def demo() -> None:
     app = Routes()
 
     @app.get("/")
-    async def root(req: Request) -> Response:
+    async def root(req: Request) -> HttpResponse:
         return HtmlResponse(
             f"""
             <!DOCTYPE html>
@@ -24,8 +24,8 @@ async def demo() -> None:
         )
 
     @app.post("/echo")
-    async def echo(req: Request) -> Response:
-        return Response(f"You said {req.body}")
+    async def echo(req: Request) -> HttpResponse:
+        return HttpResponse(f"You said {req.body}")
 
     await QuickAPI().serve(app)
 
