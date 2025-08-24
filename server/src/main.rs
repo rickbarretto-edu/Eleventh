@@ -11,7 +11,7 @@ async fn main() {
 
     // / => Welcome to Eleventh
     app.route("/", |_req, _params| 
-        Response::ok("Welcome to Eleventh!", "text/plain")
+        Response::ok().plain("Welcome to Eleventh!")
     );
 
     // /greet?name="Rick" => Hello, Rick?
@@ -19,14 +19,14 @@ async fn main() {
         let binding: String = "Anonymous".to_string();
         let name: &String = req.param("name").unwrap_or(&binding);
         
-        Response::ok(&format!("Hello, {}!", name), "text/plain")
+        Response::ok().plain(&format!("Hello, {}!", name))
     });
 
     // /users/123 => {"user_id":"123"}
     app.route("/users/{id}", |_req, params: HashMap<String, String>| {
         let id: &String = params.get("id").unwrap();
         
-        Response::json(&json!({"user_id": id}))
+        Response::ok().json(&json!({"user_id": id}))
     });
 
     println!("Starting Eleventh app on 127.0.0.1:8080");

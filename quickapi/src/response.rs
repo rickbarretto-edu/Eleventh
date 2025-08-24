@@ -5,72 +5,114 @@ pub struct Response {
     pub content_type: String,
 }
 
-impl Response {
-    pub fn ok(body: &str, content_type: &str) -> Self {
-        Self {
-            status: 200,
-            reason: "OK".to_string(),
-            body: body.to_string(),
-            content_type: content_type.to_string(),
-        }
+pub struct ResponseBuilder {
+    status: u16,
+    reason: String,
+    body: String,
+    content_type: String,
+}
+
+fn resp_to_string(status: u16, reason: &str, content_type: &str, body: &str) -> String {
+    format!(
+        "HTTP/1.1 {} {}\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n{}",
+        status,
+        reason,
+        content_type,
+        body.len(),
+        body
+    )
+}
+
+impl ResponseBuilder {
+    pub fn plain(mut self, body: &str) -> Response {
+        self.body = body.to_string();
+        self.content_type = "text/plain".to_string();
+        self.build()
     }
 
-    pub fn bad_request() -> Self {
-        Self {
-            status: 400,
-            reason: "Bad Request".to_string(),
-            body: "400 Bad Request".to_string(),
-            content_type: "text/plain".to_string(),
-        }
+    pub fn html(mut self, body: &str) -> Response {
+        self.body = body.to_string();
+        self.content_type = "text/html".to_string();
+        self.build()
     }
 
-    pub fn not_found() -> Self {
-        Self {
-            status: 404,
-            reason: "Not Found".to_string(),
-            body: "404 Not Found".to_string(),
-            content_type: "text/plain".to_string(),
-        }
+    pub fn xml(mut self, body: &str) -> Response {
+        self.body = body.to_string();
+        self.content_type = "application/xml".to_string();
+        self.build()
     }
 
-    pub fn plain(body: &str) -> Self {
-        Self::ok(body, "text/plain")
+    pub fn json(mut self, body: &serde_json::Value) -> Response {
+        self.body = body.to_string();
+        self.content_type = "application/json".to_string();
+        self.build()
     }
 
-    pub fn html(body: &str) -> Self {
-        Self::ok(body, "text/html")
+    pub fn content(mut self, body: &str, content_type: &str) -> Response {
+        self.body = body.to_string();
+        self.content_type = content_type.to_string();
+        self.build()
     }
 
-    pub fn xml(body: &str) -> Self {
-        Self::ok(body, "application/xml")
-    }
-
-    pub fn json(body: &serde_json::Value) -> Self {
-        Self {
-            status: 200,
-            reason: "OK".to_string(),
-            body: body.to_string(),
-            content_type: "application/json".to_string(),
-        }
-    }
-
-    pub fn with_status(self, status: u16, reason: &str) -> Self {
-        Self {
-            status,
-            reason: reason.to_string(),
+    pub fn build(self) -> Response {
+        Response {
+            status: self.status,
+            reason: self.reason,
             body: self.body,
             content_type: self.content_type,
         }
     }
+}
 
-    pub fn to_string(&self) -> String {
-        format!(
-            "HTTP/1.1 {} {}\r\nContent-Type: {}\r\nContent-Length: {}\r\n\r\n{}",
-            self.status,
-            self.reason,
-            self.content_type,
-            self.body.len(),
-            self.body
-        )
+impl Response {
+
+    pub fn custom(status: u16, reason: &str) -> ResponseBuilder {
+        ResponseBuilder {
+            status,
+            reason: reason.into(),
+            body: String::new(),
+            content_type: "text/plain".into(),
+        }
+    }
+
+    pub fn ok() -> ResponseBuilder {
+        ResponseBuilder {
+            status: 200,
+            reason: "OK".into(),
+            body: String::new(),
+            content_type: "text/plain".into(),
+        }
+    }
+
+    pub fn bad_request() -> ResponseBuilder {
+        ResponseBuilder {
+            status: 400,
+            reason: "Bad Request".into(),
+            body: "400 Bad Request".into(),
+            content_type: "text/plain".into(),
+        }
+    }
+
+    pub fn not_found() -> ResponseBuilder {
+        ResponseBuilder {
+            status: 404,
+            reason: "Not Found".into(),
+            body: "404 Not Found".into(),
+            content_type: "text/plain".into(),
+        }
+    }
+
+}
+
+
+impl ToString for Response {
+    fn to_string(&self) -> String {
+        resp_to_string(self.status, &self.reason, &self.content_type, &self.body)
+    }
+}
+
+impl Into<String> for Response {
+    fn into(self) -> String {
+        self.to_string()
     }
 }
