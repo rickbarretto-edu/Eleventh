@@ -45,7 +45,7 @@ class HTTPServer:
                     response = await self.app(request)
                 except Exception as e:
                     print(e)
-                    response = HttpResponse(f"500 Internal Server Error: {e}", Status.ServerError)
+                    response = HttpResponse(f"500 Internal Server Error: {e}", Status.InternalServerError)
 
                 await connection.send(str(attrs.evolve(response, keep_alive=response.should_keep_alive)))
                 if response.should_keep_alive:
