@@ -5,6 +5,7 @@ use serde_json::json;
 use quickapi::server::Server;
 use quickapi::response::Response;
 
+use server::account::route_account;
 use server::menu::route_menu;
 
 #[tokio::main]
@@ -12,6 +13,7 @@ async fn main() {
     let mut app: Server = Server::new();
 
     route_menu(&mut app);
+    route_account(&mut app);
 
     // /greet?name="Rick" => Hello, Rick?
     app.route("GET", "/greet", |req, _params| {
