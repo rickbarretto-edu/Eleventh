@@ -1,11 +1,12 @@
 import asyncio
+import json
+
 from eleventh.login.model import UserLogin
 from quickapi import QuickAPI
 from quickapi.http.request import Request
 from quickapi.http.request.target import JsonValue
 from quickapi.http.response import JsonResponse
 from quickapi.router import Routes
-import json
 
 from .repository import Users, UsersInSQLite
 
