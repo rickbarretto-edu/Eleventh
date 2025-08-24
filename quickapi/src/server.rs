@@ -82,17 +82,33 @@ impl Server {
 
     fn handle_connection(&self, mut socket: tokio::net::TcpStream) {
         let routes = self.routes.clone();
-    
+
         tokio::spawn(async move {
             let mut buf: Vec<u8> = vec![0; 1024];
-            let n: usize = socket.read(&mut buf).await.unwrap();
-            let req_text = String::from_utf8_lossy(&buf[..n]);
-    
-            let req: Request = Request::from_raw(&req_text);
+
+            let n: usize = match socket.read(&mut buf).await {
+                Ok(n) => n,
+                Err(_) => {
+                    let resp = Response::new("400 Bad Request");
+                    let _ = socket.write_all(resp.to_string().as_bytes()).await;
+                    return;
+                }
+            };
+
+            let request_raw = String::from_utf8_lossy(&buf[..n]);
+
+            let request = match Request::from_raw(&request_raw) {
+                Ok(request) => request,
+                Err(_) => {
+                    let response = Response::new("400 Bad Request");
+                    let _ = socket.write_all(response.to_string().as_bytes()).await;
+                    return;
+                }
+            };
     
             let mut matched: bool = false;
             for route in &routes {
-                if let Some(caps) = route.pattern.captures(&req.path) {
+                if let Some(caps) = route.pattern.captures(&request.path) {
 
                     let mut params: HashMap<String, String> = HashMap::new();
                     for name in &route.param_names {
@@ -101,7 +117,7 @@ impl Server {
                         }
                     }
 
-                    let response: Response = (route.handler)(req, params);
+                    let response: Response = (route.handler)(request, params);
                     let resp_text: String = response.to_string();
                     
                     socket.write_all(resp_text.as_bytes()).await.unwrap();

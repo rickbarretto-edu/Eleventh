@@ -10,15 +10,18 @@ pub struct Request {
 }
 
 impl Request {
-    pub fn from_raw(raw: &str) -> Result<Self, &'static str> {
+    pub fn from_raw(raw: &str) -> Result<Self, String> {
         let lines: Vec<&str> = raw.lines().collect();
 
         if lines.is_empty() { 
-            return Err("Empty request"); 
+            return Err("Empty request".into()); 
         }
 
         let (method, full_path) = Self::parse_request_line(lines.get(0));
-        let (path, query) = Self::parse_url(&full_path);
+
+        let (path, query) = Self::parse_url(&full_path)
+            .or_else(|e| Err(format!("Invalid URL: {}", e)))?;
+
         let body = Self::parse_body(&lines);
 
         Ok(Request { method, path, query, body })
@@ -32,8 +35,8 @@ impl Request {
         (method, full_path)
     }
 
-    fn parse_url(full_path: &str) -> (String, HashMap<String, String>) {
-        let url = Url::parse(&format!("http://localhost{}", full_path)).unwrap();
+    fn parse_url(full_path: &str) -> Result<(String, HashMap<String, String>), url::ParseError> {
+        let url = Url::parse(&format!("http://localhost{}", full_path))?;
         let path = url.path().to_string();
 
         let query = url
@@ -41,7 +44,7 @@ impl Request {
             .map(|(k, v)| (k.to_string(), v.to_string()))
             .collect::<HashMap<_, _>>();
 
-        (path, query)
+        Ok((path, query))
     }
 
     fn parse_body(lines: &[&str]) -> String {
