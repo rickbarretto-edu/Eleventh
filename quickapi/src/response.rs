@@ -6,12 +6,33 @@ pub struct Response {
 }
 
 impl Response {
-    pub fn new(body: &str) -> Self {
+    pub fn new(body: &str, content_type: &str) -> Self {
         Self {
             status: 200,
             reason: "OK".to_string(),
             body: body.to_string(),
-            content_type: "text/plain".to_string(),
+            content_type: content_type.to_string(),
+        }
+    }
+
+    pub fn plain(body: &str) -> Self {
+        Self::new(body, "text/plain")
+    }
+
+    pub fn html(body: &str) -> Self {
+        Self::new(body, "text/html")
+    }
+
+    pub fn xml(body: &str) -> Self {
+        Self::new(body, "application/xml")
+    }
+
+    pub fn json(body: &serde_json::Value) -> Self {
+        Self {
+            status: 200,
+            reason: "OK".to_string(),
+            body: body.to_string(),
+            content_type: "application/json".to_string(),
         }
     }
 
@@ -21,15 +42,6 @@ impl Response {
             reason: reason.to_string(),
             body: self.body,
             content_type: self.content_type,
-        }
-    }
-
-    pub fn json(body: &serde_json::Value) -> Self {
-        Self {
-            status: 200,
-            reason: "OK".to_string(),
-            body: body.to_string(),
-            content_type: "application/json".to_string(),
         }
     }
 
