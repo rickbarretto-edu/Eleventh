@@ -5,6 +5,8 @@ use std::fs;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use uuid::Uuid;
+
 use quickapi::response::Response;
 use quickapi::server::Server;
 
@@ -13,6 +15,7 @@ struct Account {
     username: String,
     password: String,
     created_at: String,
+    auth: String
 }
 
 type Accounts = HashMap<String, Account>;
@@ -112,7 +115,8 @@ pub fn route_account(app: &mut Server) {
                 let created_at = SystemTime::now().duration_since(UNIX_EPOCH)
                     .map(|d| d.as_secs().to_string()).unwrap_or_else(|_| "0".to_string());
 
-                let acct = Account { username: username.clone(), password: password.clone(), created_at };
+                let auth = Uuid::new_v4().to_string();
+                let acct = Account { username: username.clone(), password: password.clone(), created_at, auth: auth.clone() };
                 accounts.insert(username.clone(), acct);
 
                 if let Err(e) = save_accounts(&accounts) {
@@ -125,6 +129,7 @@ pub fn route_account(app: &mut Server) {
                 Response::ok().json(&json!({
                     "message": "Account created successfully",
                     "username": username,
+                    "auth": auth,
                     "links": [
                         {"rel": "self", "href": "/accounts/create", "method": "GET"},
                         {"rel": "login", "href": "/accounts/login", "method": "POST"},
@@ -166,10 +171,11 @@ pub fn route_account(app: &mut Server) {
         match load_accounts() {
             Ok(accounts) => {
                 match accounts.get(&username) {
-                    Some(acct) if acct.password == *password => {
+                    Some(account) if account.password == *password => {
                         Response::ok().json(&json!({
                             "message": "Login successful",
-                            "username": username,
+                            "username": account.username,
+                            "auth": account.auth,
                             "links": [
                                 {"rel": "self", "href": "/accounts/login/", "method": "GET"},
                                 {"rel": "home", "href": "/home/", "method": "GET"},
