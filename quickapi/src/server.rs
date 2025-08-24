@@ -71,12 +71,21 @@ impl Server {
         let method = HttpMethod::from_str(method);
         // Convert path like /users/{id} -> regex
         let mut param_names = Vec::new();
-        let regex_str = regex::escape(path)
+        let mut regex_str = regex::escape(path)
             .replace(r"\{", "{")
             .replace(r"\}", "}")
             .replace("{", "(?P<")
             .replace("}", ">[^/]+)")
             .replace(r"\?", "?"); // allow query params
+
+        // Add support for optional trailing slash and optional '?' at end
+        if regex_str.ends_with('?') {
+            // If path ends with '?', allow both /users? and /users/?
+            regex_str = format!("{}/?", &regex_str);
+        } else {
+            // Otherwise, allow both /menu and /menu/
+            regex_str = format!("{}/?", &regex_str);
+        }
 
         let regex = Regex::new(&format!("^{}$", regex_str)).unwrap();
 
