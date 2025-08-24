@@ -93,6 +93,55 @@ impl Server {
         self.routes.push(route);
     }
 
+    pub fn get<F>(&mut self, path: &str, handler: F)
+    where
+        F: Fn(Request, HashMap<String, String>) -> Response + Send + Sync + 'static,
+    {
+        self.route("GET", path, handler);
+    }
+
+    pub fn post<F>(&mut self, path: &str, handler: F)
+    where
+        F: Fn(Request, HashMap<String, String>) -> Response + Send + Sync + 'static,
+    {
+        self.route("POST", path, handler);
+    }
+
+    pub fn put<F>(&mut self, path: &str, handler: F)
+    where
+        F: Fn(Request, HashMap<String, String>) -> Response + Send + Sync + 'static,
+    {
+        self.route("PUT", path, handler);
+    }
+
+    pub fn delete<F>(&mut self, path: &str, handler: F)
+    where
+        F: Fn(Request, HashMap<String, String>) -> Response + Send + Sync + 'static,
+    {
+        self.route("DELETE", path, handler);
+    }
+
+    pub fn patch<F>(&mut self, path: &str, handler: F)
+    where
+        F: Fn(Request, HashMap<String, String>) -> Response + Send + Sync + 'static,
+    {
+        self.route("PATCH", path, handler);
+    }
+
+    pub fn options<F>(&mut self, path: &str, handler: F)
+    where
+        F: Fn(Request, HashMap<String, String>) -> Response + Send + Sync + 'static,
+    {
+        self.route("OPTIONS", path, handler);
+    }
+
+    pub fn head<F>(&mut self, path: &str, handler: F)
+    where
+        F: Fn(Request, HashMap<String, String>) -> Response + Send + Sync + 'static,
+    {
+        self.route("HEAD", path, handler);
+    }
+
     pub async fn run(&self, addr: &str) {
         let listener = TcpListener::bind(addr).await
             .expect("Failed to bind TCP listener");
