@@ -11,7 +11,7 @@ async fn main() {
 
     // / => Welcome to Eleventh
     app.route("/", |_req, _params| 
-        Response::new("Welcome to Eleventh!")
+        Response::ok("Welcome to Eleventh!", "text/plain")
     );
 
     // /greet?name="Rick" => Hello, Rick?
@@ -19,7 +19,7 @@ async fn main() {
         let binding: String = "Anonymous".to_string();
         let name: &String = req.param("name").unwrap_or(&binding);
         
-        Response::new(&format!("Hello, {}!", name))
+        Response::ok(&format!("Hello, {}!", name), "text/plain")
     });
 
     // /users/123 => {"user_id":"123"}
