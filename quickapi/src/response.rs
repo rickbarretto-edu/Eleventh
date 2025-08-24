@@ -6,7 +6,7 @@ pub struct Response {
 }
 
 impl Response {
-    pub fn new(body: &str, content_type: &str) -> Self {
+    pub fn ok(body: &str, content_type: &str) -> Self {
         Self {
             status: 200,
             reason: "OK".to_string(),
@@ -15,16 +15,34 @@ impl Response {
         }
     }
 
+    pub fn bad_request() -> Self {
+        Self {
+            status: 400,
+            reason: "Bad Request".to_string(),
+            body: "400 Bad Request".to_string(),
+            content_type: "text/plain".to_string(),
+        }
+    }
+
+    pub fn not_found() -> Self {
+        Self {
+            status: 404,
+            reason: "Not Found".to_string(),
+            body: "404 Not Found".to_string(),
+            content_type: "text/plain".to_string(),
+        }
+    }
+
     pub fn plain(body: &str) -> Self {
-        Self::new(body, "text/plain")
+        Self::ok(body, "text/plain")
     }
 
     pub fn html(body: &str) -> Self {
-        Self::new(body, "text/html")
+        Self::ok(body, "text/html")
     }
 
     pub fn xml(body: &str) -> Self {
-        Self::new(body, "application/xml")
+        Self::ok(body, "application/xml")
     }
 
     pub fn json(body: &serde_json::Value) -> Self {
