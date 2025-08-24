@@ -8,11 +8,11 @@ import xml.dom.minidom
 
 from quickapi.http.body import Body, MIMEType
 from quickapi.http.response.status import Status
-from quickapi.http.response.status_mixin import inject_status_mixin
+from quickapi.http.response.status_mixin import ResponseStatusMixin
 from quickapi.http.version import Version
 
 @attrs.frozen
-class HttpResponse:
+class HttpResponse(ResponseStatusMixin):
     content: str = ""
     status: Status = Status.Ok
     mime: MIMEType = MIMEType("text", "plain")
@@ -69,9 +69,3 @@ class JsonResponse(HttpResponse):
     def __attrs_post_init__(self) -> None:
         object.__setattr__(self, "mime", MIMEType("application", "json"))
         object.__setattr__(self, "content", json.dumps(self.content, ensure_ascii=False))
-
-
-inject_status_mixin(HttpResponse)
-inject_status_mixin(HtmlResponse)
-inject_status_mixin(XmlResponse)
-inject_status_mixin(JsonResponse)
