@@ -78,12 +78,12 @@ impl Server {
             .replace("}", ">[^/]+)")
             .replace(r"\?", "?"); // allow query params
 
-        // Add support for optional trailing slash and optional '?' at end
-        if regex_str.ends_with('?') {
-            // If path ends with '?', allow both /users? and /users/?
-            regex_str = format!("{}/?", &regex_str);
+        // Always allow optional trailing slash, regardless of original path
+        if regex_str.ends_with('/') {
+            // If path ends with '/', make it optional
+            regex_str = format!("{}?", &regex_str);
         } else {
-            // Otherwise, allow both /menu and /menu/
+            // If not, allow an optional trailing slash
             regex_str = format!("{}/?", &regex_str);
         }
 
