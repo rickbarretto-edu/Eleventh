@@ -10,14 +10,18 @@ pub struct Request {
 }
 
 impl Request {
-    pub fn from_raw(raw: &str) -> Self {
+    pub fn from_raw(raw: &str) -> Result<Self, &'static str> {
         let lines: Vec<&str> = raw.lines().collect();
+
+        if lines.is_empty() { 
+            return Err("Empty request"); 
+        }
 
         let (method, full_path) = Self::parse_request_line(lines.get(0));
         let (path, query) = Self::parse_url(&full_path);
         let body = Self::parse_body(&lines);
 
-        Request { method, path, query, body }
+        Ok(Request { method, path, query, body })
     }
 
     fn parse_request_line(line: Option<&&str>) -> (String, String) {
