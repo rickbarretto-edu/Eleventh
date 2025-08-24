@@ -33,4 +33,4 @@ class Target:
         return url.urlparse(self._raw)
 
     def __str__(self) -> str:
-        return self._raw
+        return str(self._raw)

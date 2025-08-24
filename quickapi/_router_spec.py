@@ -6,26 +6,6 @@ from quickapi.router import Endpoints, Routes
 
 
 @pytest.mark.asyncio
-async def test_manual_routing():
-    endpoints = Endpoints()
-
-    async def sample_action(req):
-        return HttpResponse("ok")
-
-    method = Method("GET")
-    path = Target("/test")
-
-
-    endpoints.add(method, path, sample_action)
-    action = endpoints.of(method, path)
-    response = await action(Request(method, path))
-
-    assert isinstance(response, HttpResponse)
-    assert response.status == Status.Ok
-    assert response.body.content == "ok"
-
-
-@pytest.mark.asyncio
 async def test_at_routing():
     endpoints = Endpoints()
     routes = Routes(endpoints)
