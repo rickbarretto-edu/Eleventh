@@ -5,3 +5,7 @@
 .snippet/
 log
 logs/
+
+# Rust
+Cargo.lock
+target/
