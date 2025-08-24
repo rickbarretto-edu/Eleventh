@@ -1,4 +1,3 @@
-import asyncio
 import json
 
 from eleventh.login.model import UserLogin
@@ -122,6 +121,9 @@ async def profile(request: Request):
 
 
 if __name__ == "__main__":
+
+    import asyncio
+
     async def demo():
         await QuickAPI().serve(routes)
 
