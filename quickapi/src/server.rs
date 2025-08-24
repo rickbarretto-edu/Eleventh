@@ -89,7 +89,7 @@ impl Server {
             let n: usize = match socket.read(&mut buf).await {
                 Ok(n) => n,
                 Err(_) => {
-                    let resp = Response::new("400 Bad Request");
+                    let resp = Response::new("400 Bad Request").with_status(400, "Bad Request");
                     let _ = socket.write_all(resp.to_string().as_bytes()).await;
                     return;
                 }
@@ -100,7 +100,7 @@ impl Server {
             let request = match Request::from_raw(&request_raw) {
                 Ok(request) => request,
                 Err(_) => {
-                    let response = Response::new("400 Bad Request");
+                    let response = Response::new("400 Bad Request").with_status(400, "Bad Request");
                     let _ = socket.write_all(response.to_string().as_bytes()).await;
                     return;
                 }
