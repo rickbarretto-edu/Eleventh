@@ -93,11 +93,29 @@ impl Response {
         }
     }
 
+    pub fn unauthorized() -> ResponseBuilder {
+        ResponseBuilder {
+            status: 401,
+            reason: "Unauthorized".into(),
+            body: "401 Unauthorized".into(),
+            content_type: "text/plain".into(),
+        }
+    }
+
     pub fn not_found() -> ResponseBuilder {
         ResponseBuilder {
             status: 404,
             reason: "Not Found".into(),
             body: "404 Not Found".into(),
+            content_type: "text/plain".into(),
+        }
+    }
+
+    pub fn internal_error() -> ResponseBuilder {
+        ResponseBuilder {
+            status: 500,
+            reason: "Internal Server Error".into(),
+            body: "500 Internal Server Error".into(),
             content_type: "text/plain".into(),
         }
     }
