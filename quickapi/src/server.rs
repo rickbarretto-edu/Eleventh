@@ -70,38 +70,50 @@ impl Server {
         println!("Listening on {}", addr);
 
         loop {
-            let (mut socket, _) = listener.accept().await.unwrap();
-            let routes = self.routes.clone();
-
-            tokio::spawn(async move {
-                let mut buf = vec![0; 1024];
-                let n = socket.read(&mut buf).await.unwrap();
-                let req_text = String::from_utf8_lossy(&buf[..n]);
-
-                let req = Request::from_raw(&req_text);
-
-                let mut matched = false;
-                for route in &routes {
-                    if let Some(caps) = route.pattern.captures(&req.path) {
-                        let mut params = HashMap::new();
-                        for name in &route.param_names {
-                            if let Some(m) = caps.name(name) {
-                                params.insert(name.clone(), m.as_str().to_string());
-                            }
-                        }
-                        let response = (route.handler)(req, params);
-                        let resp_text = response.to_string();
-                        socket.write_all(resp_text.as_bytes()).await.unwrap();
-                        matched = true;
-                        break;
-                    }
+            match listener.accept().await {
+                Ok((socket, _)) => self.handle_connection(socket),
+                Err(e) => {
+                    eprintln!("Failed to accept connection: {}. Skipped!", e);
+                    continue;
                 }
-
-                if !matched {
-                    let resp = Response::new("404 Not Found");
-                    socket.write_all(resp.to_string().as_bytes()).await.unwrap();
-                }
-            });
+            }
         }
+    }
+
+    fn handle_connection(&self, mut socket: tokio::net::TcpStream) {
+        let routes = self.routes.clone();
+    
+        tokio::spawn(async move {
+            let mut buf: Vec<u8> = vec![0; 1024];
+            let n: usize = socket.read(&mut buf).await.unwrap();
+            let req_text = String::from_utf8_lossy(&buf[..n]);
+    
+            let req: Request = Request::from_raw(&req_text);
+    
+            let mut matched: bool = false;
+            for route in &routes {
+                if let Some(caps) = route.pattern.captures(&req.path) {
+
+                    let mut params: HashMap<String, String> = HashMap::new();
+                    for name in &route.param_names {
+                        if let Some(m) = caps.name(name) {
+                            params.insert(name.clone(), m.as_str().to_string());
+                        }
+                    }
+
+                    let response: Response = (route.handler)(req, params);
+                    let resp_text: String = response.to_string();
+                    
+                    socket.write_all(resp_text.as_bytes()).await.unwrap();
+                    matched = true;
+                    break;
+                }
+            }
+    
+            if !matched {
+                let resp: Response = Response::new("404 Not Found");
+                socket.write_all(resp.to_string().as_bytes()).await.unwrap();
+            }
+        });
     }
 }
