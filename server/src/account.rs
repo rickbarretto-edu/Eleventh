@@ -1,8 +1,44 @@
+use serde::{Deserialize, Serialize};
 use serde_json::json;
+use std::collections::HashMap;
+use std::fs;
+use std::path::PathBuf;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use quickapi::response::Response;
 use quickapi::server::Server;
 
+#[derive(Serialize, Deserialize, Debug)]
+struct Account {
+    username: String,
+    password: String,
+    created_at: String,
+}
+
+type Accounts = HashMap<String, Account>;
+
+fn db_path() -> PathBuf {
+    // Use the crate manifest dir so the path is predictable at runtime.
+    PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/accounts.json"))
+}
+
+fn load_accounts() -> Result<Accounts, String> {
+    let path = db_path();
+
+    if !path.exists() {
+        return Ok(HashMap::new());
+    }
+
+    let s = fs::read_to_string(&path).map_err(|e| format!("failed to read DB file: {}", e))?;
+    let map: Accounts = serde_json::from_str(&s).map_err(|e| format!("invalid DB JSON: {}", e))?;
+    Ok(map)
+}
+
+fn save_accounts(accounts: &Accounts) -> Result<(), String> {
+    let path = db_path();
+    let serialized = serde_json::to_string_pretty(accounts).map_err(|e| format!("serialize error: {}", e))?;
+    fs::write(&path, serialized).map_err(|e| format!("failed to write DB file: {}", e))
+}
 
 pub fn route_account(app: &mut Server) {
 
@@ -40,54 +76,120 @@ pub fn route_account(app: &mut Server) {
 
     app.post("/accounts/create/", |_req, _params| {
 
-        let username = _req.param("username");
-        let password = _req.param("password");
+        #[derive(Debug, Deserialize)]
+        struct Signup {
+            pub username: String,
+            pub password: String,
+        }
 
-        if username.is_none() || password.is_none() {
-            Response::bad_request().json(&json!({
+        let data: Result<Signup, serde_json::Error> = serde_json::from_str(&_req.body);
+
+        if data.is_err() {
+            return Response::bad_request().json(&json!({
                 "message": "Missing username or password",
                 "links": [
                     {"rel": "back", "href": "/", "method": "GET"},
                     {"rel": "retry", "href": "/accounts/create/", "method": "POST"},
                 ]
-            }))
-        } else {
-            Response::ok().json(&json!({
-                "message": "Account created successfully",
-                "username": username.unwrap(),
-                "links": [
-                    {"rel": "self", "href": "/accounts/create", "method": "GET"},
-                    {"rel": "login", "href": "/accounts/login", "method": "POST"},
-                    {"rel": "home", "href": "/", "method": "GET"},
-                ]
+            }));
+        }
+
+        let data = data.unwrap();
+        let username: String = data.username.into();
+        let password: String = data.password.into();
+
+        match load_accounts() {
+            Ok(mut accounts) => {
+                if accounts.contains_key(&username) {
+                    return Response::bad_request().json(&json!({
+                        "message": "Username already exists",
+                        "links": [
+                            {"rel": "back", "href": "/accounts/create/", "method": "GET"},
+                        ]
+                    }));
+                }
+
+                let created_at = SystemTime::now().duration_since(UNIX_EPOCH)
+                    .map(|d| d.as_secs().to_string()).unwrap_or_else(|_| "0".to_string());
+
+                let acct = Account { username: username.clone(), password: password.clone(), created_at };
+                accounts.insert(username.clone(), acct);
+
+                if let Err(e) = save_accounts(&accounts) {
+                    return Response::internal_error().json(&json!({
+                        "message": "Failed to save account",
+                        "error": e,
+                    }));
+                }
+
+                Response::ok().json(&json!({
+                    "message": "Account created successfully",
+                    "username": username,
+                    "links": [
+                        {"rel": "self", "href": "/accounts/create", "method": "GET"},
+                        {"rel": "login", "href": "/accounts/login", "method": "POST"},
+                        {"rel": "home", "href": "/", "method": "GET"},
+                    ]
+                }))
+            }
+            Err(e) => Response::internal_error().json(&json!({
+                "message": "Failed to read accounts DB",
+                "error": e,
             }))
         }
     });
 
     app.post("/accounts/login/", |_req, _params| {
 
-        let username = _req.param("username");
-        let password = _req.param("password");
+        #[derive(Debug, Deserialize)]
+        struct Login {
+            pub username: String,
+            pub password: String,
+        }
 
-        if username.is_none() || password.is_none() {
-            Response::bad_request().json(&json!({
+        let data: Result<Login, serde_json::Error> = serde_json::from_str(&_req.body);
+
+        if data.is_err() {
+            return Response::bad_request().json(&json!({
                 "message": "Missing username or password",
                 "links": [
                     {"rel": "back", "href": "/", "method": "GET"},
                     {"rel": "retry", "href": "/accounts/login/", "method": "POST"},
                 ]
-            }))
-        } else {
-            Response::ok().json(&json!({
-                "message": "Login successful",
-                "username": username.unwrap(),
-                "links": [
-                    {"rel": "self", "href": "/accounts/login/", "method": "GET"},
-                    {"rel": "home", "href": "/home/", "method": "GET"},
-                ]
+            }));
+        }
+
+        let data = data.unwrap();
+        let username: String = data.username.into();
+        let password: String = data.password.into();
+
+        match load_accounts() {
+            Ok(accounts) => {
+                match accounts.get(&username) {
+                    Some(acct) if acct.password == *password => {
+                        Response::ok().json(&json!({
+                            "message": "Login successful",
+                            "username": username,
+                            "links": [
+                                {"rel": "self", "href": "/accounts/login/", "method": "GET"},
+                                {"rel": "home", "href": "/home/", "method": "GET"},
+                            ]
+                        }))
+                    }
+                    _ => Response::unauthorized().json(&json!({
+                        "message": "Invalid username or password",
+                        "links": [
+                            {"rel": "retry", "href": "/accounts/login/", "method": "POST"},
+                            {"rel": "create", "href": "/accounts/create/", "method": "POST"},
+                        ]
+                    })),
+                }
+            }
+            Err(e) => Response::internal_error().json(&json!({
+                "message": "Failed to read accounts DB",
+                "error": e,
             }))
         }
     });
-
 
 }
