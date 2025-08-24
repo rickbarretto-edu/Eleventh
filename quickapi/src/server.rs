@@ -64,7 +64,9 @@ impl Server {
     }
 
     pub async fn run(&self, addr: &str) {
-        let listener = TcpListener::bind(addr).await.unwrap();
+        let listener = TcpListener::bind(addr).await
+            .expect("Failed to bind TCP listener");
+
         println!("Listening on {}", addr);
 
         loop {
