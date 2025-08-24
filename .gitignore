@@ -1,9 +1,3 @@
-# Python related
-*.pyc
-
-# Package Management
-poetry.lock
-
 # Code Editors and IDEs
 .vscode/
 
@@ -11,3 +5,7 @@ poetry.lock
 .snippet/
 log
 logs/
+
+# Rust
+Cargo.lock
+target/
