@@ -10,6 +10,17 @@ pub struct Request {
 }
 
 impl Request {
+
+    pub fn new(method: &str, path: &str, body: &str) -> Self {
+        let (path, query) = Self::parse_url(path).unwrap_or((path.to_string(), HashMap::new()));
+        Self {
+            method: method.to_string(),
+            path,
+            query,
+            body: body.to_string(),
+        }
+    }
+
     pub fn from_raw(raw: &str) -> Result<Self, String> {
         let lines: Vec<&str> = raw.lines().collect();
 

@@ -151,6 +151,26 @@ impl Server {
         self.route("HEAD", path, handler);
     }
 
+    /// Simulate a request against the registered routes and return the Response.
+    /// This is used by tests to call handlers directly without spinning up the TCP server.
+    pub fn simulate(&self, method: &str, path: &str, body: &str) -> Response {
+        let request = Request::new(method, path, body);
+
+        for route in &self.routes {
+            if route.method == HttpMethod::from_str(&request.method)
+                && route.pattern.captures(&request.path).is_some()
+            {
+                let params = parameters(&request, route);
+                let response: Response = (route.handler)(request, params);
+                return response;
+            }
+        }
+
+        Response::not_found().build()
+    }
+
+    
+
     pub async fn run(&self, addr: &str) {
         let listener = TcpListener::bind(addr).await
             .expect("Failed to bind TCP listener");
@@ -198,13 +218,7 @@ impl Server {
             for route in &routes {
                 if route.method == HttpMethod::from_str(&req.method)
                     && route.pattern.captures(&req.path).is_some() {
-                    let caps = route.pattern.captures(&req.path).unwrap();
-                    let mut params: HashMap<String, String> = HashMap::new();
-                    for name in &route.param_names {
-                        if let Some(m) = caps.name(name) {
-                            params.insert(name.clone(), m.as_str().to_string());
-                        }
-                    }
+                    let params = parameters(&req, route);
 
                     let response: Response = (route.handler)(req, params);
                     let resp_text: String = response.to_string();
@@ -220,4 +234,17 @@ impl Server {
             }
         });
     }
+}
+
+fn parameters(request: &Request, route: &Route) -> HashMap<String, String> {
+    let captures = route.pattern.captures(&request.path).unwrap();
+    let mut parameters: HashMap<String, String> = HashMap::new();
+    
+    for name in &route.param_names {
+        if let Some(m) = captures.name(name) {
+            parameters.insert(name.clone(), m.as_str().to_string());
+        }
+    }
+
+    parameters
 }
