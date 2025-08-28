@@ -1,14 +1,14 @@
-use serde::{Deserialize, Serialize};
-use serde_json::json;
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use serde::{Deserialize, Serialize};
+use serde_json::json;
 use uuid::Uuid;
 
-use quickapi::response::Response;
-use quickapi::server::Server;
+use quickapi::{Server, Response};
+
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Account {

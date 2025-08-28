@@ -1,5 +1,4 @@
-use quickapi::response::Response;
-use quickapi::server::Server;
+use quickapi::{Server, Response};
 
 
 pub fn route_menu(app: &mut Server) {

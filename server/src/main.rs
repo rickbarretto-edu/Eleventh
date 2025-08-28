@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::json;
 
-use quickapi::server::Server;
-use quickapi::response::Response;
-
+use quickapi::{Server, Response};
 use server::account::route_account;
 use server::menu::route_menu;
 
