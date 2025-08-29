@@ -1,51 +1,8 @@
-use std::collections::HashMap;
-use std::path::PathBuf;
-use std::time::{SystemTime, UNIX_EPOCH};
-
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::json;
-use uuid::Uuid;
+use quickapi::{Response, Server};
 
-use quickapi::{Server, Response};
-use tokio::fs;
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Account {
-    username: String,
-    password: String,
-    created_at: String,
-    auth: String,
-}
-
-type Accounts = HashMap<String, Account>;
-
-fn db_path() -> PathBuf {
-    PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/accounts.json"))
-}
-
-async fn load_accounts() -> Result<Accounts, String> {
-    let path = db_path();
-
-    if !path.exists() {
-        return Ok(HashMap::new());
-    }
-
-    let s = fs::read_to_string(&path)
-        .await
-        .map_err(|e| format!("failed to read DB file: {}", e))?;
-    let map: Accounts =
-        serde_json::from_str(&s).map_err(|e| format!("invalid DB JSON: {}", e))?;
-    Ok(map)
-}
-
-async fn save_accounts(accounts: &Accounts) -> Result<(), String> {
-    let path = db_path();
-    let serialized = serde_json::to_string_pretty(accounts)
-        .map_err(|e| format!("serialize error: {}", e))?;
-    fs::write(&path, serialized)
-        .await
-        .map_err(|e| format!("failed to write DB file: {}", e))
-}
+use super::repository::{load_accounts, save_accounts, new_account};
 
 pub fn route_account(app: &mut Server) {
     app.get("/accounts", |_req, _params| async move {
@@ -87,9 +44,7 @@ pub fn route_account(app: &mut Server) {
             pub password: String,
         }
 
-        let data: Result<Signup, serde_json::Error> =
-            serde_json::from_str(&_req.body);
-
+        let data: Result<Signup, serde_json::Error> = serde_json::from_str(&_req.body);
         if data.is_err() {
             return Response::bad_request().json(&json!({
                 "message": "Missing username or password",
@@ -101,12 +56,9 @@ pub fn route_account(app: &mut Server) {
         }
 
         let data = data.unwrap();
-        let username = data.username;
-        let password = data.password;
-
         match load_accounts().await {
             Ok(mut accounts) => {
-                if accounts.contains_key(&username) {
+                if accounts.contains_key(&data.username) {
                     return Response::bad_request().json(&json!({
                         "message": "Username already exists",
                         "links": [
@@ -115,19 +67,8 @@ pub fn route_account(app: &mut Server) {
                     }));
                 }
 
-                let created_at = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .map(|d| d.as_secs().to_string())
-                    .unwrap_or_else(|_| "0".to_string());
-
-                let auth = Uuid::new_v4().to_string();
-                let acct = Account {
-                    username: username.clone(),
-                    password: password.clone(),
-                    created_at,
-                    auth: auth.clone(),
-                };
-                accounts.insert(username.clone(), acct);
+                let acct = new_account(data.username.clone(), data.password.clone());
+                accounts.insert(data.username.clone(), acct.clone());
 
                 if let Err(e) = save_accounts(&accounts).await {
                     return Response::internal_error().json(&json!({
@@ -138,8 +79,8 @@ pub fn route_account(app: &mut Server) {
 
                 Response::ok().json(&json!({
                     "message": "Account created successfully",
-                    "username": username,
-                    "auth": auth,
+                    "username": acct.username,
+                    "auth": acct.auth,
                     "links": [
                         {"rel": "self", "href": "/accounts/create", "method": "GET"},
                         {"rel": "login", "href": "/accounts/login", "method": "POST"},
@@ -161,9 +102,7 @@ pub fn route_account(app: &mut Server) {
             pub password: String,
         }
 
-        let data: Result<Login, serde_json::Error> =
-            serde_json::from_str(&_req.body);
-
+        let data: Result<Login, serde_json::Error> = serde_json::from_str(&_req.body);
         if data.is_err() {
             return Response::bad_request().json(&json!({
                 "message": "Missing username or password",
@@ -175,12 +114,9 @@ pub fn route_account(app: &mut Server) {
         }
 
         let data = data.unwrap();
-        let username = data.username;
-        let password = data.password;
-
         match load_accounts().await {
-            Ok(accounts) => match accounts.get(&username) {
-                Some(account) if account.password == password => {
+            Ok(accounts) => match accounts.get(&data.username) {
+                Some(account) if account.password == data.password => {
                     Response::ok().json(&json!({
                         "message": "Login successful",
                         "username": account.username,
