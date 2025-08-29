@@ -7,11 +7,15 @@ use speculate::speculate;
 use std::fs;
 use std::path::PathBuf;
 
-use quickapi::response::{self, Response};
 use serde_json::json;
-use quickapi::server::Server;
 
+use quickapi::server::{Server, Response};
 use server::account::route_account;
+
+fn block_on<F: std::future::Future>(future: F) -> F::Output {
+    tokio::runtime::Runtime::new().unwrap().block_on(future)
+}
+
 
 /// Clean database to make sure tests are independent
 /// 
@@ -36,7 +40,7 @@ speculate! {
         }
 
         it "has main route" {
-            let response: Response = app.simulate("GET", "/accounts", "");
+            let response: Response = block_on(app.simulate("GET", "/accounts", ""));
             assert_eq!(response.status, 200);
 
             let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
@@ -49,7 +53,7 @@ speculate! {
                 "password": "secret"
             }).to_string();
 
-            let res = app.simulate("POST", "/accounts/create/", &payload);
+            let res = block_on(app.simulate("POST", "/accounts/create/", &payload));
             assert_eq!(res.status, 200);
 
             let body: serde_json::Value = serde_json::from_str(&res.body).unwrap();
@@ -64,10 +68,10 @@ speculate! {
                 "password": "secret"
             }).to_string();
 
-            let create_new = app.simulate("POST", "/accounts/create/", &payload);
+            let create_new = block_on(app.simulate("POST", "/accounts/create/", &payload));
             assert_eq!(create_new.status, 200);
 
-            let recreate = app.simulate("POST", "/accounts/create/", &payload);
+            let recreate = block_on(app.simulate("POST", "/accounts/create/", &payload));
             assert_eq!(recreate.status, 400);
 
             let body: serde_json::Value = serde_json::from_str(&recreate.body).unwrap();
@@ -75,7 +79,7 @@ speculate! {
         }
 
         it "can't register for invalid body" {
-            let response = app.simulate("POST", "/accounts/create/", "not-json");
+            let response = block_on(app.simulate("POST", "/accounts/create/", "not-json"));
             assert_eq!(response.status, 400);
 
             let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
@@ -100,22 +104,24 @@ speculate! {
                 "password": "12345"
             }).to_string();
 
-            let response = app.simulate("POST", "/accounts/create/", &signup);
+            let response = block_on(app.simulate("POST", "/accounts/create/", &signup));
             assert_eq!(response.status, 200);
         }
 
         it "insert wrong credentials" {
-            app.simulate("POST", "/accounts/create/", &json!({
-                "username": "charlie",
-                "password": "right"
-            }).to_string());
+            block_on(
+                app.simulate("POST", "/accounts/create/", &json!({
+                    "username": "charlie",
+                    "password": "right"
+                }).to_string())
+            );
 
             let wrong_login = json!({
                 "username": "charlie",
                 "password": "wrong"
             }).to_string();
 
-            let response = app.simulate("POST", "/accounts/login/", &wrong_login);
+            let response = block_on(app.simulate("POST", "/accounts/login/", &wrong_login));
             assert_eq!(response.status, 401);
 
             let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
@@ -123,17 +129,19 @@ speculate! {
         }
 
         it "insert correct credentials" {
-            app.simulate("POST", "/accounts/create/", &json!({
-                "username": "charlie",
-                "password": "right"
-            }).to_string());
+            block_on(
+                app.simulate("POST", "/accounts/create/", &json!({
+                    "username": "charlie",
+                    "password": "right"
+                }).to_string())
+            );
 
             let login = json!({
                 "username": "charlie",
                 "password": "right"
             }).to_string();
 
-            let response = app.simulate("POST", "/accounts/login/", &login);
+            let response = block_on(app.simulate("POST", "/accounts/login/", &login));
             assert_eq!(response.status, 200);
 
             let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();

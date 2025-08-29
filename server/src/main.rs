@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde_json::json;
 
 use quickapi::{Server, Response};
@@ -14,7 +12,7 @@ async fn main() {
     route_account(&mut app);
 
     // /greet?name="Rick" => Hello, Rick?
-    app.route("GET", "/greet", |req, _params| {
+    app.route("GET", "/greet", |req, _params| async move {
         let binding: String = "Anonymous".to_string();
         let name: &String = req.param("name").unwrap_or(&binding);
         
@@ -22,7 +20,7 @@ async fn main() {
     });
 
     // /users/123 => {"user_id":"123"}
-    app.route("GET", "/users/{id}", |_req, params: HashMap<String, String>| {
+    app.route("GET", "/users/{id}", |_req, params| async move {
         let id: &String = params.get("id").unwrap();
         
         Response::ok().json(&json!({"user_id": id}))
