@@ -13,6 +13,9 @@ use quickapi::server::Server;
 
 use server::account::route_account;
 
+/// Clean database to make sure tests are independent
+/// 
+/// Be careful with race conditions if tests are run in parallel.
 fn cleanup_db() {
     let path = PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/accounts.json"));
     let _ = fs::remove_file(path);
@@ -28,7 +31,9 @@ speculate! {
             route_account(&mut app);
         }
 
-        after { cleanup_db(); }
+        after {
+            cleanup_db();
+        }
 
         it "has main route" {
             let response: Response = app.simulate("GET", "/accounts", "");
@@ -85,7 +90,9 @@ speculate! {
             route_account(&mut app);
         }
 
-        after { cleanup_db(); }
+        after {
+            cleanup_db();
+        }
 
         it "creates a new account" {
             let signup = json!({
@@ -98,7 +105,6 @@ speculate! {
         }
 
         it "insert wrong credentials" {
-
             app.simulate("POST", "/accounts/create/", &json!({
                 "username": "charlie",
                 "password": "right"
