@@ -2,7 +2,10 @@ use serde::Deserialize;
 use serde_json::json;
 use quickapi::{Response, Server};
 
-use crate::account::{models::Account, repository::{Accounts, PersistentAccounts, SharedAccounts, VirtualAccounts}};
+use crate::account::{
+    models::Account, 
+    repository::VirtualAccounts
+};
 
 #[derive(Debug, Deserialize)]
 pub struct Signup {
@@ -43,7 +46,7 @@ fn error_response(msg: &str, links: Vec<serde_json::Value>) -> Response {
 
 pub fn route_account(app: &mut Server) {
 
-    let accounts = PersistentAccounts::new("/data/accounts.json").shared();
+    let accounts = VirtualAccounts::new().shared();
 
     // --- static GET routes ---
 
