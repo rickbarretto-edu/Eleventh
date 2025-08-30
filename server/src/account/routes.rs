@@ -1,11 +1,11 @@
 use serde::Deserialize;
 use serde_json::json;
+
 use quickapi::{Response, Server};
 
-use crate::account::{
-    models::Account, 
-    repository::VirtualAccounts
-};
+use crate::{error_response, parse_json, route_info, unauthorized_response};
+use super::models::Account;
+use super::repository::VirtualAccounts;
 
 #[derive(Debug, Deserialize)]
 pub struct Signup {
@@ -17,39 +17,6 @@ pub struct Signup {
 pub struct Login {
     pub username: String,
     pub password: String,
-}
-
-/// Parse JSON body or return a bad request response
-fn parse_json<T: for<'de> Deserialize<'de>>(body: &str) -> Result<T, Response> {
-    serde_json::from_str(body).map_err(|_| {
-        Response::bad_request().json(&json!({
-            "message": "Invalid request body"
-        }))
-    })
-}
-
-/// Helper to build static info responses
-fn route_info(message: &str, links: Vec<serde_json::Value>) -> Response {
-    Response::ok().json(&json!({
-        "message": message,
-        "links": links
-    }))
-}
-
-/// Helper for bad request with custom message + links
-fn error_response(msg: &str, links: Vec<serde_json::Value>) -> Response {
-    Response::bad_request().json(&json!({
-        "message": msg,
-        "links": links,
-    }))
-}
-
-/// Helper for bad request with custom message + links
-fn unauthorized_response(msg: &str, links: Vec<serde_json::Value>) -> Response {
-    Response::unauthorized().json(&json!({
-        "message": msg,
-        "links": links,
-    }))
 }
 
 pub fn route_account(app: &mut Server) {
