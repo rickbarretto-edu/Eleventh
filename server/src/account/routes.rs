@@ -1,10 +1,17 @@
+use std::sync::Arc;
+
 use serde::Deserialize;
 use serde_json::json;
 use quickapi::{Response, Server};
 
-use super::repository::{load_accounts, save_accounts, new_account};
+use crate::account::models::Account;
+
+use super::repository::Accounts;
 
 pub fn route_account(app: &mut Server) {
+
+    let accounts = Arc::new(Accounts::at("/data/accounts.json".into()));
+
     app.get("/accounts", |_req, _params| async move {
         Response::ok().json(&json!({
             "message": "Account routes",
@@ -37,7 +44,9 @@ pub fn route_account(app: &mut Server) {
         }))
     });
 
+    
     app.post("/accounts/create/", |_req, _params| async move {
+        
         #[derive(Debug, Deserialize)]
         struct Signup {
             pub username: String,
@@ -45,6 +54,7 @@ pub fn route_account(app: &mut Server) {
         }
 
         let data: Result<Signup, serde_json::Error> = serde_json::from_str(&_req.body);
+
         if data.is_err() {
             return Response::bad_request().json(&json!({
                 "message": "Missing username or password",
@@ -56,46 +66,37 @@ pub fn route_account(app: &mut Server) {
         }
 
         let data = data.unwrap();
-        match load_accounts().await {
-            Ok(mut accounts) => {
-                if accounts.contains_key(&data.username) {
-                    return Response::bad_request().json(&json!({
-                        "message": "Username already exists",
-                        "links": [
-                            {"rel": "back", "href": "/accounts/create/", "method": "GET"},
-                        ]
-                    }));
-                }
+        let account = Account::new(
+            data.username.clone(), 
+            data.password.clone()
+        );
 
-                let acct = new_account(data.username.clone(), data.password.clone());
-                accounts.insert(data.username.clone(), acct.clone());
-
-                if let Err(e) = save_accounts(&accounts).await {
-                    return Response::internal_error().json(&json!({
-                        "message": "Failed to save account",
-                        "error": e,
-                    }));
-                }
-
+        match accounts.store(account.clone()).await {
+            Ok(_) => {
                 Response::ok().json(&json!({
                     "message": "Account created successfully",
-                    "username": acct.username,
-                    "auth": acct.auth,
+                    "username": &account.username,
+                    "auth": account.auth,
                     "links": [
                         {"rel": "self", "href": "/accounts/create", "method": "GET"},
                         {"rel": "login", "href": "/accounts/login", "method": "POST"},
                         {"rel": "home", "href": "/", "method": "GET"},
                     ]
                 }))
+            },
+            Err(e) => {
+                Response::internal_error().json(&json!({
+                    "message": "Failed to create account",
+                    "error": e,
+                }))
             }
-            Err(e) => Response::internal_error().json(&json!({
-                "message": "Failed to read accounts DB",
-                "error": e,
-            })),
         }
     });
 
     app.post("/accounts/login/", |_req, _params| async move {
+
+        let accounts = accounts.clone();
+
         #[derive(Debug, Deserialize)]
         struct Login {
             pub username: String,
@@ -114,30 +115,27 @@ pub fn route_account(app: &mut Server) {
         }
 
         let data = data.unwrap();
-        match load_accounts().await {
-            Ok(accounts) => match accounts.get(&data.username) {
-                Some(account) if account.password == data.password => {
-                    Response::ok().json(&json!({
-                        "message": "Login successful",
-                        "username": account.username,
-                        "auth": account.auth,
-                        "links": [
-                            {"rel": "self", "href": "/accounts/login/", "method": "GET"},
-                            {"rel": "home", "href": "/home/", "method": "GET"},
-                        ]
-                    }))
-                }
-                _ => Response::unauthorized().json(&json!({
-                    "message": "Invalid username or password",
+        let username = data.username.clone();
+        let password = data.password.clone();
+        
+        match accounts.by_credentials(&username, &password).await {
+            Some(account) => {
+                Response::ok().json(&json!({
+                    "message": "Login successful",
+                    "username": account.username,
+                    "auth": account.auth,
                     "links": [
-                        {"rel": "retry", "href": "/accounts/login/", "method": "POST"},
-                        {"rel": "create", "href": "/accounts/create/", "method": "POST"},
+                        {"rel": "self", "href": "/accounts/login/", "method": "GET"},
+                        {"rel": "home", "href": "/home/", "method": "GET"},
                     ]
-                })),
+                }))
             },
-            Err(e) => Response::internal_error().json(&json!({
-                "message": "Failed to read accounts DB",
-                "error": e,
+            None => Response::unauthorized().json(&json!({
+                "message": "Invalid username or password",
+                "links": [
+                    {"rel": "retry", "href": "/accounts/login/", "method": "POST"},
+                    {"rel": "create", "href": "/accounts/create/", "method": "POST"},
+                ]
             })),
         }
     });

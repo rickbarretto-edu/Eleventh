@@ -1,50 +1,98 @@
+use std::collections::HashMap;
 use std::path::PathBuf;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use tokio::fs;
-use uuid::Uuid;
 
-use super::models::{Account, Accounts};
+use super::models::Account;
 
-fn db_path() -> PathBuf {
-    PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/accounts.json"))
+#[derive(Clone, Debug)]
+pub struct Accounts {
+    map: HashMap<String, Account>,
 }
 
-pub async fn load_accounts() -> Result<Accounts, String> {
-    let path = db_path();
+impl Accounts {
 
-    if !path.exists() {
-        return Ok(Accounts::new());
+    pub fn new() -> Self {
+        Accounts {
+            map: HashMap::new(),
+        }
     }
 
-    let s = fs::read_to_string(&path)
-        .await
-        .map_err(|e| format!("failed to read DB file: {}", e))?;
-    let map: Accounts =
-        serde_json::from_str(&s).map_err(|e| format!("invalid DB JSON: {}", e))?;
-    Ok(map)
-}
+    pub fn at(path: String) -> PersistentJson {
+        PersistentJson::at(path)
+    }
 
-pub async fn save_accounts(accounts: &Accounts) -> Result<(), String> {
-    let path = db_path();
-    let serialized = serde_json::to_string_pretty(accounts)
-        .map_err(|e| format!("serialize error: {}", e))?;
-    fs::write(&path, serialized)
-        .await
-        .map_err(|e| format!("failed to write DB file: {}", e))
-}
+    pub async fn store(&self, new_account: Account) -> Result<(), String> {
+        if self.map.contains_key(&new_account.username) {
+            return Err("Account already exists".into());
+        }
+        Ok(())
+    }
 
-pub fn new_account(username: String, password: String) -> Account {
-    let created_at = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_secs().to_string())
-        .unwrap_or_else(|_| "0".to_string());
-
-    let auth = Uuid::new_v4().to_string();
-    Account {
-        username,
-        password,
-        created_at,
-        auth,
+    pub async fn by_credentials(&self, username: &str, password: &str) -> Option<&Account> {
+        self.map.get(username).filter(|acc| acc.password == password)
     }
 }
+
+
+struct PersistentJson {
+    path: PathBuf,
+    repo: Accounts,
+}
+
+impl PersistentJson {
+
+    pub fn at(path: String) -> Self {
+        let path: PathBuf = Self::normalized_path(&path);
+
+        Self {
+            repo: Accounts { map: Self::load_all(&path) },
+            path: path,
+        }
+    }
+
+    pub async fn store(&self, new_account: Account) -> Result<(), String> {
+        self.repo.store(new_account).await?;
+        self.save_all().await
+    }
+
+    pub async fn by_credentials(&self, username: &str, password: &str) -> Option<&Account> {
+        self.repo.by_credentials(username, password).await
+    }
+
+    pub fn normalized_path(path: &str) -> PathBuf {
+        let manifest: PathBuf = env!("CARGO_MANIFEST_DIR").into();
+
+        let binding = PathBuf::from(path.clone());
+        let relative = binding
+            .to_str()
+            .unwrap_or("/data/accounts.json")
+            .trim_start_matches('/');
+
+        manifest.join(relative)
+    }
+
+    fn load_all(path: &PathBuf) -> HashMap<String, Account> {
+        let content = std::fs::read_to_string(path)
+            .map_err(|e| format!("failed to read DB file: {}", e))
+            .unwrap();
+        
+        serde_json::from_str(&content)
+            .map_err(|e| format!("invalid DB JSON: {}", e))
+            .unwrap()
+    }
+
+    async fn save_all(&self) -> Result<(), String> {
+        let content = serde_json::to_string_pretty(&self.repo.map)
+            .map_err(|e| format!("failed to serialize accounts: {}", e))?;
+
+        fs::write(self.path.clone(), content)
+            .await
+            .map_err(|e| format!("failed to write DB file: {}", e))?;
+
+        Ok(())
+    }
+
+}
+
+
