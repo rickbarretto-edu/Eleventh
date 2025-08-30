@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Account {
     pub username: String,
@@ -11,10 +10,9 @@ pub struct Account {
 }
 
 impl Account {
-
     pub fn new(username: String, password: String) -> Account {
         use std::time;
-        
+
         let created_at = time::SystemTime::now()
             .duration_since(time::UNIX_EPOCH)
             .map(|d| d.as_secs().to_string())
@@ -29,5 +27,4 @@ impl Account {
             auth,
         }
     }
-
 }

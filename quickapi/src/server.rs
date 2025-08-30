@@ -1,7 +1,7 @@
 use std::collections::HashMap;
-use std::sync::Arc;
 use std::future::Future;
 use std::pin::Pin;
+use std::sync::Arc;
 
 use regex::Regex;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -38,8 +38,7 @@ impl HttpMethod {
 }
 
 pub type BoxedFuture = Pin<Box<dyn Future<Output = Response> + Send>>;
-pub type RouteAction =
-    Arc<dyn Fn(Request, HashMap<String, String>) -> BoxedFuture + Send + Sync>;
+pub type RouteAction = Arc<dyn Fn(Request, HashMap<String, String>) -> BoxedFuture + Send + Sync>;
 
 pub struct Route {
     pub method: HttpMethod,
@@ -90,7 +89,10 @@ impl Server {
 
         let regex = Regex::new(&format!("^{}$", regex_str)).unwrap();
 
-        for cap in Regex::new(r"\(\?P<([^>]+)>[^)]+\)").unwrap().captures_iter(&regex_str) {
+        for cap in Regex::new(r"\(\?P<([^>]+)>[^)]+\)")
+            .unwrap()
+            .captures_iter(&regex_str)
+        {
             param_names.push(cap[1].to_string());
         }
 
@@ -111,7 +113,7 @@ impl Server {
         self.route("GET", path, handler);
     }
 
-        pub fn post<F, Fut>(&mut self, path: &str, handler: F)
+    pub fn post<F, Fut>(&mut self, path: &str, handler: F)
     where
         F: Fn(Request, HashMap<String, String>) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = Response> + Send + 'static,
@@ -159,7 +161,6 @@ impl Server {
         self.route("HEAD", path, handler);
     }
 
-
     pub async fn simulate(&self, method: &str, path: &str, body: &str) -> Response {
         let request = Request::new(method, path, body);
 
@@ -176,7 +177,8 @@ impl Server {
     }
 
     pub async fn run(&self, addr: &str) {
-        let listener = TcpListener::bind(addr).await
+        let listener = TcpListener::bind(addr)
+            .await
             .expect("Failed to bind TCP listener");
 
         println!("Listening on {}", addr);
@@ -240,7 +242,7 @@ async fn handle_connection(mut socket: TcpStream, routes: Vec<Route>) {
 fn parameters(request: &Request, route: &Route) -> HashMap<String, String> {
     let captures = route.pattern.captures(&request.path).unwrap();
     let mut parameters: HashMap<String, String> = HashMap::new();
-    
+
     for name in &route.param_names {
         if let Some(m) = captures.name(name) {
             parameters.insert(name.clone(), m.as_str().to_string());

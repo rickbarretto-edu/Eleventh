@@ -65,7 +65,6 @@ impl ResponseBuilder {
 }
 
 impl Response {
-
     pub fn custom(status: u16, reason: &str) -> ResponseBuilder {
         ResponseBuilder {
             status,
@@ -119,9 +118,7 @@ impl Response {
             content_type: "text/plain".into(),
         }
     }
-
 }
-
 
 impl ToString for Response {
     fn to_string(&self) -> String {

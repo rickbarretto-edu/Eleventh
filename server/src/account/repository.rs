@@ -32,7 +32,9 @@ impl VirtualAccounts {
     }
 
     fn by_credentials_inner(&self, username: &str, password: &str) -> Option<&Account> {
-        self.map.get(username).filter(|acc| acc.password == password)
+        self.map
+            .get(username)
+            .filter(|acc| acc.password == password)
     }
 }
 

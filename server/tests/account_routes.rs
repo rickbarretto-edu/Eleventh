@@ -9,22 +9,20 @@ use std::path::PathBuf;
 
 use serde_json::json;
 
-use quickapi::server::{Server, Response};
+use quickapi::server::{Response, Server};
 use server::account::route_account;
 
 fn block_on<F: std::future::Future>(future: F) -> F::Output {
     tokio::runtime::Runtime::new().unwrap().block_on(future)
 }
 
-
 /// Clean database to make sure tests are independent
-/// 
+///
 /// Be careful with race conditions if tests are run in parallel.
 fn cleanup_db() {
     let path = PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/accounts.json"));
     let _ = fs::remove_file(path);
 }
-
 
 speculate! {
 
@@ -146,4 +144,3 @@ speculate! {
         }
     }
 }
-

@@ -10,7 +10,6 @@ pub struct Request {
 }
 
 impl Request {
-
     pub fn new(method: &str, path: &str, body: &str) -> Self {
         let (path, query) = Self::parse_url(path).unwrap_or((path.to_string(), HashMap::new()));
         Self {
@@ -24,18 +23,23 @@ impl Request {
     pub fn from_raw(raw: &str) -> Result<Self, String> {
         let lines: Vec<&str> = raw.lines().collect();
 
-        if lines.is_empty() { 
-            return Err("Empty request".into()); 
+        if lines.is_empty() {
+            return Err("Empty request".into());
         }
 
         let (method, full_path) = Self::parse_request_line(lines.get(0));
 
-        let (path, query) = Self::parse_url(&full_path)
-            .or_else(|e| Err(format!("Invalid URL: {}", e)))?;
+        let (path, query) =
+            Self::parse_url(&full_path).or_else(|e| Err(format!("Invalid URL: {}", e)))?;
 
         let body = Self::parse_body(&lines);
 
-        Ok(Request { method, path, query, body })
+        Ok(Request {
+            method,
+            path,
+            query,
+            body,
+        })
     }
 
     fn parse_request_line(line: Option<&&str>) -> (String, String) {

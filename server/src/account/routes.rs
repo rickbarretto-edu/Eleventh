@@ -3,9 +3,9 @@ use serde_json::json;
 
 use quickapi::{Response, Server};
 
-use crate::{error_response, parse_json, route_info, unauthorized_response};
 use super::models::Account;
 use super::repository::VirtualAccounts;
+use crate::{error_response, parse_json, route_info, unauthorized_response};
 
 #[derive(Debug, Deserialize)]
 pub struct Signup {
@@ -20,32 +20,39 @@ pub struct Login {
 }
 
 pub fn route_account(app: &mut Server) {
-
     let accounts = VirtualAccounts::new().shared();
 
     // --- static GET routes ---
 
     app.get("/accounts", |_req, _params| async move {
-        route_info("Account routes", vec![
-            json!({"rel": "create", "href": "/accounts/create/", "method": "GET"}),
-            json!({"rel": "login", "href": "/accounts/login/", "method": "GET"}),
-        ])
+        route_info(
+            "Account routes",
+            vec![
+                json!({"rel": "create", "href": "/accounts/create/", "method": "GET"}),
+                json!({"rel": "login", "href": "/accounts/login/", "method": "GET"}),
+            ],
+        )
     });
 
     app.get("/accounts/create/", |_req, _params| async move {
-        route_info("Create Account", vec![
-            json!({"rel": "self", "href": "/accounts/create/", "method": "POST"}),
-            json!({"rel": "back", "href": "/accounts/", "method": "GET"}),
-        ])
+        route_info(
+            "Create Account",
+            vec![
+                json!({"rel": "self", "href": "/accounts/create/", "method": "POST"}),
+                json!({"rel": "back", "href": "/accounts/", "method": "GET"}),
+            ],
+        )
     });
 
     app.get("/accounts/login/", |_req, _params| async move {
-        route_info("Enter Account", vec![
-            json!({"rel": "self", "href": "/accounts/login/", "method": "POST"}),
-            json!({"rel": "back", "href": "/accounts/", "method": "GET"}),
-        ])
+        route_info(
+            "Enter Account",
+            vec![
+                json!({"rel": "self", "href": "/accounts/login/", "method": "POST"}),
+                json!({"rel": "back", "href": "/accounts/", "method": "GET"}),
+            ],
+        )
     });
-
 
     // --- dynamic POST routes ---
 
@@ -71,11 +78,12 @@ pub fn route_account(app: &mut Server) {
                         {"rel": "home", "href": "/", "method": "GET"},
                     ]
                 })),
-                Err(_) => error_response("Username already exists", 
+                Err(_) => error_response(
+                    "Username already exists",
                     vec![
                         json!({"rel": "retry", "href": "/accounts/create/", "method": "POST"}),
                         json!({"rel": "login", "href": "/accounts/login/", "method": "POST"}),
-                    ]
+                    ],
                 ),
             }
         }
@@ -90,7 +98,10 @@ pub fn route_account(app: &mut Server) {
                 Err(resp) => return resp,
             };
 
-            match accounts.by_credentials(&data.username, &data.password).await {
+            match accounts
+                .by_credentials(&data.username, &data.password)
+                .await
+            {
                 Some(account) => Response::ok().json(&json!({
                     "message": "Login successful",
                     "username": account.username,
@@ -100,10 +111,13 @@ pub fn route_account(app: &mut Server) {
                         {"rel": "home", "href": "/home/", "method": "GET"},
                     ]
                 })),
-                None => unauthorized_response("Invalid username or password", vec![
-                    json!({"rel": "retry", "href": "/accounts/login/", "method": "POST"}),
-                    json!({"rel": "create", "href": "/accounts/create/", "method": "POST"}),
-                ]),
+                None => unauthorized_response(
+                    "Invalid username or password",
+                    vec![
+                        json!({"rel": "retry", "href": "/accounts/login/", "method": "POST"}),
+                        json!({"rel": "create", "href": "/accounts/create/", "method": "POST"}),
+                    ],
+                ),
             }
         }
     });
