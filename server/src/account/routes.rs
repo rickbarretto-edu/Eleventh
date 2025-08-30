@@ -44,6 +44,14 @@ fn error_response(msg: &str, links: Vec<serde_json::Value>) -> Response {
     }))
 }
 
+/// Helper for bad request with custom message + links
+fn unauthorized_response(msg: &str, links: Vec<serde_json::Value>) -> Response {
+    Response::unauthorized().json(&json!({
+        "message": msg,
+        "links": links,
+    }))
+}
+
 pub fn route_account(app: &mut Server) {
 
     let accounts = VirtualAccounts::new().shared();
@@ -96,10 +104,12 @@ pub fn route_account(app: &mut Server) {
                         {"rel": "home", "href": "/", "method": "GET"},
                     ]
                 })),
-                Err(e) => Response::internal_error().json(&json!({
-                    "message": "Failed to create account",
-                    "error": format!("{}", e),
-                })),
+                Err(_) => error_response("Username already exists", 
+                    vec![
+                        json!({"rel": "retry", "href": "/accounts/create/", "method": "POST"}),
+                        json!({"rel": "login", "href": "/accounts/login/", "method": "POST"}),
+                    ]
+                ),
             }
         }
     });
@@ -123,7 +133,7 @@ pub fn route_account(app: &mut Server) {
                         {"rel": "home", "href": "/home/", "method": "GET"},
                     ]
                 })),
-                None => error_response("Invalid username or password", vec![
+                None => unauthorized_response("Invalid username or password", vec![
                     json!({"rel": "retry", "href": "/accounts/login/", "method": "POST"}),
                     json!({"rel": "create", "href": "/accounts/create/", "method": "POST"}),
                 ]),

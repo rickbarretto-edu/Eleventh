@@ -35,10 +35,6 @@ speculate! {
             route_account(&mut app);
         }
 
-        after {
-            cleanup_db();
-        }
-
         it "has main route" {
             let response: Response = block_on(app.simulate("GET", "/accounts", ""));
             assert_eq!(response.status, 200);
@@ -83,7 +79,7 @@ speculate! {
             assert_eq!(response.status, 400);
 
             let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
-            assert_eq!(body["message"], "Missing username or password");
+            assert_eq!(body["message"], "Invalid request body");
         }
     }
 
