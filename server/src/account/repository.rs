@@ -1,69 +1,75 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use tokio::fs;
 
 use super::models::Account;
 
+pub trait Accounts {
+    async fn store(&self, new_account: Account) -> Result<(), String>;
+    async fn by_credentials(&self, username: &str, password: &str) -> Option<&Account>;
+    
+    fn shared(self) -> SharedAccounts<Self> where Self: Sized {
+        SharedAccounts::new(self)
+    }
+
+}
+
+/// Wrapper around Accounts to avoid Arc::clone boilerplate
+pub struct SharedAccounts<T: Accounts>(Arc<T>);
+
 #[derive(Clone, Debug)]
-pub struct Accounts {
+pub struct VirtualAccounts {
     map: HashMap<String, Account>,
 }
 
-impl Accounts {
+pub struct PersistentAccounts {
+    path: PathBuf,
+    repo: VirtualAccounts,
+}
+
+
+impl VirtualAccounts {
 
     pub fn new() -> Self {
-        Accounts {
+        VirtualAccounts {
             map: HashMap::new(),
         }
     }
+}
 
-    pub fn at(path: String) -> PersistentJson {
-        PersistentJson::at(path)
-    }
+impl Accounts for VirtualAccounts {
 
-    pub async fn store(&self, new_account: Account) -> Result<(), String> {
+    async fn store(&self, new_account: Account) -> Result<(), String> {
         if self.map.contains_key(&new_account.username) {
             return Err("Account already exists".into());
         }
         Ok(())
     }
 
-    pub async fn by_credentials(&self, username: &str, password: &str) -> Option<&Account> {
+    async fn by_credentials(&self, username: &str, password: &str) -> Option<&Account> {
         self.map.get(username).filter(|acc| acc.password == password)
     }
+
 }
 
 
-struct PersistentJson {
-    path: PathBuf,
-    repo: Accounts,
-}
+impl PersistentAccounts {
 
-impl PersistentJson {
-
-    pub fn at(path: String) -> Self {
-        let path: PathBuf = Self::normalized_path(&path);
+    pub fn new(path: &str) -> Self {
+        let path: PathBuf = dbg!(Self::normalized_path(&path));
 
         Self {
-            repo: Accounts { map: Self::load_all(&path) },
+            repo: VirtualAccounts { map: Self::load_all(&path) },
             path: path,
         }
-    }
-
-    pub async fn store(&self, new_account: Account) -> Result<(), String> {
-        self.repo.store(new_account).await?;
-        self.save_all().await
-    }
-
-    pub async fn by_credentials(&self, username: &str, password: &str) -> Option<&Account> {
-        self.repo.by_credentials(username, password).await
     }
 
     pub fn normalized_path(path: &str) -> PathBuf {
         let manifest: PathBuf = env!("CARGO_MANIFEST_DIR").into();
 
-        let binding = PathBuf::from(path.clone());
+        let binding = PathBuf::from(path);
         let relative = binding
             .to_str()
             .unwrap_or("/data/accounts.json")
@@ -92,7 +98,46 @@ impl PersistentJson {
 
         Ok(())
     }
+}
 
+impl Accounts for PersistentAccounts {
+
+    async fn store(&self, new_account: Account) -> Result<(), String> {
+        self.repo.store(new_account).await?;
+        self.save_all().await
+    }
+
+    async fn by_credentials(&self, username: &str, password: &str) -> Option<&Account> {
+        self.repo.by_credentials(username, password).await
+    }
+
+}
+
+
+impl Clone for SharedAccounts<VirtualAccounts> {
+    fn clone(&self) -> Self {
+        SharedAccounts(self.0.clone())
+    }
+}
+
+impl Clone for SharedAccounts<PersistentAccounts> {
+    fn clone(&self) -> Self {
+        SharedAccounts(self.0.clone())
+    }
+}
+
+impl <T: Accounts> SharedAccounts<T> {
+    pub fn new(repo: T) -> Self {
+        SharedAccounts(Arc::new(repo))
+    }
+}
+
+impl<T: Accounts> std::ops::Deref for SharedAccounts<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 
