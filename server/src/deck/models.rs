@@ -110,18 +110,18 @@ impl Deck {
         let defenders: Vec<PlayerCard> = DEFENDERS
             .map(|_| PlayerCard::random(&mut rng).is("DEF"))
             .collect();
-        let mids: Vec<PlayerCard> = MIDFIELDERS
+        let midfielders: Vec<PlayerCard> = MIDFIELDERS
             .map(|_| PlayerCard::random(&mut rng).is("MID"))
             .collect();
-        let fwd: Vec<PlayerCard> = FORWARDS
+        let forward: Vec<PlayerCard> = FORWARDS
             .map(|_| PlayerCard::random(&mut rng).is("FWD"))
             .collect();
 
         let mut player_cards: Vec<PlayerCard> = Vec::new();
         player_cards.extend(goalkeepers);
         player_cards.extend(defenders);
-        player_cards.extend(mids);
-        player_cards.extend(fwd);
+        player_cards.extend(midfielders);
+        player_cards.extend(forward);
 
         let special_cards: Vec<SpecialCard> = SPECIAL_CARDS
             .map(|_| SpecialCard::random(&mut rng))
