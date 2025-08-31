@@ -34,6 +34,7 @@ impl DailyDecks {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Inventories {
     per_user: HashMap<String, Inventory>,
 }

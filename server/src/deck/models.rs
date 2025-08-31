@@ -54,6 +54,7 @@ impl Deck {
 }
 
 
+#[derive(Debug, Clone)]
 pub struct Inventory {
     deck: Deck,
     limit: Amount,
