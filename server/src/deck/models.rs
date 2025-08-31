@@ -86,7 +86,7 @@ impl Inventory {
         }
     }
 
-    pub fn players(self) -> Vec<PlayerCard> {
+    pub fn players(&self) -> Vec<PlayerCard> {
         self.deck.players.clone()
     }
 
