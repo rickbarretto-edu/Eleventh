@@ -1,25 +1,22 @@
-use rand::{prelude::*};
-use serde::{Serialize, Deserialize};
+use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use crate::models::cards::{PlayerCard, SpecialCard};
 
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Deck {
-    pub player_cards: Vec<PlayerCard>,
-    pub special_cards: Vec<SpecialCard>,
+    pub players: Vec<PlayerCard>,
+    pub power_ups: Vec<SpecialCard>,
 }
 
 impl Deck {
-
     pub fn random(mut rng: impl Rng) -> Deck {
-
         const GOALKEEPERS: std::ops::Range<i32> = 0..1;
         const DEFENDERS: std::ops::Range<i32> = 0..4;
         const MIDFIELDERS: std::ops::Range<i32> = 0..4;
         const FORWARDS: std::ops::Range<i32> = 0..2;
         const SPECIAL_CARDS: std::ops::Range<i32> = 0..3;
-        
+
         let goalkeepers: Vec<PlayerCard> = GOALKEEPERS
             .map(|_| PlayerCard::random(&mut rng).is("GK"))
             .collect();
@@ -44,8 +41,8 @@ impl Deck {
             .collect();
 
         Deck {
-            player_cards,
-            special_cards,
+            players: player_cards,
+            power_ups: special_cards,
         }
     }
 }

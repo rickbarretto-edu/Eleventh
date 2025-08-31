@@ -1,20 +1,21 @@
+use std::collections::HashMap;
 
 use rand::Rng;
 
-use super::models::Deck;
+use crate::models::cards::PlayerCard;
+use crate::models::cards::SpecialCard;
 
+use super::models::Deck;
 
 #[derive(Debug, Clone)]
 pub struct DailyDecks {
     decks: Vec<Deck>,
 }
 
-
 impl DailyDecks {
-
     pub fn new(mut rng: impl Rng) -> Self {
         Self {
-            decks: Self::new_decks(&mut rng)
+            decks: Self::new_decks(&mut rng),
         }
     }
 
@@ -31,11 +32,7 @@ impl DailyDecks {
     }
 
     fn new_decks(mut rng: impl Rng) -> Vec<Deck> {
-        (0..256)
-            .map(|_| Deck::random(&mut rng))
-            .collect()
+        (0..256).map(|_| Deck::random(&mut rng)).collect()
     }
-
 }
-
 
