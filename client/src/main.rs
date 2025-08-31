@@ -16,8 +16,8 @@ fn main() {
 
 #[allow(non_snake_case)]
 fn WelcomeScreen(app: &mut Cursive) {
-    let body =
-        TextView::new(vec!["Eleventh", "Only 11 win!", "Press <Start> to begin."].join("\n"));
+    let content = &vec!["Eleventh", "Only 11 win!", "", "Press <Start> to begin."];
+    let body = TextView::new(content.join("\n")).center();
 
     let view = Dialog::around(body)
         .title("Eleventh")
