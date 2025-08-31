@@ -1,47 +1,51 @@
+use std::sync::{Arc, Mutex};
 use cursive::views::Dialog;
 use cursive::Cursive;
-use std::sync::Arc;
+use super::Page;
 
-type NextPage = Arc<dyn Fn(&mut Cursive) + Send + Sync>;
-
-#[derive(Clone)]
 pub struct Welcome {
-    title: String,
-    subtitle: String,
-    instructions: String,
-    next_page: NextPage,
+    ctx: Arc<Mutex<Cursive>>,
+    next: Option<Arc<dyn Page + Send + Sync>>,
 }
 
 impl Welcome {
-    pub fn new(next: NextPage) -> Self {
-        Self {
-            title: "Eleventh".to_string(),
-            subtitle: "Only 11 win!".to_string(),
-            instructions: "Press <Start> to begin.".to_string(),
-            next_page: next,
-        }
+    pub fn new(ctx: Arc<Mutex<Cursive>>) -> Self {
+        Self { ctx, next: None }
     }
 
-    pub fn message(&self) -> String {
+    pub fn opens(&mut self, next: Arc<dyn Page + Send + Sync>) {
+        self.next = Some(next);
+    }
+
+    fn message() -> String {
         vec![
-            self.title.as_str(),
-            self.subtitle.as_str(),
-            self.instructions.as_str(),
-        ]
-        .join("\n")
+            "Eleventh",
+            "Only 11 win!",
+            "Press <Start> to begin."
+        ].join("\n")
+    }
+}
+
+impl Page for Welcome {
+    fn context(&self) -> Arc<Mutex<Cursive>> {
+        self.ctx.clone()
     }
 
-    pub fn display(self, app: &mut Cursive) {
-        let welcome = self.clone();
-        app.add_layer(
-            Dialog::text(self.message())
-                .title("Welcome!")
-                .button("Start", move |s| welcome.clone().show_next(s)),
-        );
-    }
+    fn render(&self) {
+        let ctx = self.context();
+        let mut context = ctx.lock().unwrap();
 
-    fn show_next(self, app: &mut Cursive) {
-        app.pop_layer();
-        (self.next_page)(app);
+        let next_page = self.next.clone();
+
+        let dialog = Dialog::text(Self::message())
+            .title("Welcome!")
+            .button("Start", move |_s| {
+                if let Some(next) = &next_page {
+                    next.render();
+                }
+            });
+
+        context.pop_layer();
+        context.add_layer(dialog);
     }
 }

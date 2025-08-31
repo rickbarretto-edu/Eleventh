@@ -1,17 +1,27 @@
 use std::sync::Arc;
+use std::sync::Mutex;
 
-use eleventh::pages::Login;
+use cursive::Cursive;
+
+use cursive::CursiveExt;
+use eleventh::pages::Page;
 use eleventh::pages::Welcome;
 
-fn main() {
-    let mut siv = cursive::default();
 
-    let login = Login::new();
+#[tokio::main]
+pub async fn main() {
 
-    Welcome::new(
-        Arc::new(move |app| login.clone().display(app))
-    )
-        .display(&mut siv);
+    let mut cursive = Arc::new(Mutex::new(Cursive::default()));
 
-    siv.run();
+    let welcome = Arc::new(Welcome::new(cursive.clone()));
+    // let account = Arc::new(Account::new());
+    // let main = Arc::new(Main::new());
+
+    // welcome.opens(account);
+    // account.opens(main);
+    // main.backs_to(welcome);
+
+    welcome.render();
+    cursive.lock().unwrap().run();
+
 }
