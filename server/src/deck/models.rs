@@ -97,7 +97,7 @@ impl Inventory {
     }
 
     pub fn fire(&mut self, index: usize) -> Option<PlayerCard> {
-        if index > 0 && index < self.deck.players.len() {
+        if index < self.deck.players.len() {
             Some(self.deck.players.remove(index))
         } else {
             None
