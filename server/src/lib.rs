@@ -5,6 +5,9 @@ use serde_json::json;
 pub mod account;
 pub mod menu;
 pub mod deck;
+pub mod shared;
+
+pub use shared::models;
 
 /// Parse JSON body or return a bad request response
 pub fn parse_json<T: for<'de> Deserialize<'de>>(body: &str) -> Result<T, Response> {
