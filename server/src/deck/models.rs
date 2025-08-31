@@ -1,19 +1,22 @@
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use crate::models::cards::{PlayerCard, SpecialCard};
+
+type Amount = usize;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Deck {
     pub players: Vec<PlayerCard>,
-    pub power_ups: Vec<SpecialCard>,
+    pub power_ups: HashMap<SpecialCard, Amount>,
 }
 
 impl Deck {
-    pub fn new(players: &[PlayerCard], power_ups: &[SpecialCard]) -> Self {
+    pub fn new(players: &[PlayerCard], power_ups: &[(SpecialCard, Amount)]) -> Self {
         Self {
-            players: players.into(),
-            power_ups: power_ups.into(),
+            players: players.to_vec(),
+            power_ups: power_ups.iter().cloned().collect(),
         }
     }
 
@@ -24,39 +27,28 @@ impl Deck {
         const FORWARDS: std::ops::Range<i32> = 0..2;
         const SPECIAL_CARDS: std::ops::Range<i32> = 0..3;
 
-        let goalkeepers: Vec<PlayerCard> = GOALKEEPERS
-            .map(|_| PlayerCard::random(&mut rng).is("GK"))
-            .collect();
-        let defenders: Vec<PlayerCard> = DEFENDERS
-            .map(|_| PlayerCard::random(&mut rng).is("DEF"))
-            .collect();
-        let midfielders: Vec<PlayerCard> = MIDFIELDERS
-            .map(|_| PlayerCard::random(&mut rng).is("MID"))
-            .collect();
-        let forward: Vec<PlayerCard> = FORWARDS
-            .map(|_| PlayerCard::random(&mut rng).is("FWD"))
-            .collect();
-
         let mut player_cards: Vec<PlayerCard> = Vec::new();
-        player_cards.extend(goalkeepers);
-        player_cards.extend(defenders);
-        player_cards.extend(midfielders);
-        player_cards.extend(forward);
+        player_cards.extend(GOALKEEPERS.map(|_| PlayerCard::random(&mut rng).is("GK")));
+        player_cards.extend(DEFENDERS.map(|_| PlayerCard::random(&mut rng).is("DEF")));
+        player_cards.extend(MIDFIELDERS.map(|_| PlayerCard::random(&mut rng).is("MID")));
+        player_cards.extend(FORWARDS.map(|_| PlayerCard::random(&mut rng).is("FWD")));
 
-        let special_cards: Vec<SpecialCard> = SPECIAL_CARDS
-            .map(|_| SpecialCard::random(&mut rng))
-            .collect();
+        let mut power_ups: HashMap<SpecialCard, Amount> = HashMap::new();
+        for _ in SPECIAL_CARDS {
+            let card = SpecialCard::random(&mut rng);
+            *power_ups.entry(card).or_insert(0) += 1;
+        }
 
         Deck {
             players: player_cards,
-            power_ups: special_cards,
+            power_ups,
         }
     }
 
-    pub fn joined(self, other: Self) -> Self {
-        Self {
-            players: [self.players, other.players].concat(),
-            power_ups: [self.power_ups, other.power_ups].concat(),
+    pub fn join(&mut self, other: Self) {
+        self.players.extend(other.players);
+        for (card, amount) in other.power_ups {
+            *self.power_ups.entry(card).or_insert(0) += amount;
         }
     }
 }
