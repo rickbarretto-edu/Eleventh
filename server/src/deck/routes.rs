@@ -97,7 +97,23 @@ pub fn route_decks(app: &mut Server) {
         let local_inventory = global_inventories.clone();
         async move {
             let mut inventories = local_inventory.lock();
-            todo!()
+            
+            let id = _params.get("id");
+
+            if id.is_none() {
+                return error_response("Missing user ID", vec![]);
+            }
+
+            let user_id = id.unwrap();
+            let deck = inventories.deck_of(user_id);
+            let players = deck.players();
+            let power_ups = deck.power_ups();
+
+            Response::ok().json(&json!({
+                "message": "Your deck",
+                "players": players,
+                "power_ups": power_ups,
+            }))
         }
     });
 }
