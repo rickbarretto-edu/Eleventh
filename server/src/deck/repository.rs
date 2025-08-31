@@ -2,10 +2,8 @@ use std::collections::HashMap;
 
 use rand::Rng;
 
-use crate::models::cards::PlayerCard;
-use crate::models::cards::SpecialCard;
-
 use super::models::Deck;
+use crate::deck::models::Inventory;
 
 #[derive(Debug, Clone)]
 pub struct DailyDecks {
@@ -36,3 +34,18 @@ impl DailyDecks {
     }
 }
 
+pub struct Inventories {
+    per_user: HashMap<String, Inventory>,
+}
+
+impl Inventories {
+    pub fn new() -> Self {
+        Self {
+            per_user: HashMap::new(),
+        }
+    }
+
+    pub fn deck_of(&mut self, user_id: &str) -> &mut Inventory {
+        self.per_user.entry(user_id.into()).or_default()
+    }
+}

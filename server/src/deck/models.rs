@@ -59,11 +59,22 @@ pub struct Inventory {
     limit: Amount,
 }
 
+impl Default for Inventory {
+
+    fn default() -> Self {
+        Self {
+            limit: 50,
+            deck: Deck::new(&[], &[]),
+        }
+    }
+
+}
+
 impl Inventory {
     pub fn new(limit: usize) -> Self {
         Self {
             limit,
-            deck: Deck::new(&[], &[]),
+            ..Default::default()
         }
     }
 
