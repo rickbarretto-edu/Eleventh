@@ -10,6 +10,13 @@ pub struct Deck {
 }
 
 impl Deck {
+    pub fn new(players: &[PlayerCard], power_ups: &[SpecialCard]) -> Self {
+        Self {
+            players: players.into(),
+            power_ups: power_ups.into(),
+        }
+    }
+
     pub fn random(mut rng: impl Rng) -> Deck {
         const GOALKEEPERS: std::ops::Range<i32> = 0..1;
         const DEFENDERS: std::ops::Range<i32> = 0..4;
@@ -43,6 +50,13 @@ impl Deck {
         Deck {
             players: player_cards,
             power_ups: special_cards,
+        }
+    }
+
+    pub fn joined(self, other: Self) -> Self {
+        Self {
+            players: [self.players, other.players].concat(),
+            power_ups: [self.power_ups, other.power_ups].concat(),
         }
     }
 }
