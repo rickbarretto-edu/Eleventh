@@ -34,7 +34,10 @@ impl DailyDecks {
     }
 }
 
-#[derive(Debug, Clone)]
+use std::sync::{Arc, Mutex};
+
+
+#[derive(Debug)]
 pub struct Inventories {
     per_user: HashMap<String, Inventory>,
 }
@@ -46,7 +49,32 @@ impl Inventories {
         }
     }
 
+    pub fn shared(self) -> SharedInventories {
+        SharedInventories::new(self)
+    }
+
+    /// Get or create an Inventory for a user
     pub fn deck_of(&mut self, user_id: &str) -> &mut Inventory {
         self.per_user.entry(user_id.into()).or_default()
+    }
+}
+
+/// Shared wrapper (Arc + Mutex)
+#[derive(Clone)]
+pub struct SharedInventories(Arc<Mutex<Inventories>>);
+
+impl SharedInventories {
+    pub fn new(inventories: Inventories) -> Self {
+        SharedInventories(Arc::new(Mutex::new(inventories)))
+    }
+
+    /// Get the inner Arc<Mutex<_>> (for cloning into tasks)
+    fn inner(&self) -> Arc<Mutex<Inventories>> {
+        Arc::clone(&self.0)
+    }
+
+    /// Lock and access the inventories
+    pub fn lock(&self) -> std::sync::MutexGuard<'_, Inventories> {
+        self.0.lock().unwrap()
     }
 }

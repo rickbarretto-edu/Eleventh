@@ -90,8 +90,10 @@ impl Inventory {
         self.deck.players.clone()
     }
 
-    pub fn power_ups(self) -> HashMap<SpecialCard, Amount> {
-        self.deck.power_ups.clone()
+    pub fn power_ups(&self) -> Vec<(SpecialCard, Amount)> {
+        self.deck.power_ups.iter()
+            .map(|(card, amount)| (card.clone(), *amount))
+            .collect()
     }
 
     pub fn fire(&mut self, index: usize) -> Option<PlayerCard> {

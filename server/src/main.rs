@@ -3,6 +3,7 @@ use serde_json::json;
 use quickapi::{Response, Server};
 use server::account::route_account;
 use server::menu::route_menu;
+use server::deck::route_decks;
 
 #[tokio::main]
 async fn main() {
@@ -12,6 +13,7 @@ async fn main() {
 
     route_menu(&mut app);
     route_account(&mut app);
+    route_decks(&mut app);
 
     // /greet?name="Rick" => Hello, Rick?
     app.route("GET", "/greet", |req, _params| async move {

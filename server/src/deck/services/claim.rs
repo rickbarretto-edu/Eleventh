@@ -7,7 +7,6 @@ use tokio::time;
 use crate::deck::models::Deck;
 use crate::deck::repository::DailyDecks;
 
-
 /// Tracks when a user last claimed a reward
 #[derive(Debug, Clone)]
 pub struct PlayerClaim {
@@ -16,13 +15,13 @@ pub struct PlayerClaim {
 
 /// The reward service manages daily decks and per-user rewards
 #[derive(Debug)]
-pub struct RewardingService {
+pub struct Rewarding {
     daily_decks: DailyDecks,
     refreshed_at: NaiveDate,
     claims: HashMap<String, PlayerClaim>,
 }
 
-impl RewardingService {
+impl Rewarding {
     pub fn new(mut rng: impl Rng) -> Self {
         let today = Utc::now().date_naive();
         Self {
@@ -31,6 +30,10 @@ impl RewardingService {
             claims: HashMap::new(),
         }
     }
+
+    pub fn shared(self) -> SharedRewarding {
+        SharedRewarding::new(self)
+    } 
 
     /// Claim a reward for a user (once per 24h).
     pub fn claim_reward(
@@ -69,27 +72,47 @@ impl RewardingService {
         self.daily_decks.regerate(&mut rng);
         self.refreshed_at = Utc::now().date_naive();
     }
+}
 
-    /// Run background midnight-refresh loop.
-    /// Should be spawned as a tokio task.
-    pub async fn run(self: Self) {
-        let service: Arc<Mutex<Self>> = Arc::new(Mutex::new(self));
+/// Shared handle type
+#[derive(Clone)]
+pub struct SharedRewarding(Arc<Mutex<Rewarding>>);
 
-        loop {
-            // Compute how long until next midnight UTC
-            let now = Utc::now();
-            let tomorrow_midnight = (now + chrono::Duration::days(1))
-                .date_naive()
-                .and_hms_opt(0, 0, 0)
-                .unwrap();
-            let wait_secs = (tomorrow_midnight - now.naive_utc()).num_seconds();
+impl SharedRewarding {
 
-            time::sleep(time::Duration::from_secs(wait_secs as u64)).await;
+    pub fn new(rewarding: Rewarding) -> Self {
+        SharedRewarding(Arc::new(Mutex::new(rewarding)))
+    }
 
-            if let Ok(mut svc) = service.lock() {
-                svc.force_refresh(rand::rng());
-                println!("Decks refreshed at midnight!");
+    fn inner(&self) -> Arc<Mutex<Rewarding>> {
+        Arc::clone(&self.0)
+    }
+
+    pub fn spawn_refresher(&self) {
+        let svc = self.inner();
+
+        tokio::spawn(async move {
+            loop {
+                let now = Utc::now();
+                let tomorrow_midnight = (now + chrono::Duration::days(1))
+                    .date_naive()
+                    .and_hms_opt(0, 0, 0)
+                    .unwrap();
+                let wait_secs = (tomorrow_midnight - now.naive_utc()).num_seconds();
+
+                time::sleep(time::Duration::from_secs(wait_secs as u64)).await;
+
+                if let Ok(mut svc) = svc.lock() {
+                    svc.force_refresh(rand::rng());
+                    println!("Decks refreshed at midnight!");
+                }
             }
-        }
+        });
+    }
+
+    /// Get a locked reference to mutate directly
+    pub fn lock(&self) -> std::sync::MutexGuard<'_, Rewarding> {
+        self.0.lock().unwrap()
     }
 }
+

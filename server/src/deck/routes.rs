@@ -3,9 +3,9 @@ use serde_json::json;
 
 use quickapi::{Response, Server};
 
-use super::repository::DailyDecks;
 use super::repository::Inventories;
-use crate::{error_response, parse_json, route_info, unauthorized_response};
+use super::services::claim::Rewarding;
+use crate::error_response;
 
 #[derive(Debug, Deserialize)]
 pub struct ClaimBody {
@@ -19,33 +19,54 @@ pub struct Login {
 }
 
 pub fn route_decks(app: &mut Server) {
-    let daily_decks = DailyDecks::new(rand::rng());
-    let inventories = Inventories::new();
+    let global_rewards = Rewarding::new(rand::rng()).shared();
+    let global_inventories = Inventories::new().shared();
+
+    global_rewards.spawn_refresher();
 
 
-    let daily_decks = daily_decks.clone();
-    let inventories_repo = inventories.clone();
     app.get("/user/{id}/deck/claim/", move |_req, _params| {
-        let daily_decks = daily_decks.clone();
-        let inventories = inventories_repo.clone();
+        let local_rewards = global_rewards.clone();
+        let local_inventory = global_inventories.clone();
         async move {
 
-            todo!()
+            let mut rewards = local_rewards.lock();
+            let mut inventories = local_inventory.lock();
+
+            let id = _params.get("id");
+
+            if id.is_none() {
+                return error_response("Missing user ID", vec![]);
+            }
+
+            let user_id = id.unwrap();
+            match rewards.claim_reward(user_id, rand::rng()) {
+                Err(e) => Response::bad_request().json(&json!({
+                    "message": "Could not claim reward!",
+                    "error": e,
+                })),
+                Ok(claimed) => {
+                    let inventory = inventories.deck_of(user_id);
+                    inventory.add_deck(claimed);
+
+                    Response::ok().json(&json!({
+                        "message": "You got new cards!",
+                        "players": inventory.clone().players(),
+                        "power_ups": inventory.clone().power_ups(),
+                    }))
+                }
+            }
         }
     });
 
-    let inventories_repo = inventories.clone();
     app.delete("/user/deck/fire/{index}", move |_req, _params| {
-        let inventories = inventories_repo.clone();
         async move {
 
           todo!()
         }
     });
 
-    let inventories_repo = inventories.clone();
     app.get("/user/{id}/deck/", move |_req, _params| {
-        let inventories = inventories_repo.clone();
         async move {
 
           todo!()
