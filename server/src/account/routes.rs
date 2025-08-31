@@ -22,40 +22,6 @@ pub struct Login {
 pub fn route_account(app: &mut Server) {
     let accounts = VirtualAccounts::new().shared();
 
-    // --- static GET routes ---
-
-    app.get("/accounts", |_req, _params| async move {
-        route_info(
-            "Account routes",
-            vec![
-                json!({"rel": "create", "href": "/accounts/create/", "method": "GET"}),
-                json!({"rel": "login", "href": "/accounts/login/", "method": "GET"}),
-            ],
-        )
-    });
-
-    app.get("/accounts/create/", |_req, _params| async move {
-        route_info(
-            "Create Account",
-            vec![
-                json!({"rel": "self", "href": "/accounts/create/", "method": "POST"}),
-                json!({"rel": "back", "href": "/accounts/", "method": "GET"}),
-            ],
-        )
-    });
-
-    app.get("/accounts/login/", |_req, _params| async move {
-        route_info(
-            "Enter Account",
-            vec![
-                json!({"rel": "self", "href": "/accounts/login/", "method": "POST"}),
-                json!({"rel": "back", "href": "/accounts/", "method": "GET"}),
-            ],
-        )
-    });
-
-    // --- dynamic POST routes ---
-
     let create_repo = accounts.clone();
     app.post("/accounts/create/", move |_req, _params| {
         let accounts = create_repo.clone();
