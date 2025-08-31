@@ -1,27 +1,97 @@
-use std::sync::Arc;
-use std::sync::Mutex;
-
+use cursive::view::*;
+use cursive::views::Button;
+use cursive::views::Dialog;
+use cursive::views::EditView;
+use cursive::views::LinearLayout;
+use cursive::views::TextView;
+use cursive::*;
 use cursive::Cursive;
 
-use cursive::CursiveExt;
-use eleventh::pages::Page;
-use eleventh::pages::Welcome;
 
+fn main() {
+    let mut app = Cursive::default();
 
-#[tokio::main]
-pub async fn main() {
+    WelcomeScreen(&mut app);
+    app.run();
+}
 
-    let mut cursive = Arc::new(Mutex::new(Cursive::default()));
+#[allow(non_snake_case)]
+fn WelcomeScreen(app: &mut Cursive) {
+    let body = TextView::new("Welcome to the Game!\nPress Enter to continue");
+    let view = Dialog::around(body)
+        .title("Welcome")
+        .button("Continue", |s| { AccountMenu(s) });
+    
+    app.add_layer(view);
+}
 
-    let welcome = Arc::new(Welcome::new(cursive.clone()));
-    // let account = Arc::new(Account::new());
-    // let main = Arc::new(Main::new());
+#[allow(non_snake_case)]
+fn AccountMenu(app: &mut Cursive) {
+    app.pop_layer();
+    
+    let login = Button::new("Login", |s| {
+        MainMenu(s);
+    });
 
-    // welcome.opens(account);
-    // account.opens(main);
-    // main.backs_to(welcome);
+    let signup = Button::new("Signup", |s| {
+        MainMenu(s);
+    });
 
-    welcome.render();
-    cursive.lock().unwrap().run();
+    let layout = LinearLayout::vertical()
+        .child(TextView::new("Login"))
+        .child(EditView::new().with_name("username").fixed_width(20))
+        .child(EditView::new().secret().with_name("password").fixed_width(20))
+        .child(login)
+        .child(signup);
 
+    let dialog = Dialog::around(layout).title("Login / Signup");
+
+    app.add_layer(dialog);
+}
+
+#[allow(non_snake_case)]
+fn MainMenu(app: &mut Cursive) {
+    app.pop_layer();
+
+    let options = Dialog::text("Main Menu")
+        .title("Main Menu")
+        .button("Match", |s| MatchScreen(s))
+        .button("Team", |s| TeamScreen(s))
+        .button("Reward", |s| RewardScreen(s))
+        .button("Quit", |s| s.quit());
+
+    app.add_layer(options);
+}
+
+#[allow(non_snake_case)]
+fn MatchScreen(app: &mut Cursive) {
+    app.pop_layer();
+
+    let options = Dialog::text("Match Screen")
+        .title("Match")
+        .button("Back to Main", |s| MainMenu(s));
+    
+    app.add_layer(options);
+}
+
+#[allow(non_snake_case)]
+fn TeamScreen(app: &mut Cursive) {
+    app.pop_layer();
+
+    let options = Dialog::text("Team Screen")
+        .title("Team")
+        .button("Back to Main", |s| MainMenu(s));
+    
+    app.add_layer(options);
+}
+
+#[allow(non_snake_case)]
+fn RewardScreen(s: &mut Cursive) {
+    s.pop_layer();
+
+    let options = Dialog::text("Reward Screen")
+        .title("Reward")
+        .button("Back to Main", |s| MainMenu(s));
+    
+    s.add_layer(options);
 }
