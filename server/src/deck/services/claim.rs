@@ -10,16 +10,16 @@ use crate::deck::repository::DailyDecks;
 
 /// Tracks when a user last claimed a reward
 #[derive(Debug, Clone)]
-pub struct PlayerRewardState {
-    last_claimed: Option<DateTime<Utc>>,
+pub struct PlayerClaim {
+    claimed_at: Option<DateTime<Utc>>,
 }
 
 /// The reward service manages daily decks and per-user rewards
 #[derive(Debug)]
 pub struct RewardingService {
     daily_decks: DailyDecks,
-    last_deck_refresh: NaiveDate,
-    players: HashMap<String, PlayerRewardState>,
+    refreshed_at: NaiveDate,
+    claims: HashMap<String, PlayerClaim>,
 }
 
 impl RewardingService {
@@ -27,8 +27,8 @@ impl RewardingService {
         let today = Utc::now().date_naive();
         Self {
             daily_decks: DailyDecks::new(&mut rng),
-            last_deck_refresh: today,
-            players: HashMap::new(),
+            refreshed_at: today,
+            claims: HashMap::new(),
         }
     }
 
@@ -42,22 +42,22 @@ impl RewardingService {
         let today = now.date_naive();
 
         // Refresh deck if midnight passed
-        if today > self.last_deck_refresh {
+        if today > self.refreshed_at {
             self.force_refresh(&mut rng);
         }
 
-        let player_state = self.players
+        let player_state = self.claims
             .entry(user_id.to_string())
-            .or_insert(PlayerRewardState { last_claimed: None });
+            .or_insert(PlayerClaim { claimed_at: None });
 
-        if let Some(last) = player_state.last_claimed {
+        if let Some(last) = player_state.claimed_at {
             if now.signed_duration_since(last) < Duration::hours(24) {
                 return Err("Reward already claimed in the last 24h");
             }
         }
 
         if let Some(deck) = self.daily_decks.reward() {
-            player_state.last_claimed = Some(now);
+            player_state.claimed_at = Some(now);
             Ok(deck)
         } else {
             Err("No rewards available today. Try again in 24h!")
@@ -67,7 +67,7 @@ impl RewardingService {
     /// Force deck refresh (midnight rollover).
     pub fn force_refresh(&mut self, mut rng: impl Rng) {
         self.daily_decks.regerate(&mut rng);
-        self.last_deck_refresh = Utc::now().date_naive();
+        self.refreshed_at = Utc::now().date_naive();
     }
 
     /// Run background midnight-refresh loop.
