@@ -52,3 +52,41 @@ impl Deck {
         }
     }
 }
+
+
+pub struct Inventory {
+    deck: Deck,
+    limit: Amount,
+}
+
+impl Inventory {
+    pub fn new(limit: usize) -> Self {
+        Self {
+            limit,
+            deck: Deck::new(&[], &[]),
+        }
+    }
+
+    pub fn add_deck(&mut self, deck: Deck) {
+        self.deck.join(deck);
+        if self.deck.players.len() > self.limit {
+            let _ = self.deck.players.split_off(50);
+        }
+    }
+
+    pub fn players(self) -> Vec<PlayerCard> {
+        self.deck.players.clone()
+    }
+
+    pub fn power_ups(self) -> HashMap<SpecialCard, Amount> {
+        self.deck.power_ups.clone()
+    }
+
+    pub fn fire(&mut self, index: usize) -> Option<PlayerCard> {
+        if index > 0 || index < self.deck.players.len() {
+            Some(self.deck.players.remove(index))
+        } else {
+            None
+        }
+    }
+}
