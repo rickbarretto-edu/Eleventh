@@ -17,11 +17,13 @@ fn main() {
 
 #[allow(non_snake_case)]
 fn WelcomeScreen(app: &mut Cursive) {
-    let body = TextView::new("Welcome to the Game!\nPress Enter to continue");
+    let body =
+        TextView::new(vec!["Eleventh", "Only 11 win!", "Press <Start> to begin."].join("\n"));
+
     let view = Dialog::around(body)
-        .title("Welcome")
-        .button("Continue", |s| { AccountMenu(s) });
-    
+        .title("Eleventh")
+        .button("Start", |s| AccountMenu(s));
+
     app.add_layer(view);
 }
 
