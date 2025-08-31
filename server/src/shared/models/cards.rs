@@ -65,7 +65,9 @@ impl PlayerCard {
 }
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash)]
 pub struct SpecialCard {
     pub name: String,
     pub effect: String,
