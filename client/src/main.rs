@@ -4,9 +4,8 @@ use cursive::views::Dialog;
 use cursive::views::EditView;
 use cursive::views::LinearLayout;
 use cursive::views::TextView;
-use cursive::*;
 use cursive::Cursive;
-
+use cursive::*;
 
 fn main() {
     let mut app = Cursive::default();
@@ -30,7 +29,7 @@ fn WelcomeScreen(app: &mut Cursive) {
 #[allow(non_snake_case)]
 fn AccountMenu(app: &mut Cursive) {
     app.pop_layer();
-    
+
     let login = Button::new("Login", |s| {
         MainMenu(s);
     });
@@ -42,7 +41,12 @@ fn AccountMenu(app: &mut Cursive) {
     let layout = LinearLayout::vertical()
         .child(TextView::new("Login"))
         .child(EditView::new().with_name("username").fixed_width(20))
-        .child(EditView::new().secret().with_name("password").fixed_width(20))
+        .child(
+            EditView::new()
+                .secret()
+                .with_name("password")
+                .fixed_width(20),
+        )
         .child(login)
         .child(signup);
 
@@ -72,7 +76,7 @@ fn MatchScreen(app: &mut Cursive) {
     let options = Dialog::text("Match Screen")
         .title("Match")
         .button("Back to Main", |s| MainMenu(s));
-    
+
     app.add_layer(options);
 }
 
@@ -83,7 +87,7 @@ fn TeamScreen(app: &mut Cursive) {
     let options = Dialog::text("Team Screen")
         .title("Team")
         .button("Back to Main", |s| MainMenu(s));
-    
+
     app.add_layer(options);
 }
 
@@ -94,6 +98,6 @@ fn RewardScreen(s: &mut Cursive) {
     let options = Dialog::text("Reward Screen")
         .title("Reward")
         .button("Back to Main", |s| MainMenu(s));
-    
+
     s.add_layer(options);
 }
