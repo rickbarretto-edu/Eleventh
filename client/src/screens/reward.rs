@@ -44,7 +44,7 @@ pub fn RewardScreen(app: &mut Cursive, auth: String) {
     let reward = response.unwrap().json::<RewardResponse>();
 
     if reward.is_err() {
-        ErrorDialog(app, auth.clone(), "Failed to parse server response".into());
+        return ErrorDialog(app, auth.clone(), "Failed to parse server response".into());
     }
 
     let reward = reward.unwrap();
