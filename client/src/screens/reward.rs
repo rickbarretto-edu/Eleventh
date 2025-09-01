@@ -37,7 +37,8 @@ pub fn RewardScreen(app: &mut Cursive, auth: String) {
     let response = blocking::get(&url);
 
     if response.is_err() {
-        return ErrorDialog(app, auth, format!("Request failed: {}", e));
+        let message = response.err().unwrap();
+        return ErrorDialog(app, auth, format!("Request failed: {}", message));
     }
 
     if let Ok(reward) = response.unwrap().json::<RewardResponse>() {
