@@ -34,41 +34,25 @@ pub fn RewardScreen(app: &mut Cursive, auth: String) {
     app.pop_layer();
 
     let url = format!("http://127.0.0.1:8080/user/{}/deck/claim", auth);
+    let response = blocking::get(&url);
 
-    let res = blocking::get(&url);
+    if response.is_err() {
+        return ErrorDialog(app, auth, format!("Request failed: {}", e));
+    }
 
-    match res {
-        Ok(resp) => {
-            if let Ok(reward) = resp.json::<RewardResponse>() {
-                if let Some(err) = reward.error {
-                    let no_reward = Dialog::text(format!("{}\n{}", reward.message, err))
-                        .title("Error")
-                        .button("Back", move |s| MainMenu(s, auth.clone()));
-                    app.add_layer(no_reward);
-                } else if let Some(players) = reward.players {
-                    let mut iter = players.into_iter();
-                    if let Some(first) = iter.next() {
-                        EarnedCard(app, auth.clone(), first, iter.collect());
-                    }
-                } else {
-                    let empty_reward = Dialog::text(reward.message)
-                        .title("Reward")
-                        .button("Back", move |s| MainMenu(s, auth.clone()));
-                    app.add_layer(empty_reward);
-                }
-            } else {
-                let bad_response = Dialog::text("Failed to parse server response")
-                    .title("Error")
-                    .button("Back", move |s| MainMenu(s, auth.clone()));
-                app.add_layer(bad_response);
+    if let Ok(reward) = response.unwrap().json::<RewardResponse>() {
+        if let Some(err) = reward.error {
+            ErrorDialog(app, auth, format!("{}\n{}", reward.message, err));
+        } else if let Some(players) = reward.players {
+            let mut iter = players.into_iter();
+            if let Some(first) = iter.next() {
+                EarnedCard(app, auth.clone(), first, iter.collect());
             }
+        } else {
+            InfoDialog(app, auth, "Reward", reward.message);
         }
-        Err(e) => {
-            let connection_failed = Dialog::text(format!("Request failed: {}", e))
-                .title("Error")
-                .button("Back", move |s| MainMenu(s, auth.clone()));
-            app.add_layer(connection_failed);
-        }
+    } else {
+        ErrorDialog(app, auth, "Failed to parse server response".into());
     }
 }
 
@@ -96,4 +80,20 @@ fn EarnedCard(app: &mut Cursive, auth: String, player: Player, rest: Vec<Player>
 
     app.pop_layer();
     app.add_layer(next_button);
+}
+
+#[allow(non_snake_case)]
+fn ErrorDialog(app: &mut Cursive, auth: String, msg: String) {
+    let dialog = Dialog::text(msg)
+        .title("Error")
+        .button("Back", move |s| MainMenu(s, auth.clone()));
+    app.add_layer(dialog);
+}
+
+#[allow(non_snake_case)]
+fn InfoDialog(app: &mut Cursive, auth: String, title: &str, msg: String) {
+    let dialog = Dialog::text(msg)
+        .title(title)
+        .button("Back", move |s| MainMenu(s, auth.clone()));
+    app.add_layer(dialog);
 }
