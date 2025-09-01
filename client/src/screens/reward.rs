@@ -41,19 +41,23 @@ pub fn RewardScreen(app: &mut Cursive, auth: String) {
         return ErrorDialog(app, auth, format!("Request failed: {}", message));
     }
 
-    if let Ok(reward) = response.unwrap().json::<RewardResponse>() {
-        if let Some(err) = reward.error {
-            ErrorDialog(app, auth, format!("{}\n{}", reward.message, err));
-        } else if let Some(players) = reward.players {
-            let mut iter = players.into_iter();
-            if let Some(first) = iter.next() {
-                EarnedCard(app, auth.clone(), first, iter.collect());
-            }
-        } else {
-            InfoDialog(app, auth, "Reward", reward.message);
+    let reward = response.unwrap().json::<RewardResponse>();
+
+    if reward.is_err() {
+        ErrorDialog(app, auth.clone(), "Failed to parse server response".into());
+    }
+
+    let reward = reward.unwrap();
+
+    if let Some(err) = reward.error {
+        ErrorDialog(app, auth, format!("{}\n{}", reward.message, err));
+    } else if let Some(players) = reward.players {
+        let mut iter = players.into_iter();
+        if let Some(first) = iter.next() {
+            EarnedCard(app, auth.clone(), first, iter.collect());
         }
     } else {
-        ErrorDialog(app, auth, "Failed to parse server response".into());
+        InfoDialog(app, auth, "Reward", reward.message);
     }
 }
 
