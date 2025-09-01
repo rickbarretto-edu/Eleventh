@@ -48,7 +48,7 @@ pub fn RewardScreen(app: &mut Cursive, auth: String) {
                 } else if let Some(players) = reward.players {
                     let mut iter = players.into_iter();
                     if let Some(first) = iter.next() {
-                        CardReward(app, auth.clone(), first, iter.collect());
+                        EarnedCard(app, auth.clone(), first, iter.collect());
                     }
                 } else {
                     let empty_reward = Dialog::text(reward.message)
@@ -73,24 +73,25 @@ pub fn RewardScreen(app: &mut Cursive, auth: String) {
 }
 
 #[allow(non_snake_case)]
-fn CardReward(app: &mut Cursive, auth: String, player: Player, rest: Vec<Player>) {
+fn EarnedCard(app: &mut Cursive, auth: String, player: Player, rest: Vec<Player>) {
     let info = format!(
         "{} ({})\nAttack: {}\nDefense: {}\nPassing: {}\nStamina: {}",
         player.name, player.position, player.attack, player.defense, player.passing, player.stamina
     );
 
+    let dialog = Dialog::around(TextView::new(info))
+        .title("New Player");
+
     let next_button = if rest.is_empty() {
-        Dialog::around(TextView::new(info))
-            .title("New Player")
-            .button("Finish", move |s| MainMenu(s, auth.clone()))
+        dialog.button("Finish", move |s| {
+            MainMenu(s, auth.clone())
+        })
     } else {
-        Dialog::around(TextView::new(info))
-            .title("New Player")
-            .button("Next", move |s| {
-                let mut rest = rest.clone();
-                let next = rest.remove(0);
-                CardReward(s, auth.clone(), next, rest);
-            })
+        dialog.button("Next", move |s| {
+            let mut rest = rest.clone();
+            let next = rest.remove(0);
+            EarnedCard(s, auth.clone(), next, rest);
+        })
     };
 
     app.pop_layer();
