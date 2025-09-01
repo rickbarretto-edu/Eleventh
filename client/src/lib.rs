@@ -1,1 +1,2 @@
-pub mod pages;
+pub mod screens;
+pub mod theme;

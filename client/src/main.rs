@@ -1,17 +1,14 @@
-use std::sync::Arc;
+use cursive::Cursive;
+use cursive::*;
 
-use eleventh::pages::Login;
-use eleventh::pages::Welcome;
+use eleventh::screens::WelcomeScreen;
+use eleventh::theme;
 
 fn main() {
-    let mut siv = cursive::default();
+    let mut app = Cursive::default();
+    
+    WelcomeScreen(&mut app);
 
-    let login = Login::new();
-
-    Welcome::new(
-        Arc::new(move |app| login.clone().display(app))
-    )
-        .display(&mut siv);
-
-    siv.run();
+    app.set_theme(theme::theme());
+    app.run();
 }
