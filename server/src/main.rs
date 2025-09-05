@@ -22,8 +22,6 @@ async fn main() {
 
     let mut app: Server = Server::new();
 
-    // let accounts = Accounts::new("/data/accounts.json").shared();
-
     route_menu(&mut app);
     route_account(&mut app);
     route_decks(&mut app);
