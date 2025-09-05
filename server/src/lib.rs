@@ -3,7 +3,6 @@ use serde::Deserialize;
 use serde_json::json;
 
 pub mod account;
-pub mod menu;
 pub mod deck;
 pub mod shared;
 pub mod services;
