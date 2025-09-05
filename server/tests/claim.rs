@@ -2,6 +2,7 @@
 use quickapi::server::Server;
 use server::deck::route_decks;
 use server::services::Services;
+use speculate::speculate;
 
 pub fn services() -> Services {
     use server::services::inject;
@@ -15,33 +16,41 @@ pub fn services() -> Services {
     }
 }
 
-#[tokio::test]
-async fn claims_a_new_deck_successfully() {
-    let mut app = Server::new(services());
-    route_decks(&mut app);
 
-    let response = app.simulate("GET", "/user/123/deck/claim/", "").await;
-    assert_eq!(response.status, 200);
-
-    let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
-    assert_eq!(body["message"], "You got new cards!");
-    assert!(body["players"].is_array());
-    assert!(body["power_ups"].is_array());
+fn block_on<F: std::future::Future>(future: F) -> F::Output {
+    tokio::runtime::Runtime::new().unwrap().block_on(future)
 }
 
-#[tokio::test]
-async fn prevents_claiming_twice_in_24h() {
-    let mut app = Server::new(services());
-    route_decks(&mut app);
+speculate! {
 
-    // first claim
-    let _ = app.simulate("GET", "/user/123/deck/claim/", "").await;
+    describe "User Claims Deck" {
 
-    // second claim
-    let second = app.simulate("GET", "/user/123/deck/claim", "").await;
-    assert_eq!(second.status, 400);
+        before {
+            let mut app = Server::new(services());
+            route_decks(&mut app);
+        }
 
-    let body: serde_json::Value = serde_json::from_str(&second.body).unwrap();
-    assert_eq!(body["message"], "Could not claim reward!");
-    assert_eq!(body["error"], "Reward already claimed in the last 24h");
+        it "should get a new deck" {
+            let response = block_on(app.simulate("GET", "/user/123/deck/claim/", ""));
+            assert_eq!(response.status, 200);
+
+            let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
+            assert_eq!(body["message"], "You got new cards!");
+            assert!(body["players"].is_array());
+            assert!(body["power_ups"].is_array());
+        }
+
+        it "should prevent claiming twice in 24h" {
+                // first claim
+            let _ = block_on(app.simulate("GET", "/user/123/deck/claim/", ""));
+
+            // second claim
+            let second = block_on(app.simulate("GET", "/user/123/deck/claim", ""));
+            assert_eq!(second.status, 400);
+
+            let body: serde_json::Value = serde_json::from_str(&second.body).unwrap();
+            assert_eq!(body["message"], "Could not claim reward!");
+            assert_eq!(body["error"], "Reward already claimed in the last 24h");
+        }
+    }
 }
