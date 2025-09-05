@@ -1,13 +1,18 @@
 use serde_json::json;
 
+// QuickAPI
 use quickapi::{Response, Server};
+
+// Routes
 use server::account::route_account;
+use server::deck::route_decks;
+
+// Services
+use server::services::Services;
+use server::services::inject;
 use server::account::VirtualAccounts;
 use server::deck::Inventories;
 use server::deck::Rewarding;
-use server::deck::route_decks;
-use server::services::inject;
-use server::services::Services;
 
 #[tokio::main]
 async fn main() {
