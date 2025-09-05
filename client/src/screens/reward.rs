@@ -84,8 +84,7 @@ fn EarnedCard(
         player.name, player.position, player.attack, player.defense, player.passing, player.stamina
     );
 
-    let dialog = Dialog::around(TextView::new(info))
-        .title("New Player");
+    let dialog = Dialog::around(TextView::new(info)).title("New Player");
 
     let next_button = if rest.is_empty() {
         if powerups.is_empty() {
@@ -122,8 +121,7 @@ fn EarnedPowerUp(
         powerup.name, powerup.effect, amount
     );
 
-    let dialog = Dialog::around(TextView::new(info))
-        .title("New PowerUp");
+    let dialog = Dialog::around(TextView::new(info)).title("New PowerUp");
 
     let next_button = if rest.is_empty() {
         dialog.button("Finish", move |s| MainMenu(s, auth.clone()))

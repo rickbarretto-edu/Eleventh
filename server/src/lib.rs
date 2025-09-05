@@ -4,8 +4,8 @@ use serde_json::json;
 
 pub mod account;
 pub mod deck;
-pub mod shared;
 pub mod services;
+pub mod shared;
 
 pub use shared::models;
 

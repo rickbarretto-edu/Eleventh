@@ -1,8 +1,8 @@
-use cursive::theme::{BaseColor, Color, Palette, PaletteColor, BorderStyle, Theme};
+use cursive::theme::{BaseColor, BorderStyle, Color, Palette, PaletteColor, Theme};
 
 pub fn theme() -> Theme {
     let mut palette = Palette::default();
-    
+
     const WHITE: Color = Color::Dark(BaseColor::White);
     const GRAY_150: Color = Color::Rgb(150, 150, 150);
     const GRAY_180: Color = Color::Rgb(180, 180, 180);
@@ -24,7 +24,7 @@ pub fn theme() -> Theme {
     palette[PaletteColor::TitleSecondary] = GRAY_180;
 
     palette[PaletteColor::Highlight] = NEON_BLUE;
-    palette[PaletteColor::HighlightText] = WHITE;    
+    palette[PaletteColor::HighlightText] = WHITE;
     palette[PaletteColor::HighlightInactive] = METALLIC_GOLD;
 
     palette[PaletteColor::Shadow] = DARK_SHADOW;

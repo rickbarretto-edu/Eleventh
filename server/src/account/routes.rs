@@ -5,8 +5,8 @@ use quickapi::{Response, Server};
 
 use super::models::Account;
 use super::repository::VirtualAccounts;
-use crate::{error_response, parse_json, unauthorized_response};
 use crate::services::Services;
+use crate::{error_response, parse_json, unauthorized_response};
 
 #[derive(Debug, Deserialize)]
 pub struct Signup {

@@ -10,15 +10,14 @@ extern crate speculate;
 #[cfg(test)]
 use speculate::speculate;
 
-
 fn block_on<F: std::future::Future>(future: F) -> F::Output {
     tokio::runtime::Runtime::new().unwrap().block_on(future)
 }
 
 pub fn services() -> Services {
-    use server::services::inject;
     use server::account::VirtualAccounts;
     use server::deck::{Inventories, Rewarding};
+    use server::services::inject;
 
     Services {
         accounts: inject(VirtualAccounts::new()),

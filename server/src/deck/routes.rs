@@ -30,7 +30,7 @@ pub fn route_decks(app: &mut Server<Services>) {
     app.get("/user/{id}/deck/claim/", move |_req, _params| {
         let rewards = local_rewards.clone();
         let inventory = local_inventory.clone();
-    
+
         async move {
             let mut rewards = rewards.lock();
             let mut inventories = inventory.lock();
@@ -98,7 +98,7 @@ pub fn route_decks(app: &mut Server<Services>) {
         let local_inventory = global_inventories.clone();
         async move {
             let mut inventories = local_inventory.lock();
-            
+
             let id = _params.get("id");
 
             if id.is_none() {

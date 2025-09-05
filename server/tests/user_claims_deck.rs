@@ -1,13 +1,12 @@
-
 use quickapi::server::Server;
 use server::deck::route_decks;
 use server::services::Services;
 use speculate::speculate;
 
 pub fn services() -> Services {
-    use server::services::inject;
     use server::account::VirtualAccounts;
     use server::deck::{Inventories, Rewarding};
+    use server::services::inject;
 
     Services {
         accounts: inject(VirtualAccounts::new()),
@@ -15,7 +14,6 @@ pub fn services() -> Services {
         rewarding: inject(Rewarding::new(rand::rng())),
     }
 }
-
 
 fn block_on<F: std::future::Future>(future: F) -> F::Output {
     tokio::runtime::Runtime::new().unwrap().block_on(future)
@@ -43,7 +41,7 @@ speculate! {
         it "should prevent claiming twice in 24h" {
             let _ = block_on(app.simulate("GET", "/user/123/deck/claim/", ""));
             let second = block_on(app.simulate("GET", "/user/123/deck/claim", ""));
-            
+
             assert_eq!(second.status, 400);
 
             let body: serde_json::Value = serde_json::from_str(&second.body).unwrap();

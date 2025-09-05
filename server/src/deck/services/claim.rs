@@ -1,7 +1,7 @@
+use chrono::{DateTime, Duration, NaiveDate, Utc};
+use rand::Rng;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use rand::Rng;
-use chrono::{NaiveDate, DateTime, Duration, Utc};
 use tokio::time;
 
 use crate::deck::models::Deck;
@@ -33,14 +33,10 @@ impl Rewarding {
 
     pub fn shared(self) -> SharedRewarding {
         SharedRewarding::new(self)
-    } 
+    }
 
     /// Claim a reward for a user (once per 24h).
-    pub fn claim_reward(
-        &mut self,
-        user_id: &str,
-        mut rng: impl Rng,
-    ) -> Result<Deck, &'static str> {
+    pub fn claim_reward(&mut self, user_id: &str, mut rng: impl Rng) -> Result<Deck, &'static str> {
         let now = Utc::now();
         let today = now.date_naive();
 
@@ -49,7 +45,8 @@ impl Rewarding {
             self.force_refresh(&mut rng);
         }
 
-        let player_state = self.claims
+        let player_state = self
+            .claims
             .entry(user_id.to_string())
             .or_insert(PlayerClaim { claimed_at: None });
 
@@ -79,7 +76,6 @@ impl Rewarding {
 pub struct SharedRewarding(Arc<Mutex<Rewarding>>);
 
 impl SharedRewarding {
-
     pub fn new(rewarding: Rewarding) -> Self {
         SharedRewarding(Arc::new(Mutex::new(rewarding)))
     }
@@ -115,4 +111,3 @@ impl SharedRewarding {
         self.0.lock().unwrap()
     }
 }
-

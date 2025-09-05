@@ -5,9 +5,9 @@ use server::services::Services;
 use speculate::speculate;
 
 pub fn services() -> Services {
-    use server::services::inject;
     use server::account::VirtualAccounts;
     use server::deck::{Inventories, Rewarding};
+    use server::services::inject;
 
     Services {
         accounts: inject(VirtualAccounts::new()),
@@ -59,14 +59,14 @@ speculate! {
         let claim = block_on(app.simulate("GET", "/user/123/deck/claim", ""));
         let fire = block_on(app.simulate("DELETE", "/user/123/deck/fire/0/", ""));
         let final_deck = block_on(app.simulate("GET", "/user/123/deck/", ""));
-        
+
         let fire_body: serde_json::Value = serde_json::from_str(&fire.body).unwrap();
         let claim_body: serde_json::Value = serde_json::from_str(&claim.body).unwrap();
         let final_body: serde_json::Value = serde_json::from_str(&final_deck.body).unwrap();
-        
+
         assert_eq!(claim.status, 200);
         assert_eq!(fire.status, 200);
-        
+
         assert_eq!(claim_body["message"], "You got new cards!");
         assert!(claim_body["players"].as_array().unwrap().len() > 0);
 

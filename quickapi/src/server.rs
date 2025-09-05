@@ -65,7 +65,10 @@ pub struct Server<T> {
 
 impl<T> Server<T> {
     pub fn new(services: T) -> Self {
-        Self { routes: Vec::new(), services }
+        Self {
+            routes: Vec::new(),
+            services,
+        }
     }
 
     pub fn route<F, Fut>(&mut self, method: &str, path: &str, handler: F)

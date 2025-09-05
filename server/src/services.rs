@@ -16,11 +16,10 @@ pub fn inject<T>(service: T) -> Arc<Mutex<T>> {
 }
 
 impl Services {
-
     pub fn accounts(&self) -> Arc<Mutex<VirtualAccounts>> {
         Arc::clone(&self.accounts)
     }
-    
+
     pub fn inventories(&self) -> Arc<Mutex<Inventories>> {
         Arc::clone(&self.inventories)
     }
@@ -28,6 +27,4 @@ impl Services {
     pub fn rewarding(&self) -> Arc<Mutex<Rewarding>> {
         Arc::clone(&self.rewarding)
     }
-
 }
-

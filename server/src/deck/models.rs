@@ -53,7 +53,6 @@ impl Deck {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct Inventory {
     deck: Deck,
@@ -61,14 +60,12 @@ pub struct Inventory {
 }
 
 impl Default for Inventory {
-
     fn default() -> Self {
         Self {
             limit: 50,
             deck: Deck::new(&[], &[]),
         }
     }
-
 }
 
 impl Inventory {
@@ -91,7 +88,9 @@ impl Inventory {
     }
 
     pub fn power_ups(&self) -> Vec<(SpecialCard, Amount)> {
-        self.deck.power_ups.iter()
+        self.deck
+            .power_ups
+            .iter()
             .map(|(card, amount)| (card.clone(), *amount))
             .collect()
     }
