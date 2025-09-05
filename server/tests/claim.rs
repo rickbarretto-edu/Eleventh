@@ -41,11 +41,9 @@ speculate! {
         }
 
         it "should prevent claiming twice in 24h" {
-                // first claim
             let _ = block_on(app.simulate("GET", "/user/123/deck/claim/", ""));
-
-            // second claim
             let second = block_on(app.simulate("GET", "/user/123/deck/claim", ""));
+            
             assert_eq!(second.status, 400);
 
             let body: serde_json::Value = serde_json::from_str(&second.body).unwrap();
