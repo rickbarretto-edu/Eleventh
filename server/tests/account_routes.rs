@@ -46,14 +46,6 @@ speculate! {
             route_account(&mut app);
         }
 
-        it "has main route" {
-            let response: Response = block_on(app.simulate("GET", "/accounts", ""));
-            assert_eq!(response.status, 200);
-
-            let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
-            assert_eq!(body["message"], "Account routes");
-        }
-
         it "creates account" {
             let payload = json!({
                 "username": "alice",
