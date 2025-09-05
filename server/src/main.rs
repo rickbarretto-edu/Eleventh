@@ -2,11 +2,24 @@ use serde_json::json;
 
 use quickapi::{Response, Server};
 use server::account::route_account;
+use server::account::VirtualAccounts;
+use server::deck::Inventories;
+use server::deck::Rewarding;
 use server::menu::route_menu;
 use server::deck::route_decks;
+use server::services::inject;
+use server::services::Services;
 
 #[tokio::main]
 async fn main() {
+    let rng = rand::rng();
+
+    let services = Services {
+        accounts: inject(VirtualAccounts::new()),
+        inventories: inject(Inventories::new()),
+        rewarding: inject(Rewarding::new(rng)),
+    };
+
     let mut app: Server = Server::new();
 
     // let accounts = Accounts::new("/data/accounts.json").shared();

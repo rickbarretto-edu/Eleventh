@@ -6,6 +6,7 @@ pub mod account;
 pub mod menu;
 pub mod deck;
 pub mod shared;
+pub mod services;
 
 pub use shared::models;
 
