@@ -22,7 +22,6 @@ async fn main() {
 
     let mut app: Server = Server::new();
 
-    route_menu(&mut app);
     route_account(&mut app);
     route_decks(&mut app);
 
