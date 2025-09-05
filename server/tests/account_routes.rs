@@ -11,9 +11,22 @@ use serde_json::json;
 
 use quickapi::server::{Response, Server};
 use server::account::route_account;
+use server::services::Services;
 
 fn block_on<F: std::future::Future>(future: F) -> F::Output {
     tokio::runtime::Runtime::new().unwrap().block_on(future)
+}
+
+pub fn services() -> Services {
+    use server::services::inject;
+    use server::account::VirtualAccounts;
+    use server::deck::{Inventories, Rewarding};
+
+    Services {
+        accounts: inject(VirtualAccounts::new()),
+        inventories: inject(Inventories::new()),
+        rewarding: inject(Rewarding::new(rand::rng())),
+    }
 }
 
 /// Clean database to make sure tests are independent
@@ -29,7 +42,7 @@ speculate! {
     describe "Accounts Route" {
 
         before {
-            let mut app = Server::new();
+            let mut app = Server::new(services());
             route_account(&mut app);
         }
 
@@ -84,7 +97,7 @@ speculate! {
     describe "New user Charlie" {
 
         before {
-            let mut app = Server::new();
+            let mut app = Server::new(services());
             route_account(&mut app);
         }
 

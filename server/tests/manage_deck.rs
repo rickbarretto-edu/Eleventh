@@ -1,9 +1,23 @@
 use quickapi::server::Server;
 use server::deck::route_decks;
 
+use server::services::Services;
+
+pub fn services() -> Services {
+    use server::services::inject;
+    use server::account::VirtualAccounts;
+    use server::deck::{Inventories, Rewarding};
+
+    Services {
+        accounts: inject(VirtualAccounts::new()),
+        inventories: inject(Inventories::new()),
+        rewarding: inject(Rewarding::new(rand::rng())),
+    }
+}
+
 #[tokio::test]
 async fn user_can_claim_and_fire_cards() {
-    let mut app = Server::new();
+    let mut app = Server::new(services());
     route_decks(&mut app);
 
     // Initial deck should be empty

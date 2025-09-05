@@ -1,10 +1,23 @@
 
 use quickapi::server::Server;
 use server::deck::route_decks;
+use server::services::Services;
+
+pub fn services() -> Services {
+    use server::services::inject;
+    use server::account::VirtualAccounts;
+    use server::deck::{Inventories, Rewarding};
+
+    Services {
+        accounts: inject(VirtualAccounts::new()),
+        inventories: inject(Inventories::new()),
+        rewarding: inject(Rewarding::new(rand::rng())),
+    }
+}
 
 #[tokio::test]
 async fn claims_a_new_deck_successfully() {
-    let mut app = Server::new();
+    let mut app = Server::new(services());
     route_decks(&mut app);
 
     let response = app.simulate("GET", "/user/123/deck/claim/", "").await;
@@ -18,7 +31,7 @@ async fn claims_a_new_deck_successfully() {
 
 #[tokio::test]
 async fn prevents_claiming_twice_in_24h() {
-    let mut app = Server::new();
+    let mut app = Server::new(services());
     route_decks(&mut app);
 
     // first claim
