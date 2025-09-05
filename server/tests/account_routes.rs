@@ -29,14 +29,6 @@ pub fn services() -> Services {
     }
 }
 
-/// Clean database to make sure tests are independent
-///
-/// Be careful with race conditions if tests are run in parallel.
-fn cleanup_db() {
-    let path = PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/accounts.json"));
-    let _ = fs::remove_file(path);
-}
-
 speculate! {
 
     describe "Accounts Route" {
@@ -91,10 +83,6 @@ speculate! {
         before {
             let mut app = Server::new(services());
             route_account(&mut app);
-        }
-
-        after {
-            cleanup_db();
         }
 
         it "creates a new account" {
