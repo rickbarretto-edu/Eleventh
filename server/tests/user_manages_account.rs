@@ -4,12 +4,9 @@ extern crate speculate;
 #[cfg(test)]
 use speculate::speculate;
 
-use std::fs;
-use std::path::PathBuf;
-
 use serde_json::json;
 
-use quickapi::server::{Response, Server};
+use quickapi::server::Server;
 use server::account::route_account;
 use server::services::Services;
 
