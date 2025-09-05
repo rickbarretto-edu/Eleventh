@@ -15,12 +15,12 @@ fn block_on<F: std::future::Future>(future: F) -> F::Output {
 }
 
 pub fn services() -> Services {
-    use server::account::VirtualAccounts;
+    use server::account::Accounts;
     use server::deck::{Inventories, Rewarding};
     use server::services::inject;
 
     Services {
-        accounts: inject(VirtualAccounts::new()),
+        accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
         rewarding: inject(Rewarding::new(rand::rng())),
     }

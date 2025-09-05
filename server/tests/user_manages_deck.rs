@@ -5,12 +5,12 @@ use server::services::Services;
 use speculate::speculate;
 
 pub fn services() -> Services {
-    use server::account::VirtualAccounts;
+    use server::account::Accounts;
     use server::deck::{Inventories, Rewarding};
     use server::services::inject;
 
     Services {
-        accounts: inject(VirtualAccounts::new()),
+        accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
         rewarding: inject(Rewarding::new(rand::rng())),
     }

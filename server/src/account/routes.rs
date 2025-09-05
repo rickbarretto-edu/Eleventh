@@ -4,7 +4,7 @@ use serde_json::json;
 use quickapi::{Response, Server};
 
 use super::models::Account;
-use super::repository::VirtualAccounts;
+use super::repository::Accounts;
 use crate::services::Services;
 use crate::{error_response, parse_json, unauthorized_response};
 
@@ -21,7 +21,7 @@ pub struct Login {
 }
 
 pub fn route_account(app: &mut Server<Services>) {
-    let accounts = VirtualAccounts::new().shared();
+    let accounts = Accounts::new().shared();
 
     let create_repo = accounts.clone();
     app.post("/accounts/create/", move |_req, _params| {

@@ -1,12 +1,12 @@
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use crate::account::VirtualAccounts;
+use crate::account::Accounts;
 use crate::deck::Inventories;
 use crate::deck::Rewarding;
 
 pub struct Services {
-    pub accounts: Arc<Mutex<VirtualAccounts>>,
+    pub accounts: Arc<Mutex<Accounts>>,
     pub inventories: Arc<Mutex<Inventories>>,
     pub rewarding: Arc<Mutex<Rewarding>>,
 }
@@ -16,7 +16,7 @@ pub fn inject<T>(service: T) -> Arc<Mutex<T>> {
 }
 
 impl Services {
-    pub fn accounts(&self) -> Arc<Mutex<VirtualAccounts>> {
+    pub fn accounts(&self) -> Arc<Mutex<Accounts>> {
         Arc::clone(&self.accounts)
     }
 

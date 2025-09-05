@@ -3,5 +3,5 @@ mod repository;
 mod routes;
 
 pub use models::Account;
-pub use repository::VirtualAccounts;
+pub use repository::Accounts;
 pub use routes::route_account;
