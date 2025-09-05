@@ -89,25 +89,25 @@ impl SharedRewarding {
     }
 
     pub fn spawn_refresher(&self) {
-        let svc = self.inner();
+        // let svc = self.inner();
 
-        tokio::spawn(async move {
-            loop {
-                let now = Utc::now();
-                let tomorrow_midnight = (now + chrono::Duration::days(1))
-                    .date_naive()
-                    .and_hms_opt(0, 0, 0)
-                    .unwrap();
-                let wait_secs = (tomorrow_midnight - now.naive_utc()).num_seconds();
+        // tokio::spawn(async move {
+        //     loop {
+        //         let now = Utc::now();
+        //         let tomorrow_midnight = (now + chrono::Duration::days(1))
+        //             .date_naive()
+        //             .and_hms_opt(0, 0, 0)
+        //             .unwrap();
+        //         let wait_secs = (tomorrow_midnight - now.naive_utc()).num_seconds();
 
-                time::sleep(time::Duration::from_secs(wait_secs as u64)).await;
+        //         time::sleep(time::Duration::from_secs(wait_secs as u64)).await;
 
-                if let Ok(mut svc) = svc.lock() {
-                    svc.force_refresh(rand::rng());
-                    println!("Decks refreshed at midnight!");
-                }
-            }
-        });
+        //         if let Ok(mut svc) = svc.lock() {
+        //             svc.force_refresh(rand::rng());
+        //             println!("Decks refreshed at midnight!");
+        //         }
+        //     }
+        // });
     }
 
     /// Get a locked reference to mutate directly
