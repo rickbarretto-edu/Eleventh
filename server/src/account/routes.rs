@@ -5,7 +5,8 @@ use quickapi::{Response, Server};
 
 use super::models::Account;
 use super::repository::VirtualAccounts;
-use crate::{error_response, parse_json, route_info, unauthorized_response};
+use crate::{error_response, parse_json, unauthorized_response};
+use crate::services::Services;
 
 #[derive(Debug, Deserialize)]
 pub struct Signup {
@@ -19,7 +20,7 @@ pub struct Login {
     pub password: String,
 }
 
-pub fn route_account(app: &mut Server) {
+pub fn route_account(app: &mut Server<Services>) {
     let accounts = VirtualAccounts::new().shared();
 
     let create_repo = accounts.clone();

@@ -1,7 +1,5 @@
-use serde_json::json;
-
 // QuickAPI
-use quickapi::{Response, Server};
+use quickapi::Server;
 
 // Routes
 use server::account::route_account;
@@ -24,7 +22,7 @@ async fn main() {
         rewarding: inject(Rewarding::new(rng)),
     };
 
-    let mut app: Server = Server::new();
+    let mut app: Server<Services> = Server::new(services);
 
     route_account(&mut app);
     route_decks(&mut app);

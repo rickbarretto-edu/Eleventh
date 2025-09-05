@@ -6,6 +6,7 @@ use quickapi::{Response, Server};
 use super::repository::Inventories;
 use super::services::claim::Rewarding;
 use crate::error_response;
+use crate::services::Services;
 
 #[derive(Debug, Deserialize)]
 pub struct ClaimBody {
@@ -18,7 +19,7 @@ pub struct Login {
     pub password: String,
 }
 
-pub fn route_decks(app: &mut Server) {
+pub fn route_decks(app: &mut Server<Services>) {
     let global_rewards = Rewarding::new(rand::rng()).shared();
     let global_inventories = Inventories::new().shared();
 
