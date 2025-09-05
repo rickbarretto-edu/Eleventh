@@ -14,7 +14,7 @@ pub struct PlayerClaim {
 }
 
 /// The reward service manages daily decks and per-user rewards
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Rewarding {
     daily_decks: DailyDecks,
     refreshed_at: NaiveDate,

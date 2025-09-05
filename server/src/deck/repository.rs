@@ -37,7 +37,7 @@ impl DailyDecks {
 use std::sync::{Arc, Mutex};
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Inventories {
     per_user: HashMap<String, Inventory>,
 }
