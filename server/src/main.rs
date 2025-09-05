@@ -5,7 +5,6 @@ use server::account::route_account;
 use server::account::VirtualAccounts;
 use server::deck::Inventories;
 use server::deck::Rewarding;
-use server::menu::route_menu;
 use server::deck::route_decks;
 use server::services::inject;
 use server::services::Services;
