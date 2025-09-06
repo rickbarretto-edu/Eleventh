@@ -18,6 +18,7 @@ const SPECIAL_CARD_NAMES: &[(&str, &str)] = &[
 ];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash)]
 pub struct PlayerCard {
     pub name: String,
     pub position: String,
