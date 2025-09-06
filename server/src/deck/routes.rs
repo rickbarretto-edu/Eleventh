@@ -45,8 +45,8 @@ async fn claim(
 
             Response::ok().json(&json!({
                 "message": "You got new cards!",
-                "players": &claimed.players,
-                "power_ups": &claimed.power_ups,
+                "players": &claimed.players().await,
+                "power_ups": &claimed.power_ups().await,
             }))
         }
     }

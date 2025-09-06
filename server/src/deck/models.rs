@@ -8,8 +8,8 @@ type Amount = usize;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Deck {
-    pub players: Vec<PlayerCard>,
-    pub power_ups: HashMap<SpecialCard, Amount>,
+    players: Vec<PlayerCard>,
+    power_ups: HashMap<SpecialCard, Amount>,
 }
 
 impl Deck {
@@ -18,6 +18,17 @@ impl Deck {
             players: players.to_vec(),
             power_ups: power_ups.iter().cloned().collect(),
         }
+    }
+
+    pub async fn players(&self) -> Vec<PlayerCard> {
+        self.players.clone()
+    }
+
+    pub async fn power_ups(&self) -> Vec<(SpecialCard, Amount)> {
+        self.power_ups
+            .iter()
+            .map(|(card, amount)| (card.clone(), *amount))
+            .collect()
     }
 
     pub fn random(mut rng: impl Rng) -> Deck {
@@ -84,15 +95,11 @@ impl Inventory {
     }
 
     pub async fn players(&self) -> Vec<PlayerCard> {
-        self.deck.players.clone()
+        self.deck.players().await
     }
 
     pub async fn power_ups(&self) -> Vec<(SpecialCard, Amount)> {
-        self.deck
-            .power_ups
-            .iter()
-            .map(|(card, amount)| (card.clone(), *amount))
-            .collect()
+        self.deck.power_ups().await
     }
 
     pub async fn fire(&mut self, index: usize) -> Option<PlayerCard> {
