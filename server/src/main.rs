@@ -1,6 +1,8 @@
 // QuickAPI
 use quickapi::Server;
 
+use rand::rngs::StdRng;
+use rand::SeedableRng;
 // Routes
 use server::account::route_account;
 use server::deck::route_decks;
@@ -14,7 +16,7 @@ use server::services::Services;
 
 #[tokio::main]
 async fn main() {
-    let rng = rand::rng();
+    let rng = StdRng::from_os_rng();
 
     let services = Services {
         accounts: inject(Accounts::new()),
@@ -25,7 +27,7 @@ async fn main() {
     let mut app: Server<Services> = Server::new(services);
 
     route_account(&mut app);
-    // route_decks(&mut app);
+    route_decks(&mut app);
 
     app.run("127.0.0.1:8080").await;
 }

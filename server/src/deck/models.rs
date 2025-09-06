@@ -76,18 +76,18 @@ impl Inventory {
         }
     }
 
-    pub fn add_deck(&mut self, deck: Deck) {
+    pub async fn add_deck(&mut self, deck: Deck) {
         self.deck.join(deck);
         if self.deck.players.len() > self.limit {
             let _ = self.deck.players.split_off(50);
         }
     }
 
-    pub fn players(&self) -> Vec<PlayerCard> {
+    pub async fn players(&self) -> Vec<PlayerCard> {
         self.deck.players.clone()
     }
 
-    pub fn power_ups(&self) -> Vec<(SpecialCard, Amount)> {
+    pub async fn power_ups(&self) -> Vec<(SpecialCard, Amount)> {
         self.deck
             .power_ups
             .iter()
@@ -95,7 +95,7 @@ impl Inventory {
             .collect()
     }
 
-    pub fn fire(&mut self, index: usize) -> Option<PlayerCard> {
+    pub async fn fire(&mut self, index: usize) -> Option<PlayerCard> {
         if index < self.deck.players.len() {
             Some(self.deck.players.remove(index))
         } else {

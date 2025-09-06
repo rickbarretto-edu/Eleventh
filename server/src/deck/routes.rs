@@ -1,11 +1,16 @@
+use std::collections::HashMap;
+use std::sync::Arc;
+
+use rand::rngs::StdRng;
+use rand::SeedableRng;
 use serde::Deserialize;
 use serde_json::json;
+use tokio::sync::Mutex;
 
 use quickapi::{Response, Server};
 
 use super::repository::Inventories;
 use super::services::claim::Rewarding;
-use crate::error_response;
 use crate::services::Services;
 
 #[derive(Debug, Deserialize)]
@@ -19,102 +24,99 @@ pub struct Login {
     pub password: String,
 }
 
-pub fn route_decks(app: &mut Server<Services>) {
-    let global_rewards = Rewarding::new(rand::rng()).shared();
-    let global_inventories = Inventories::new().shared();
 
-    global_rewards.spawn_refresher();
+async fn claim(
+    rewards: Arc<Mutex<Rewarding>>,
+    inventories: Arc<Mutex<Inventories>>,
+    params: HashMap<String, String>
+) -> Response {
 
-    let local_rewards = global_rewards.clone();
-    let local_inventory = global_inventories.clone();
-    app.get("/user/{id}/deck/claim/", move |_req, _params| {
-        let rewards = local_rewards.clone();
-        let inventory = local_inventory.clone();
+    let id = params.get("id").expect("To have ID parameter");
 
-        async move {
-            let mut rewards = rewards.lock();
-            let mut inventories = inventory.lock();
-
-            let id = _params.get("id");
-
-            if id.is_none() {
-                return error_response("Missing user ID", vec![]);
-            }
-
-            let user_id = id.unwrap();
-            match rewards.claim_reward(user_id, rand::rng()) {
-                Err(e) => Response::bad_request().json(&json!({
-                    "message": "Could not claim reward!",
-                    "error": e,
-                })),
-                Ok(claimed) => {
-                    let inventory = inventories.deck_of(user_id);
-                    inventory.add_deck(claimed);
-
-                    Response::ok().json(&json!({
-                        "message": "You got new cards!",
-                        "players": inventory.clone().players(),
-                        "power_ups": inventory.clone().power_ups(),
-                    }))
-                }
-            }
-        }
-    });
-
-    let local_inventory = global_inventories.clone();
-    app.delete("/user/{id}/deck/fire/{index}", move |_req, _params| {
-        let inventory = local_inventory.clone();
-        async move {
-            let mut inventories = inventory.lock();
-
-            let id = _params.get("id");
-            let idx = _params.get("index");
-            if id.is_none() || idx.is_none() {
-                return error_response("Missing user ID", vec![]);
-            }
-
-            let user_id = id.unwrap();
-            let card_index = idx.unwrap().parse();
-
-            if card_index.is_err() {
-                return error_response("Bad Request, index should be a natural number.", vec![]);
-            }
-
-            let inventory = inventories.deck_of(user_id);
-
-            match inventory.fire(card_index.unwrap()) {
-                Some(_) => Response::ok().json(&json!({
-                    "message": "Card removed from deck",
-                })),
-                None => Response::bad_request().json(&json!({
-                    "message": "Could not remove from deck.",
-                    "error": "index out of bounds",
-                })),
-            }
-        }
-    });
-
-    app.get("/user/{id}/deck/", move |_req, _params| {
-        let local_inventory = global_inventories.clone();
-        async move {
-            let mut inventories = local_inventory.lock();
-
-            let id = _params.get("id");
-
-            if id.is_none() {
-                return error_response("Missing user ID", vec![]);
-            }
-
-            let user_id = id.unwrap();
-            let deck = inventories.deck_of(user_id);
-            let players = deck.players();
-            let power_ups = deck.power_ups();
+    match rewards.lock().await.claim_reward(id, StdRng::from_os_rng()).await {
+        Err(e) => Response::bad_request().json(&json!({
+            "message": "Could not claim reward!",
+            "error": e,
+        })),
+        Ok(claimed) => {
+            let mut inventories = inventories.lock().await;
+            let inventory = inventories.deck_of(id).await;
+            inventory.add_deck(claimed.clone()).await;
 
             Response::ok().json(&json!({
-                "message": "Your deck",
-                "players": players,
-                "power_ups": power_ups,
+                "message": "You got new cards!",
+                "players": &claimed.players,
+                "power_ups": &claimed.power_ups,
             }))
         }
+    }
+}
+
+
+async fn fire(
+    inventories: Arc<Mutex<Inventories>>,
+    params: HashMap<String, String>,
+) -> Response {
+    let mut inventories = inventories.lock().await;
+
+    let user_id = params.get("id").expect("Have user ID as parameter.");
+    let card_index: usize = params.get("index")
+        .expect("Have index of the card to be fired.")
+        .parse::<usize>()
+        .expect("Expected to be a natural number");
+
+    let inventory = inventories.deck_of(user_id).await;
+
+    match inventory.fire(card_index).await {
+        Some(_) => Response::ok().json(&json!({
+            "message": "Card removed from deck",
+        })),
+        None => Response::bad_request().json(&json!({
+            "message": "Could not remove from deck.",
+            "error": "index out of bounds",
+        })),
+    }
+}
+
+
+async fn user_deck(
+    inventories: Arc<Mutex<Inventories>>,
+    params: HashMap<String, String>,
+) -> Response {
+     let mut inventories = inventories.lock().await;
+
+    let user_id = params.get("id").expect("Have user ID as parameter.");
+
+    let deck = inventories.deck_of(user_id).await;
+    let players = deck.players().await;
+    let power_ups = deck.power_ups().await;
+
+    Response::ok().json(&json!({
+        "message": "Your deck",
+        "players": players,
+        "power_ups": power_ups,
+    }))
+}
+
+
+pub fn route_decks(app: &mut Server<Services>) {
+
+    let services = app.services.clone();
+    app.get("/user/{id}/deck/claim/", move |_, params| {
+        let rewards = services.rewarding();
+        let inventories = services.inventories();
+        async move { claim(rewards, inventories, params).await }
+    });
+    
+    let services = app.services.clone();
+    app.delete("/user/{id}/deck/fire/{index}", move |_, params| {
+        let inventories = services.inventories();
+        async move { fire(inventories, params).await }
+    });
+    
+    let services = app.services.clone();
+    app.get("/user/{id}/deck/", move |_, params| {
+        let inventories = services.inventories();
+        async move { user_deck(inventories, params).await }
     });
 }
