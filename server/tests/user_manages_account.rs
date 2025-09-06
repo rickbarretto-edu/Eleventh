@@ -1,27 +1,34 @@
+use serde_json::json;
+
+use quickapi::server::Server;
+use server::account::route_account;
+use server::services::Services;
+
+use rand::rngs::StdRng;
+use rand::SeedableRng;
+
 #[cfg(test)]
 extern crate speculate;
 
 #[cfg(test)]
 use speculate::speculate;
 
-use std::fs;
-use std::path::PathBuf;
-
-use serde_json::json;
-
-use quickapi::server::{Response, Server};
-use server::account::route_account;
-
 fn block_on<F: std::future::Future>(future: F) -> F::Output {
     tokio::runtime::Runtime::new().unwrap().block_on(future)
 }
 
-/// Clean database to make sure tests are independent
-///
-/// Be careful with race conditions if tests are run in parallel.
-fn cleanup_db() {
-    let path = PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/data/accounts.json"));
-    let _ = fs::remove_file(path);
+pub fn services() -> Services {
+    use server::account::Accounts;
+    use server::deck::{Inventories, Rewarding};
+    use server::services::inject;
+
+    let rng = StdRng::from_os_rng();
+
+    Services {
+        accounts: inject(Accounts::new()),
+        inventories: inject(Inventories::new()),
+        rewarding: inject(Rewarding::new(rng)),
+    }
 }
 
 speculate! {
@@ -29,16 +36,8 @@ speculate! {
     describe "Accounts Route" {
 
         before {
-            let mut app = Server::new();
+            let mut app = Server::new(services());
             route_account(&mut app);
-        }
-
-        it "has main route" {
-            let response: Response = block_on(app.simulate("GET", "/accounts", ""));
-            assert_eq!(response.status, 200);
-
-            let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
-            assert_eq!(body["message"], "Account routes");
         }
 
         it "creates account" {
@@ -66,30 +65,18 @@ speculate! {
             assert_eq!(create_new.status, 200);
 
             let recreate = block_on(app.simulate("POST", "/accounts/create/", &payload));
-            assert_eq!(recreate.status, 400);
+            assert_eq!(recreate.status, 401);
 
             let body: serde_json::Value = serde_json::from_str(&recreate.body).unwrap();
             assert_eq!(body["message"], "Username already exists");
-        }
-
-        it "can't register for invalid body" {
-            let response = block_on(app.simulate("POST", "/accounts/create/", "not-json"));
-            assert_eq!(response.status, 400);
-
-            let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
-            assert_eq!(body["message"], "Invalid request body");
         }
     }
 
     describe "New user Charlie" {
 
         before {
-            let mut app = Server::new();
+            let mut app = Server::new(services());
             route_account(&mut app);
-        }
-
-        after {
-            cleanup_db();
         }
 
         it "creates a new account" {

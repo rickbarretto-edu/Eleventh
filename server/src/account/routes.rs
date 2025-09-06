@@ -1,11 +1,15 @@
+use std::sync::Arc;
+
 use serde::Deserialize;
 use serde_json::json;
+use tokio::sync::Mutex;
 
-use quickapi::{Response, Server};
+use quickapi::{Request, Response, Server};
 
-use super::models::Account;
-use super::repository::VirtualAccounts;
-use crate::{error_response, parse_json, route_info, unauthorized_response};
+use crate::account::models::Account;
+use crate::account::repository::Accounts;
+use crate::parse_json;
+use crate::services::Services;
 
 #[derive(Debug, Deserialize)]
 pub struct Signup {
@@ -19,72 +23,57 @@ pub struct Login {
     pub password: String,
 }
 
-pub fn route_account(app: &mut Server) {
-    let accounts = VirtualAccounts::new().shared();
+async fn signup(accounts: Arc<Mutex<Accounts>>, request: Request) -> Response {
+    let forms: Signup =
+        serde_json::from_str(&request.body).expect("It should have the correct format.");
 
-    let create_repo = accounts.clone();
-    app.post("/accounts/create/", move |_req, _params| {
-        let accounts = create_repo.clone();
-        async move {
-            let data: Signup = match parse_json(&_req.body) {
-                Ok(d) => d,
-                Err(resp) => return resp,
-            };
+    let new_account = Account::new(forms.username, forms.password);
 
-            let account = Account::new(data.username, data.password);
+    match accounts.lock().await.store(new_account.clone()).await {
+        Ok(_) => Response::ok().json(&json!({
+            "message": "Account created successfully",
+            "username": &new_account.username,
+            "auth": new_account.auth,
+        })),
+        Err(_) => Response::unauthorized().json(&json!({
+            "message": "Username already exists"
+        })),
+    }
+}
 
-            match accounts.store(account.clone()).await {
-                Ok(_) => Response::ok().json(&json!({
-                    "message": "Account created successfully",
-                    "username": &account.username,
-                    "auth": account.auth,
-                    "links": [
-                        {"rel": "self", "href": "/accounts/create", "method": "GET"},
-                        {"rel": "login", "href": "/accounts/login", "method": "POST"},
-                        {"rel": "home", "href": "/", "method": "GET"},
-                    ]
-                })),
-                Err(_) => error_response(
-                    "Username already exists",
-                    vec![
-                        json!({"rel": "retry", "href": "/accounts/create/", "method": "POST"}),
-                        json!({"rel": "login", "href": "/accounts/login/", "method": "POST"}),
-                    ],
-                ),
-            }
-        }
+async fn login(accounts: Arc<Mutex<Accounts>>, request: Request) -> Response {
+    let data: Login = match parse_json(&request.body) {
+        Ok(d) => d,
+        Err(resp) => return resp,
+    };
+
+    match accounts
+        .lock()
+        .await
+        .by_credentials(&data.username, &data.password)
+        .await
+    {
+        Some(account) => Response::ok().json(&json!({
+            "message": "Login successful",
+            "username": account.username,
+            "auth": account.auth,
+        })),
+        None => Response::unauthorized().json(&json!({
+            "message": "Invalid username or password",
+        })),
+    }
+}
+
+pub fn route_account(app: &mut Server<Services>) {
+    let services = app.services.clone();
+    app.post("/accounts/create/", move |req, _| {
+        let accounts = services.accounts();
+        signup(accounts.clone(), req)
     });
 
-    let login_repo = accounts.clone();
-    app.post("/accounts/login/", move |_req, _params| {
-        let accounts = login_repo.clone();
-        async move {
-            let data: Login = match parse_json(&_req.body) {
-                Ok(d) => d,
-                Err(resp) => return resp,
-            };
-
-            match accounts
-                .by_credentials(&data.username, &data.password)
-                .await
-            {
-                Some(account) => Response::ok().json(&json!({
-                    "message": "Login successful",
-                    "username": account.username,
-                    "auth": account.auth,
-                    "links": [
-                        {"rel": "self", "href": "/accounts/login/", "method": "GET"},
-                        {"rel": "home", "href": "/home/", "method": "GET"},
-                    ]
-                })),
-                None => unauthorized_response(
-                    "Invalid username or password",
-                    vec![
-                        json!({"rel": "retry", "href": "/accounts/login/", "method": "POST"}),
-                        json!({"rel": "create", "href": "/accounts/create/", "method": "POST"}),
-                    ],
-                ),
-            }
-        }
+    let services = app.services.clone();
+    app.post("/accounts/login/", move |req, _| {
+        let accounts = services.accounts();
+        login(accounts.clone(), req)
     });
 }

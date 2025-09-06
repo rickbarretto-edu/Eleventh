@@ -1,8 +1,8 @@
+use super::MainMenu;
+use cursive::view::Nameable;
+use cursive::view::Resizable;
 use cursive::views::{Button, Dialog, EditView, LinearLayout, TextView};
 use cursive::Cursive;
-use cursive::view::Resizable;
-use cursive::view::Nameable;
-use super::MainMenu;
 
 #[allow(non_snake_case)]
 pub fn AccountMenu(app: &mut Cursive) {
@@ -58,7 +58,12 @@ pub fn AccountMenu(app: &mut Cursive) {
         .child(TextView::new("Username"))
         .child(EditView::new().with_name("username").fixed_width(20))
         .child(TextView::new("Password"))
-        .child(EditView::new().secret().with_name("password").fixed_width(20))
+        .child(
+            EditView::new()
+                .secret()
+                .with_name("password")
+                .fixed_width(20),
+        )
         .child(login_button)
         .child(signup_button);
 
@@ -80,11 +85,11 @@ fn login(username: &str, password: &str) -> Result<String, String> {
     if let Some(auth) = json.get("auth").and_then(|v| v.as_str()) {
         Ok(auth.to_string())
     } else {
-        Err(json.get("message")
+        Err(json
+            .get("message")
             .and_then(|v| v.as_str())
             .map(|s| s.to_string())
-            .unwrap_or_else(|| "Login failed".to_string())
-        )
+            .unwrap_or_else(|| "Login failed".to_string()))
     }
 }
 
@@ -104,6 +109,7 @@ fn signup(username: &str, password: &str) -> Result<String, String> {
         Err(json
             .get("message")
             .and_then(|v| v.as_str())
-            .unwrap_or("Signup failed").to_owned())
+            .unwrap_or("Signup failed")
+            .to_owned())
     }
 }

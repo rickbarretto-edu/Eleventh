@@ -23,9 +23,11 @@ struct PowerUp {
 
 #[derive(Debug, Deserialize)]
 struct DeckResponse {
-    message: String,
     players: Vec<Player>,
     power_ups: Vec<(PowerUp, u32)>,
+
+    #[allow(dead_code, reason = "needed for deserialization purposes.")]
+    message: String,
 }
 
 #[allow(non_snake_case)]
@@ -68,12 +70,7 @@ pub fn TeamScreen(app: &mut Cursive, auth: String) {
 fn CardItem(i: usize, player: &Player, auth_clone: String) -> Dialog {
     let player_info = format!(
         "{} - {} | ATK: {} DEF: {} PASS: {} STA: {}",
-        player.position,
-        player.name,
-        player.attack,
-        player.defense,
-        player.passing,
-        player.stamina
+        player.position, player.name, player.attack, player.defense, player.passing, player.stamina
     );
 
     Dialog::around(TextView::new(player_info)).button("Remove", move |s| {

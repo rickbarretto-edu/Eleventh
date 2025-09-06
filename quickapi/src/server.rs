@@ -58,13 +58,17 @@ impl Clone for Route {
     }
 }
 
-pub struct Server {
+pub struct Server<T> {
+    pub services: Arc<T>,
     routes: Vec<Route>,
 }
 
-impl Server {
-    pub fn new() -> Self {
-        Self { routes: Vec::new() }
+impl<T> Server<T> {
+    pub fn new(services: T) -> Self {
+        Self {
+            routes: Vec::new(),
+            services: Arc::new(services),
+        }
     }
 
     pub fn route<F, Fut>(&mut self, method: &str, path: &str, handler: F)

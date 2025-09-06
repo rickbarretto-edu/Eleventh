@@ -1,6 +1,5 @@
-use rand::{prelude::*};
-use serde::{Serialize, Deserialize};
-
+use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 
 const PLAYER_NAMES: &[&str] = &[
     "Alex", "Jordan", "Chris", "Taylor", "Morgan", "Casey", "Drew", "Jamie", "Riley", "Cameron",
@@ -18,7 +17,6 @@ const SPECIAL_CARD_NAMES: &[(&str, &str)] = &[
     ("Dribble Mastery", "Increase attack chance"),
 ];
 
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerCard {
     pub name: String,
@@ -29,17 +27,11 @@ pub struct PlayerCard {
     pub stamina: u8,
 }
 
-
 impl PlayerCard {
-
     pub fn random<R: Rng>(rng: &mut R) -> Self {
-        let name = PLAYER_NAMES.choose(rng)
-            .unwrap_or(&"John Doe")
-            .to_string();
+        let name = PLAYER_NAMES.choose(rng).unwrap_or(&"John Doe").to_string();
 
-        let position = POSITIONS.choose(rng)
-            .unwrap_or(&"MID")
-            .to_string();
+        let position = POSITIONS.choose(rng).unwrap_or(&"MID").to_string();
 
         PlayerCard {
             name,
@@ -61,21 +53,15 @@ impl PlayerCard {
         const MINIMUM: u8 = 50;
         rng.random_range(MINIMUM..=MAXIMUM)
     }
-
 }
 
-
-#[derive(Debug, Clone)]
-#[derive(Serialize, Deserialize)]
-#[derive(PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct SpecialCard {
     pub name: String,
     pub effect: String,
 }
 
-
 impl SpecialCard {
-
     pub fn random<R: Rng>(rng: &mut R) -> Self {
         let (name, effect) = SPECIAL_CARD_NAMES
             .choose(rng)
@@ -86,5 +72,4 @@ impl SpecialCard {
             effect: effect.to_string(),
         }
     }
-
 }

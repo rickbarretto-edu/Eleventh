@@ -8,8 +8,8 @@ type Amount = usize;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Deck {
-    pub players: Vec<PlayerCard>,
-    pub power_ups: HashMap<SpecialCard, Amount>,
+    players: Vec<PlayerCard>,
+    power_ups: HashMap<SpecialCard, Amount>,
 }
 
 impl Deck {
@@ -18,6 +18,17 @@ impl Deck {
             players: players.to_vec(),
             power_ups: power_ups.iter().cloned().collect(),
         }
+    }
+
+    pub async fn players(&self) -> Vec<PlayerCard> {
+        self.players.clone()
+    }
+
+    pub async fn power_ups(&self) -> Vec<(SpecialCard, Amount)> {
+        self.power_ups
+            .iter()
+            .map(|(card, amount)| (card.clone(), *amount))
+            .collect()
     }
 
     pub fn random(mut rng: impl Rng) -> Deck {
@@ -53,7 +64,6 @@ impl Deck {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct Inventory {
     deck: Deck,
@@ -61,14 +71,12 @@ pub struct Inventory {
 }
 
 impl Default for Inventory {
-
     fn default() -> Self {
         Self {
             limit: 50,
             deck: Deck::new(&[], &[]),
         }
     }
-
 }
 
 impl Inventory {
@@ -79,24 +87,22 @@ impl Inventory {
         }
     }
 
-    pub fn add_deck(&mut self, deck: Deck) {
+    pub async fn add_deck(&mut self, deck: Deck) {
         self.deck.join(deck);
         if self.deck.players.len() > self.limit {
             let _ = self.deck.players.split_off(50);
         }
     }
 
-    pub fn players(&self) -> Vec<PlayerCard> {
-        self.deck.players.clone()
+    pub async fn players(&self) -> Vec<PlayerCard> {
+        self.deck.players().await
     }
 
-    pub fn power_ups(&self) -> Vec<(SpecialCard, Amount)> {
-        self.deck.power_ups.iter()
-            .map(|(card, amount)| (card.clone(), *amount))
-            .collect()
+    pub async fn power_ups(&self) -> Vec<(SpecialCard, Amount)> {
+        self.deck.power_ups().await
     }
 
-    pub fn fire(&mut self, index: usize) -> Option<PlayerCard> {
+    pub async fn fire(&mut self, index: usize) -> Option<PlayerCard> {
         if index < self.deck.players.len() {
             Some(self.deck.players.remove(index))
         } else {

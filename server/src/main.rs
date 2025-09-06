@@ -1,34 +1,33 @@
-use serde_json::json;
+// QuickAPI
+use quickapi::Server;
 
-use quickapi::{Response, Server};
+use rand::rngs::StdRng;
+use rand::SeedableRng;
+// Routes
 use server::account::route_account;
-use server::menu::route_menu;
 use server::deck::route_decks;
+
+// Services
+use server::account::Accounts;
+use server::deck::Inventories;
+use server::deck::Rewarding;
+use server::services::inject;
+use server::services::Services;
 
 #[tokio::main]
 async fn main() {
-    let mut app: Server = Server::new();
+    let rng = StdRng::from_os_rng();
 
-    // let accounts = Accounts::new("/data/accounts.json").shared();
+    let services = Services {
+        accounts: inject(Accounts::new()),
+        inventories: inject(Inventories::new()),
+        rewarding: inject(Rewarding::new(rng)),
+    };
 
-    route_menu(&mut app);
+    let mut app: Server<Services> = Server::new(services);
+
     route_account(&mut app);
     route_decks(&mut app);
-
-    // /greet?name="Rick" => Hello, Rick?
-    app.route("GET", "/greet", |req, _params| async move {
-        let binding: String = "Anonymous".to_string();
-        let name: &String = req.param("name").unwrap_or(&binding);
-
-        Response::ok().plain(&format!("Hello, {}!", name))
-    });
-
-    // /users/123 => {"user_id":"123"}
-    app.route("GET", "/users/{id}", |_req, params| async move {
-        let id: &String = params.get("id").unwrap();
-
-        Response::ok().json(&json!({"user_id": id}))
-    });
 
     app.run("127.0.0.1:8080").await;
 }
