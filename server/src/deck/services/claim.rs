@@ -67,7 +67,7 @@ impl Rewarding {
 
         // Refresh deck if midnight passed
         if today > self.refreshed_at {
-            self.force_refresh(&mut rng);
+            self.force_refresh(&mut rng).await;
         }
 
         let player_state = self
