@@ -4,6 +4,10 @@ use quickapi::server::Server;
 use server::account::route_account;
 use server::services::Services;
 
+use rand::rngs::StdRng;
+use rand::SeedableRng;
+
+
 #[cfg(test)]
 extern crate speculate;
 
@@ -19,10 +23,12 @@ pub fn services() -> Services {
     use server::deck::{Inventories, Rewarding};
     use server::services::inject;
 
+    let rng = StdRng::from_os_rng();
+
     Services {
         accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
-        rewarding: inject(Rewarding::new(rand::rng())),
+        rewarding: inject(Rewarding::new(rng)),
     }
 }
 
