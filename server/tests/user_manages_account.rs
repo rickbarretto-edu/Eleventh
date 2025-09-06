@@ -7,7 +7,6 @@ use server::services::Services;
 use rand::rngs::StdRng;
 use rand::SeedableRng;
 
-
 #[cfg(test)]
 extern crate speculate;
 
@@ -66,7 +65,7 @@ speculate! {
             assert_eq!(create_new.status, 200);
 
             let recreate = block_on(app.simulate("POST", "/accounts/create/", &payload));
-            assert_eq!(recreate.status, 400);
+            assert_eq!(recreate.status, 401);
 
             let body: serde_json::Value = serde_json::from_str(&recreate.body).unwrap();
             assert_eq!(body["message"], "Username already exists");

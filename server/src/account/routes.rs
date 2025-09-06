@@ -39,7 +39,7 @@ async fn signup(
             "username": &new_account.username,
             "auth": new_account.auth,
         })),
-        Err(_) => Response::bad_request().json(&json!({
+        Err(_) => Response::unauthorized().json(&json!({
             "message": "Username already exists"
         }))
     }
@@ -61,7 +61,7 @@ async fn login(
             "username": account.username,
             "auth": account.auth,
         })),
-        None => Response::bad_request().json(&json!({
+        None => Response::unauthorized().json(&json!({
             "message": "Invalid username or password",
         })),
     }
