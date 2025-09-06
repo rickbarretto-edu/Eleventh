@@ -23,9 +23,11 @@ struct PowerUp {
 
 #[derive(Debug, Deserialize)]
 struct DeckResponse {
-    message: String,
     players: Vec<Player>,
     power_ups: Vec<(PowerUp, u32)>,
+
+    #[allow(dead_code, reason = "needed for deserialization purposes.")]
+    message: String,
 }
 
 #[allow(non_snake_case)]
