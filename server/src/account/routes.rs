@@ -72,12 +72,12 @@ pub fn route_account(app: &mut Server<Services>) {
     let services = app.services.clone();
     app.post("/accounts/create/", move |req, _| {
         let accounts = services.accounts();
-        async move { signup(accounts.clone(), req).await }
+        signup(accounts.clone(), req)
     });
     
     let services = app.services.clone();
     app.post("/accounts/login/", move |req, _| {
         let accounts = services.accounts();
-        async move { login(accounts.clone(), req).await }
+        login(accounts.clone(), req)
     });
 }

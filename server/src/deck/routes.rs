@@ -105,18 +105,18 @@ pub fn route_decks(app: &mut Server<Services>) {
     app.get("/user/{id}/deck/claim/", move |_, params| {
         let rewards = services.rewarding();
         let inventories = services.inventories();
-        async move { claim(rewards, inventories, params).await }
+        claim(rewards, inventories, params)
     });
     
     let services = app.services.clone();
     app.delete("/user/{id}/deck/fire/{index}", move |_, params| {
         let inventories = services.inventories();
-        async move { fire(inventories, params).await }
+        fire(inventories, params)
     });
     
     let services = app.services.clone();
     app.get("/user/{id}/deck/", move |_, params| {
         let inventories = services.inventories();
-        async move { user_deck(inventories, params).await }
+        user_deck(inventories, params)
     });
 }
