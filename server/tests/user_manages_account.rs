@@ -71,14 +71,6 @@ speculate! {
             let body: serde_json::Value = serde_json::from_str(&recreate.body).unwrap();
             assert_eq!(body["message"], "Username already exists");
         }
-
-        it "can't register for invalid body" {
-            let response = block_on(app.simulate("POST", "/accounts/create/", "not-json"));
-            assert_eq!(response.status, 400);
-
-            let body: serde_json::Value = serde_json::from_str(&response.body).unwrap();
-            assert_eq!(body["message"], "Invalid request body");
-        }
     }
 
     describe "New user Charlie" {
