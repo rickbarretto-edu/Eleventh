@@ -1,10 +1,9 @@
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use rand::{rngs::StdRng, Rng};
-use tokio::sync::Mutex;
 use std::{collections::HashMap, sync::Arc};
+use tokio::sync::Mutex;
 
 use crate::deck::models::Deck;
-
 
 #[derive(Debug, Clone)]
 pub struct DailyDecks {
@@ -35,7 +34,6 @@ impl DailyDecks {
     }
 }
 
-
 /// Tracks when a user last claimed a reward
 #[derive(Debug, Clone)]
 pub struct PlayerClaim {
@@ -61,7 +59,11 @@ impl Rewarding {
     }
 
     /// Claim a reward for a user (once per 24h).
-    pub async fn claim_reward(&mut self, user_id: &str, mut rng: StdRng) -> Result<Deck, &'static str> {
+    pub async fn claim_reward(
+        &mut self,
+        user_id: &str,
+        mut rng: StdRng,
+    ) -> Result<Deck, &'static str> {
         let now = Utc::now();
         let today = now.date_naive();
 

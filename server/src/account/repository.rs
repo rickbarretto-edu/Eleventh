@@ -9,7 +9,9 @@ pub struct Accounts {
 
 impl Accounts {
     pub fn new() -> Self {
-        Accounts { map: HashMap::new() }
+        Accounts {
+            map: HashMap::new(),
+        }
     }
 
     pub async fn store(&mut self, new_account: Account) -> Result<(), String> {

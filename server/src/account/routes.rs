@@ -6,10 +6,10 @@ use tokio::sync::Mutex;
 
 use quickapi::{Request, Response, Server};
 
-use crate::services::Services;
-use crate::account::repository::Accounts;
 use crate::account::models::Account;
+use crate::account::repository::Accounts;
 use crate::parse_json;
+use crate::services::Services;
 
 #[derive(Debug, Deserialize)]
 pub struct Signup {
@@ -23,13 +23,9 @@ pub struct Login {
     pub password: String,
 }
 
-async fn signup(
-    accounts: Arc<Mutex<Accounts>>,
-    request: Request,
-) -> Response {
-
-    let forms: Signup = serde_json::from_str(&request.body)
-        .expect("It should have the correct format.");
+async fn signup(accounts: Arc<Mutex<Accounts>>, request: Request) -> Response {
+    let forms: Signup =
+        serde_json::from_str(&request.body).expect("It should have the correct format.");
 
     let new_account = Account::new(forms.username, forms.password);
 
@@ -41,21 +37,22 @@ async fn signup(
         })),
         Err(_) => Response::unauthorized().json(&json!({
             "message": "Username already exists"
-        }))
+        })),
     }
 }
 
-async fn login(
-    accounts: Arc<Mutex<Accounts>>,
-    request: Request,
-) -> Response {
-
+async fn login(accounts: Arc<Mutex<Accounts>>, request: Request) -> Response {
     let data: Login = match parse_json(&request.body) {
         Ok(d) => d,
         Err(resp) => return resp,
     };
 
-    match accounts.lock().await.by_credentials(&data.username, &data.password).await {
+    match accounts
+        .lock()
+        .await
+        .by_credentials(&data.username, &data.password)
+        .await
+    {
         Some(account) => Response::ok().json(&json!({
             "message": "Login successful",
             "username": account.username,
@@ -67,14 +64,13 @@ async fn login(
     }
 }
 
-
 pub fn route_account(app: &mut Server<Services>) {
     let services = app.services.clone();
     app.post("/accounts/create/", move |req, _| {
         let accounts = services.accounts();
         signup(accounts.clone(), req)
     });
-    
+
     let services = app.services.clone();
     app.post("/accounts/login/", move |req, _| {
         let accounts = services.accounts();
