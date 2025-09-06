@@ -59,7 +59,7 @@ impl Clone for Route {
 }
 
 pub struct Server<T> {
-    pub services: T,
+    pub services: Arc<T>,
     routes: Vec<Route>,
 }
 
@@ -67,7 +67,7 @@ impl<T> Server<T> {
     pub fn new(services: T) -> Self {
         Self {
             routes: Vec::new(),
-            services,
+            services: Arc::new(services),
         }
     }
 
