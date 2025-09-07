@@ -1,11 +1,12 @@
 #[cfg(test)]
 extern crate speculate;
+use serde_json::Value;
 use server::matches::Matches;
 use server::services::Services;
 #[cfg(test)]
 use speculate::speculate;
 
-use server::models::cards::PlayerCard;
+
 
 pub fn services() -> Services {
     use rand::rngs::StdRng;
@@ -15,7 +16,7 @@ pub fn services() -> Services {
     use server::deck::{Inventories, Rewarding};
     use server::services::inject;
 
-    let rng = String::from_os_rng();
+    let rng = StdRng::from_os_rng();
 
     Services {
         accounts: inject(Accounts::new()),
