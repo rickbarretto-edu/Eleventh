@@ -68,7 +68,7 @@ impl Paired {
         Some(Finished { winner, score })
     }
 
-    fn run_match(&self) -> (usize, usize) {
+    pub fn run_match(&self) -> (usize, usize) {
         if !self.both_named() {
             return (0, 0);
         }
