@@ -4,7 +4,7 @@ use super::teams::Team;
 pub struct Match {}
 
 impl Match {
-    pub async fn new(host: impl Into<String>) -> Created {
+    pub fn new(host: impl Into<String>) -> Created {
         Created { by: host.into() }
     }
 }
@@ -15,8 +15,8 @@ pub struct Created {
 }
 
 impl Created {
-    pub async fn join(self, guest: impl Into<String>) -> Option<Paired> {
-        Paired::new(self.by, guest).await
+    pub fn join(self, guest: impl Into<String>) -> Option<Paired> {
+        Paired::new(self.by, guest)
     }
 }
 
@@ -30,7 +30,7 @@ pub struct Paired {
 
 impl Paired {
 
-    pub async fn new(host: impl Into<String>, guest: impl Into<String>) -> Option<Self> {
+    pub fn new(host: impl Into<String>, guest: impl Into<String>) -> Option<Self> {
         let host: String = host.into();
         let guest: String = guest.into();
 
@@ -41,11 +41,11 @@ impl Paired {
         }
     }
 
-    fn both_named(&self) -> bool {
+    pub fn both_named(&self) -> bool {
         self.host_team.is_some() && self.guest_team.is_some()
     }
 
-    pub async fn name(&mut self, who: String, team: Team) {
+    pub fn name(&mut self, who: String, team: Team) {
         if self.host == who {
             self.host_team = Some(team);
         } else if self.guest == who {
@@ -53,7 +53,7 @@ impl Paired {
         }
     }
 
-    pub async fn finish(&self) -> Option<Finished> {
+    pub fn finish(&self) -> Option<Finished> {
         if !self.both_named() {
             return None;
         }
