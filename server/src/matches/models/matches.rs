@@ -11,7 +11,7 @@ impl Match {
 
 #[derive(Debug, Clone)]
 pub struct Created {
-    by: String,
+    pub by: String,
 }
 
 impl Created {
@@ -22,10 +22,10 @@ impl Created {
 
 #[derive(Debug, Clone)]
 pub struct Paired {
-    host: String,
-    host_team: Option<Team>,
-    guest: String, 
-    guest_team: Option<Team>,
+    pub host: String,
+    pub host_team: Option<Team>,
+    pub guest: String, 
+    pub guest_team: Option<Team>,
 }
 
 impl Paired {
@@ -82,6 +82,6 @@ impl Paired {
 
 #[derive(Debug, Clone)]
 pub struct Finished {
-    winner: String,
-    score: (usize, usize)
+    pub winner: String,
+    pub score: (usize, usize)
 }
