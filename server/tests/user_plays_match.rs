@@ -1,21 +1,27 @@
 #[cfg(test)]
 extern crate speculate;
+use server::matches::Matches;
+use server::services::Services;
 #[cfg(test)]
 use speculate::speculate;
 
 use server::models::cards::PlayerCard;
 
 pub fn services() -> Services {
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
+
     use server::account::Accounts;
     use server::deck::{Inventories, Rewarding};
     use server::services::inject;
 
-    let rng = StdRng::from_os_rng();
+    let rng = String::from_os_rng();
 
     Services {
         accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
         rewarding: inject(Rewarding::new(rng)),
+        matches: inject(Matches::new())
     }
 }
 
@@ -27,8 +33,8 @@ fn block_on<F: std::future::Future>(future: F) -> F::Output {
 speculate! {
 
     before {
-        let mut app = Server::new(services());
-        route_match(&mut app);
+        let mut app = quickapi::Server::new(services());
+        server::matches::route_match(&mut app);
     }
 
     describe "Match Pairing" {

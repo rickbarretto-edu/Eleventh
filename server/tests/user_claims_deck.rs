@@ -1,5 +1,6 @@
 use quickapi::server::Server;
 use server::deck::route_decks;
+use server::matches::Matches;
 use server::services::Services;
 
 #[cfg(test)]
@@ -21,6 +22,7 @@ pub fn services() -> Services {
         accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
         rewarding: inject(Rewarding::new(rng)),
+        matches: inject(Matches::new())
     }
 }
 
