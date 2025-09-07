@@ -1,9 +1,13 @@
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::models::cards::PlayerCard;
 use crate::models::cards::SpecialCard;
 
 
 
 #[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize)]
 pub struct Team {
     named: Vec<PlayerCard>,
     helper: SpecialCard
