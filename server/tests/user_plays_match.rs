@@ -62,7 +62,7 @@ speculate! {
             let _ = block_on(app.simulate("POST", "/match/1/start/", ""));
             let denied = block_on(app.simulate("POST", "/match/1/start/", ""));
 
-            assert_eq!(denied.status, 502);
+            assert_eq!(denied.status, 401);
         }
     }
 
