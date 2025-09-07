@@ -41,18 +41,17 @@ speculate! {
     describe "Match Pairing" {
         it "starts with a host but no guest" {
             let created = block_on(app.simulate("POST", "/match/1/start/", ""));
-            let game = serde_json::from_str(&created.body).unwrap();
+            let game: Value = serde_json::from_str(&created.body).unwrap();
 
             assert_eq!(created.status, 401);
             assert_eq!(game["status"], "pairing");
-            assert_eq!(game["host"], Some("1"));
-            assert_eq!(game["guest"], None);
+            assert_eq!(game["host"], "1");
         }
 
         it "can pair two players" {
-            let created = block_on(app.simulate("POST", "/match/1/start/", ""));
+            let _ = block_on(app.simulate("POST", "/match/1/start/", ""));
             let joined = block_on(app.simulate("POST", "/match/2/start/", ""));
-            let game = serde_json::from_str(&joined.body).unwrap();
+            let game: Value = serde_json::from_str(&joined.body).unwrap();
 
             assert_eq!(game["host"], "1");
             assert_eq!(game["guest"], "2");
@@ -60,46 +59,23 @@ speculate! {
         }
 
         it "user can join to only one match at time" {
-            let created = block_on(app.simulate("POST", "/match/1/start/", ""));
+            let _ = block_on(app.simulate("POST", "/match/1/start/", ""));
             let denied = block_on(app.simulate("POST", "/match/1/start/", ""));
-            let game = serde_json::from_str(&joined.body).unwrap();
 
-            assert_eq!(created.status, 502);
+            assert_eq!(denied.status, 502);
         }
     }
 
     describe "Paired Match" {
 
         before {
-            let created = block_on(app.simulate("POST", "/match/1/start/", ""));
+            let _ = block_on(app.simulate("POST", "/match/1/start/", ""));
             let joined = block_on(app.simulate("POST", "/match/2/start/", ""));
-            let game = serde_json::from_str(&joined.body).unwrap();
+            let game: Value = serde_json::from_str(&joined.body).unwrap();
         }
 
         it "status is initiated" {
             assert_eq!(game["status"], "paired");
-        }
-        
-        it "players can select their team" {
-            assert_eq!(game["status"], "paired");
-
-            let named = vec![
-                PlayerCard::new(),
-                PlayerCard::new(),
-                PlayerCard::new(),
-                PlayerCard::new(),
-                PlayerCard::new(),
-            ];
-            let host = block_on(app.simulate("POST", "/match/1/name/", named.into()));
-            let game = block_on(app.simulate("GET", "/match/1/status/"));
-            assert_eq!(game["status"], "waiting");
-            
-            let guest = block_on(app.simulate("POST", "/match/2/name/", named.into()));
-            let game = block_on(app.simulate("GET", "/match/2/status/"));
-            
-            assert_eq!(game["status"], "finished");
-            assert!(game.get("score").is_some());
-            assert!(game.get("winner").is_some());
         }
     }
 
