@@ -2,11 +2,15 @@ use quickapi::server::Server;
 use server::deck::route_decks;
 use server::services::Services;
 
-use rand::rngs::StdRng;
-use rand::SeedableRng;
+#[cfg(test)]
+extern crate speculate;
+
+#[cfg(test)]
 use speculate::speculate;
 
 pub fn services() -> Services {
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
     use server::account::Accounts;
     use server::deck::{Inventories, Rewarding};
     use server::services::inject;
