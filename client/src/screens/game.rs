@@ -2,7 +2,7 @@ use cursive::views::{Dialog, SelectView};
 use cursive::Cursive;
 use reqwest::blocking::Client;
 
-use super::MainMenu;
+use super::{MainMenu, NamePlayers};
 
 #[allow(non_snake_case)]
 pub fn ChampionshipMenu(app: &mut Cursive, auth: String) {
@@ -39,7 +39,7 @@ fn on_back(app: &mut Cursive, auth_clone: String) {
 /// Open next page or display error when the user clicks in 'Go'
 fn on_go(app: &mut Cursive, auth: &String) {
     match join(auth) {
-        Ok(_) => open_next(app, auth),
+        Ok(_) => NamePlayers(app, auth.clone()),
         Err(err) => display_error(app, err)
     };
 }
@@ -50,15 +50,6 @@ fn display_error(app: &mut Cursive, err: String) {
         .title("Error");
     app.add_layer(error);
 }
-
-/// Open the next page
-fn open_next(app: &mut Cursive, auth_clone: &String) {
-    app.pop_layer();
-    NamePlayers(app, auth_clone.clone());
-}
-
-#[allow(non_snake_case)]
-fn NamePlayers(app: &mut Cursive, auth: String) {}
 
 /// Join a player to a match
 fn join(auth: &String) -> Result<String, String> {

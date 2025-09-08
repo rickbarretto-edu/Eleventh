@@ -1,12 +1,16 @@
+use std::fmt::{self, Display};
+
 use cursive::views::{Dialog, ListView, ScrollView, TextView};
 use cursive::Cursive;
 use reqwest::blocking::Client;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use super::MainMenu;
 
-#[derive(Debug, Deserialize, Clone)]
-struct Player {
+#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash)]
+pub struct Player {
     name: String,
     position: String,
     attack: u32,
@@ -15,16 +19,34 @@ struct Player {
     stamina: u32,
 }
 
-#[derive(Debug, Deserialize, Clone)]
-struct PowerUp {
+impl Display for Player {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{} ({}) | ATK: {} | DEF: {} | PASS: {} | STA: {}",
+            self.name, self.position, self.attack, self.defense, self.passing, self.stamina
+        )
+    }
+}
+
+#[derive(Debug, Clone)]
+#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash)]
+pub struct PowerUp {
     name: String,
     effect: String,
 }
 
+impl Display for PowerUp {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}: {}", self.name, self.effect)
+    }
+}
+
 #[derive(Debug, Deserialize)]
-struct DeckResponse {
-    players: Vec<Player>,
-    power_ups: Vec<(PowerUp, u32)>,
+pub struct DeckResponse {
+    pub players: Vec<Player>,
+    pub power_ups: Vec<(PowerUp, u32)>,
 
     #[allow(dead_code, reason = "needed for deserialization purposes.")]
     message: String,
@@ -86,7 +108,7 @@ fn PowerItem(power: &PowerUp, count: &u32) -> TextView {
     TextView::new(power_info)
 }
 
-fn user_deck(auth: &String) -> Result<reqwest::blocking::Response, reqwest::Error> {
+pub fn user_deck(auth: &String) -> Result<reqwest::blocking::Response, reqwest::Error> {
     let client = Client::new();
     let url: String = format!("http://127.0.0.1:8080/user/{}/deck/", auth);
     client.get(&url).send()
