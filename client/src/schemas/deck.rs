@@ -1,3 +1,9 @@
+use std::fmt;
+use std::fmt::Display;
+
+use serde::Deserialize;
+use serde::Serialize;
+
 #[derive(Debug, Deserialize)]
 pub struct DeckResponse {
     pub players: Vec<Player>,
