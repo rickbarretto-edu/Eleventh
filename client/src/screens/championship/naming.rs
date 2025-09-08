@@ -4,7 +4,8 @@ use cursive::views::{Dialog, ListView, ScrollView, SelectView};
 use cursive::{traits::*, Cursive};
 use std::sync::{Arc, Mutex};
 
-use crate::screens::team::{user_deck, DeckResponse};
+use crate::schemas::deck::DeckResponse;
+use crate::screens::team::user_deck;
 use crate::screens::MainMenu;
 
 #[allow(non_snake_case)]
