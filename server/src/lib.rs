@@ -1,13 +1,19 @@
+use std::sync::Arc;
+
 use quickapi::Response;
 use serde::Deserialize;
 use serde_json::json;
 
 pub mod account;
 pub mod deck;
+pub mod matches;
 pub mod services;
 pub mod shared;
 
 pub use shared::models;
+use tokio::sync::Mutex;
+
+pub type Shared<T> = Arc<Mutex<T>>;
 
 /// Parse JSON body or return a bad request response
 pub fn parse_json<T: for<'de> Deserialize<'de>>(body: &str) -> Result<T, Response> {

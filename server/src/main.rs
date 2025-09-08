@@ -1,11 +1,14 @@
+use rand::rngs::StdRng;
+use rand::SeedableRng;
+
 // QuickAPI
 use quickapi::Server;
 
-use rand::rngs::StdRng;
-use rand::SeedableRng;
 // Routes
 use server::account::route_account;
 use server::deck::route_decks;
+use server::matches::Matches;
+use server::matches::route_match;
 
 // Services
 use server::account::Accounts;
@@ -22,12 +25,14 @@ async fn main() {
         accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
         rewarding: inject(Rewarding::new(rng)),
+        matches: inject(Matches::new())
     };
 
     let mut app: Server<Services> = Server::new(services);
 
     route_account(&mut app);
     route_decks(&mut app);
+    route_match(&mut app);
 
     app.run("127.0.0.1:8080").await;
 }

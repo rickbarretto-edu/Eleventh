@@ -1,13 +1,15 @@
 use quickapi::server::Server;
 use server::deck::route_decks;
 
+use server::matches::Matches;
 use server::services::Services;
 
-use rand::rngs::StdRng;
-use rand::SeedableRng;
 use speculate::speculate;
 
 pub fn services() -> Services {
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
+
     use server::account::Accounts;
     use server::deck::{Inventories, Rewarding};
     use server::services::inject;
@@ -18,6 +20,7 @@ pub fn services() -> Services {
         accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
         rewarding: inject(Rewarding::new(rng)),
+        matches: inject(Matches::new())
     }
 }
 

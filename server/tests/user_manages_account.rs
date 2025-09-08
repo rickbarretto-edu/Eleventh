@@ -2,10 +2,8 @@ use serde_json::json;
 
 use quickapi::server::Server;
 use server::account::route_account;
+use server::matches::Matches;
 use server::services::Services;
-
-use rand::rngs::StdRng;
-use rand::SeedableRng;
 
 #[cfg(test)]
 extern crate speculate;
@@ -18,6 +16,9 @@ fn block_on<F: std::future::Future>(future: F) -> F::Output {
 }
 
 pub fn services() -> Services {
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
+
     use server::account::Accounts;
     use server::deck::{Inventories, Rewarding};
     use server::services::inject;
@@ -28,6 +29,7 @@ pub fn services() -> Services {
         accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
         rewarding: inject(Rewarding::new(rng)),
+        matches: inject(Matches::new())
     }
 }
 
