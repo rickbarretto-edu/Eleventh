@@ -4,42 +4,77 @@ use reqwest::blocking::Client;
 
 use super::MainMenu;
 
-pub fn MatchScreen(app: &mut Cursive, auth: String) {
-    app.pop_layer();
+#[allow(non_snake_case)]
+pub fn ChampionshipMenu(app: &mut Cursive, auth: String) {
+    let options = vec![
+        ("Go".to_string(), "Go".to_string()),
+        ("Back".to_string(), "Back".to_string()),
+    ];
 
-    let options = Dialog::new()
-        .button("Start Match", move |s| {
+    let menu = SelectView::<String>::new()
+        .autojump()
+        .with_all(options)
+        .on_submit(move |app, choice: &String| {
             let auth = auth.clone();
-            let result = block_on_match_request(&auth, &format!("/match/{}/start/", auth));
-            s.pop_layer();
-            s.add_layer(
-                Dialog::text(format!("Start result:\n{result}"))
-                    .title("Match Result")
-                    .button("Back", |_| {}),
-            );
+            match choice.as_str() {
+                "Go" => on_go(app, &auth),
+                "Back" => on_back(app, auth),
+                _ => {}
+            }
         });
 
-    let dialog = Dialog::around(options)
-        .title("Match Menu")
-        .button("Back to Main", move |_| {});
+    let main_dialog = Dialog::around(menu)
+        .title("Championship")
+        .button("Quit", |app| app.quit());
 
-    app.add_layer(dialog);
+    app.add_layer(main_dialog);
 }
 
-fn block_on_match_request(auth: &str, endpoint: &str) -> String {
-    let client = Client::new();
-    let url = format!("http://127.0.0.1:8080{}", endpoint);
+/// Return to main menu when the user clicks in 'Back'
+fn on_back(app: &mut Cursive, auth_clone: String) {
+    app.pop_layer();
+    MainMenu(app, auth_clone.clone());
+}
 
-    let res = client
+/// Open next page or display error when the user clicks in 'Go'
+fn on_go(app: &mut Cursive, auth: &String) {
+    match join(auth) {
+        Ok(_) => open_next(app, auth),
+        Err(err) => display_error(app, err)
+    };
+}
+
+/// Display request error to end-user
+fn display_error(app: &mut Cursive, err: String) {
+    let error = Dialog::info(err)
+        .title("Error");
+    app.add_layer(error);
+}
+
+/// Open the next page
+fn open_next(app: &mut Cursive, auth_clone: &String) {
+    app.pop_layer();
+    NamePlayers(app, auth_clone.clone());
+}
+
+#[allow(non_snake_case)]
+fn NamePlayers(app: &mut Cursive, auth: String) {}
+
+/// Join a player to a match
+fn join(auth: &String) -> Result<String, String> {
+    let client = Client::new();
+    let url = format!("http://127.0.0.1:8080/match/{}/start/", auth);
+
+    let response = client
         .post(&url)
         .header("Authorization", auth)
         .send();
 
-    match res {
+    match response {
         Ok(resp) => match resp.text() {
-            Ok(text) => text,
-            Err(e) => format!("Failed to read response: {}", e),
+            Ok(text) => Ok(text.into()),
+            Err(e) => Err(format!("Failed to read response: {}", e)),
         },
-        Err(e) => format!("Request error: {}", e),
+        Err(e) => Err(format!("Request error: {}", e)),
     }
-}
+} 

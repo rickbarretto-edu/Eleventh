@@ -3,7 +3,7 @@ use std::sync::Arc;
 use cursive::views::Dialog;
 use cursive::Cursive;
 
-use super::MatchScreen;
+use super::ChampionshipMenu;
 use super::RewardScreen;
 use super::TeamScreen;
 
@@ -17,7 +17,7 @@ pub fn MainMenu(app: &mut Cursive, auth: String) {
         .title("Main Menu")
         .button("Match", {
             let auth = auth.clone();
-            move |s| MatchScreen(s, (*auth).clone())
+            move |s| ChampionshipMenu(s, (*auth).clone())
         })
         .button("Team", {
             let auth = auth.clone();
