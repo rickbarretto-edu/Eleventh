@@ -6,9 +6,9 @@ pub mod team;
 pub mod welcome;
 
 pub use account::AccountMenu;
+pub use championship::ChampionshipMenu;
+pub use championship::NamePlayers;
 pub use main_menu::MainMenu;
 pub use reward::RewardScreen;
 pub use team::TeamScreen;
-pub use welcome::WelcomeScreen;
-pub use championship::ChampionshipMenu;
-pub use championship::NamePlayers;
+pub use welcome::Welcome;
