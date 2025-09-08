@@ -2,7 +2,9 @@ use cursive::views::{Dialog, SelectView};
 use cursive::Cursive;
 use reqwest::blocking::Client;
 
-use super::{MainMenu, NamePlayers};
+use crate::screens::MainMenu;
+use crate::screens::NamePlayers;
+
 
 #[allow(non_snake_case)]
 pub fn ChampionshipMenu(app: &mut Cursive, auth: String) {

@@ -1,17 +1,19 @@
+/// Name Players & Power-up to use in your next match
+
 use cursive::views::{Dialog, ListView, ScrollView, SelectView};
 use cursive::{traits::*, Cursive};
 use std::sync::{Arc, Mutex};
 
-use super::team::{user_deck, DeckResponse};
-use super::MainMenu;
+use crate::screens::team::{user_deck, DeckResponse};
+use crate::screens::MainMenu;
 
-// Stub: replace with your actual implementation
 #[allow(non_snake_case)]
 fn ResultOfMatch(app: &mut Cursive, auth: String) {
     app.pop_layer();
     app.add_layer(Dialog::info(format!("Result page for {}", auth)));
 }
 
+/// Players naming window
 #[allow(non_snake_case)]
 pub fn NamePlayers(app: &mut Cursive, auth: String) {
     app.pop_layer();
