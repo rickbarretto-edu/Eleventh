@@ -1,3 +1,3 @@
 pub mod account;
 pub mod deck;
-pub mod join;
+pub mod championship;

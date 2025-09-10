@@ -1,7 +1,7 @@
 use cursive::views::{Dialog, SelectView};
 use cursive::Cursive;
-use reqwest::blocking::Client;
 
+use crate::services;
 use crate::screens::MainMenu;
 use crate::screens::NamePlayers;
 
@@ -40,7 +40,7 @@ fn on_back(app: &mut Cursive, auth_clone: String) {
 
 /// Open next page or display error when the user clicks in 'Go'
 fn on_go(app: &mut Cursive, auth: &String) {
-    match join(auth) {
+    match services::championship::join(auth) {
         Ok(_) => NamePlayers(app, auth.clone()),
         Err(err) => display_error(app, err)
     };
@@ -52,22 +52,3 @@ fn display_error(app: &mut Cursive, err: String) {
         .title("Error");
     app.add_layer(error);
 }
-
-/// Join a player to a match
-fn join(auth: &String) -> Result<String, String> {
-    let client = Client::new();
-    let url = format!("http://127.0.0.1:8080/match/{}/start/", auth);
-
-    let response = client
-        .post(&url)
-        .header("Authorization", auth)
-        .send();
-
-    match response {
-        Ok(resp) => match resp.text() {
-            Ok(text) => Ok(text.into()),
-            Err(e) => Err(format!("Failed to read response: {}", e)),
-        },
-        Err(e) => Err(format!("Request error: {}", e)),
-    }
-} 
