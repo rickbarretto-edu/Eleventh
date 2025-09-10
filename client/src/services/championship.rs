@@ -26,7 +26,7 @@ pub fn status(auth: &String) -> Result<MatchState, String> {
     let client = Client::new();
     let url = format!("http://127.0.0.1:8080/match/{}/status/", auth);
 
-    let response = client.post(&url).send();
+    let response = client.get(&url).send();
 
     match response {
         Ok(resp) => match resp.text() {
