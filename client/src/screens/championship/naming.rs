@@ -5,8 +5,8 @@ use cursive::{traits::*, Cursive};
 use std::sync::{Arc, Mutex};
 
 use crate::schemas::deck::DeckResponse;
-use crate::screens::MainMenu;
 use crate::services;
+use crate::screens;
 
 #[allow(non_snake_case)]
 fn ResultOfMatch(app: &mut Cursive, auth: String) {
@@ -57,7 +57,7 @@ pub fn NamePlayers(app: &mut Cursive, auth: String) {
                 Info(app, "You must pick exactly 5 players and 1 power-up!");
             }
             })
-            .button("Back", move |app| {MainMenu(app, auth.clone());
+            .button("Back", move |app| {screens::MainMenu(app, auth.clone());
         });
 
     app.add_layer(main_dialog);
