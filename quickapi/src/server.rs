@@ -227,6 +227,11 @@ async fn handle_connection(mut socket: TcpStream, routes: Vec<Route>) {
         }
     };
 
+    println!(">>>>>>>");
+    println!("{}", req);
+    println!("<<<<<<<");
+
+
     for route in &routes {
         if route.method == HttpMethod::from_str(&req.method)
             && route.pattern.captures(&req.path).is_some()
