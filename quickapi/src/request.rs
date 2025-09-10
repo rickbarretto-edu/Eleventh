@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt;
 use url::Url;
 
 #[derive(Debug, Clone)]
@@ -68,5 +69,36 @@ impl Request {
 
     pub fn param(&self, key: &str) -> Option<&String> {
         self.query.get(key)
+    }
+}
+
+impl fmt::Display for Request {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // Reconstruct query string
+        let query_string = if self.query.is_empty() {
+            "".to_string()
+        } else {
+            let pairs: Vec<String> = self
+                .query
+                .iter()
+                .map(|(k, v)| format!("{}={}", k, v))
+                .collect();
+            format!("?{}", pairs.join("&"))
+        };
+
+        // Print like an HTTP request
+        write!(
+            f,
+            "{} {}{} HTTP/1.1\n{}\n\n{}",
+            self.method,
+            self.path,
+            query_string,
+            if self.query.is_empty() {
+                String::new()
+            } else {
+                format!("Params: {:?}", self.query)
+            },
+            self.body
+        )
     }
 }
