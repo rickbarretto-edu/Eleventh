@@ -240,7 +240,6 @@ async fn handle_connection(mut socket: TcpStream, routes: Vec<Route>) {
             let response: Response = (route.handler)(req, params).await;
             let resp_text: String = response.to_string();
             println!("{}", &resp_text);
-            println!("-------");
             let _ = socket.write_all(resp_text.as_bytes()).await;
             return;
         }
@@ -248,7 +247,6 @@ async fn handle_connection(mut socket: TcpStream, routes: Vec<Route>) {
 
     let resp: Response = Response::not_found().build();
     println!("{}", &resp.to_string());
-    println!("-------");
     let _ = socket.write_all(resp.to_string().as_bytes()).await;
 }
 
