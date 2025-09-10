@@ -1,55 +1,57 @@
-use super::MainMenu;
 use cursive::view::Nameable;
 use cursive::view::Resizable;
 use cursive::views::{Button, Dialog, EditView, LinearLayout, TextView};
 use cursive::Cursive;
 
+use crate::services;
+use crate::screens;
+
 #[allow(non_snake_case)]
 pub fn AccountMenu(app: &mut Cursive) {
     app.pop_layer();
 
-    let login_button = Button::new("Login", |s| {
-        let username = s
-            .call_on_name("username", |view: &mut EditView| view.get_content())
+    let login_button = Button::new("Login", |app| {
+        let username = app
+            .call_on_name("username", |field: &mut EditView| field.get_content())
             .unwrap()
             .to_string();
-        let password = s
-            .call_on_name("password", |view: &mut EditView| view.get_content())
+        let password = app
+            .call_on_name("password", |field: &mut EditView| field.get_content())
             .unwrap()
             .to_string();
 
-        let auth_result = login(&username, &password);
+        let auth_result = services::account::login(&username, &password);
 
         match auth_result {
             Ok(auth) => {
-                let auth_clone = auth.clone();
-                MainMenu(s, auth_clone);
+                let auth = auth.clone();
+                screens::MainMenu(app, auth);
             }
-            Err(err_msg) => {
-                s.add_layer(Dialog::info(err_msg));
+            Err(message) => {
+                app.add_layer(Dialog::info(message));
             }
         }
     });
 
-    let signup_button = Button::new("Signup", |s| {
-        let username = s
-            .call_on_name("username", |view: &mut EditView| view.get_content())
+    let signup_button = Button::new("Signup", |app| {
+        let username = app
+            .call_on_name("username", |field: &mut EditView| field.get_content())
             .unwrap()
             .to_string();
-        let password = s
+        let password = app
             .call_on_name("password", |view: &mut EditView| view.get_content())
             .unwrap()
             .to_string();
 
-        let auth_result = signup(&username, &password);
+        let auth_result = services::account::signup(&username, &password);
 
         match auth_result {
             Ok(auth) => {
-                let auth_clone = auth.clone();
-                MainMenu(s, auth_clone);
+                let auth = auth.clone();
+                screens::MainMenu(app, auth);
             }
-            Err(err_msg) => {
-                s.add_layer(Dialog::info(err_msg));
+            Err(message) => {
+                app.add_layer(Dialog::info(message));
             }
         }
     });
@@ -70,46 +72,4 @@ pub fn AccountMenu(app: &mut Cursive) {
     let dialog = Dialog::around(layout).title("Login / Signup");
 
     app.add_layer(dialog);
-}
-
-fn login(username: &str, password: &str) -> Result<String, String> {
-    let client = reqwest::blocking::Client::new();
-    let res = client
-        .post("http://127.0.0.1:8080/accounts/login/")
-        .json(&serde_json::json!({ "username": username, "password": password }))
-        .send()
-        .map_err(|_| "Failed to send request")?;
-
-    let json: serde_json::Value = res.json().map_err(|_| "Failed to parse response")?;
-
-    if let Some(auth) = json.get("auth").and_then(|v| v.as_str()) {
-        Ok(auth.to_string())
-    } else {
-        Err(json
-            .get("message")
-            .and_then(|v| v.as_str())
-            .map(|s| s.to_string())
-            .unwrap_or_else(|| "Login failed".to_string()))
-    }
-}
-
-fn signup(username: &str, password: &str) -> Result<String, String> {
-    let client = reqwest::blocking::Client::new();
-    let res = client
-        .post("http://127.0.0.1:8080/accounts/create/")
-        .json(&serde_json::json!({ "username": username, "password": password }))
-        .send()
-        .map_err(|_| "Failed to send request")?;
-
-    let json: serde_json::Value = res.json().map_err(|_| "Failed to parse response")?;
-
-    if let Some(auth) = json.get("auth").and_then(|v| v.as_str()) {
-        Ok(auth.to_string())
-    } else {
-        Err(json
-            .get("message")
-            .and_then(|v| v.as_str())
-            .unwrap_or("Signup failed")
-            .to_owned())
-    }
 }

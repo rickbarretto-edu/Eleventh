@@ -1,13 +1,14 @@
 pub mod account;
-pub mod game;
+pub mod championship;
 pub mod main_menu;
 pub mod reward;
 pub mod team;
 pub mod welcome;
 
 pub use account::AccountMenu;
-pub use game::MatchScreen;
+pub use championship::ChampionshipMenu;
+pub use championship::NamePlayers;
 pub use main_menu::MainMenu;
 pub use reward::RewardScreen;
 pub use team::TeamScreen;
-pub use welcome::WelcomeScreen;
+pub use welcome::Welcome;
