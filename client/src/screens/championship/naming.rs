@@ -5,8 +5,8 @@ use cursive::{traits::*, Cursive};
 use std::sync::{Arc, Mutex};
 
 use crate::schemas::deck::DeckResponse;
-use crate::screens::team::user_deck;
 use crate::screens::MainMenu;
+use crate::services;
 
 #[allow(non_snake_case)]
 fn ResultOfMatch(app: &mut Cursive, auth: String) {
@@ -64,7 +64,7 @@ pub fn NamePlayers(app: &mut Cursive, auth: String) {
 }
 
 fn deck_of(app: &mut Cursive, auth: &String) -> Option<DeckResponse> {
-    let deck: DeckResponse = match user_deck(auth) {
+    let deck: DeckResponse = match services::deck::list(auth) {
         Ok(resp) => match resp.json() {
             Ok(json) => json,
             Err(_) => {
