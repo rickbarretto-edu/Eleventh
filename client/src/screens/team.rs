@@ -2,7 +2,7 @@ use cursive::views::{Dialog, ListView, ScrollView, TextView};
 use cursive::Cursive;
 use reqwest::blocking::Client;
 
-use crate::screens;
+use crate::{screens, services};
 use crate::schemas::deck::DeckResponse;
 use crate::schemas::deck::Player;
 use crate::schemas::deck::PowerUp;
@@ -35,7 +35,7 @@ pub fn TeamScreen(app: &mut Cursive, auth: String) {
 }
 
 fn deck_of(app: &mut Cursive, auth: &String) -> Option<DeckResponse> {
-    let deck: DeckResponse = match user_deck(auth) {
+    let deck: DeckResponse = match services::deck::list(auth) {
         Ok(resp) => match resp.json() {
             Ok(json) => json,
             Err(_) => {
@@ -66,12 +66,6 @@ fn CardItem(i: usize, player: &Player, auth_clone: String) -> Dialog {
 fn PowerItem(power: &PowerUp, count: &u32) -> TextView {
     let power_info = format!("{}x : {}", count, power);
     TextView::new(power_info)
-}
-
-pub fn user_deck(auth: &String) -> Result<reqwest::blocking::Response, reqwest::Error> {
-    let client = Client::new();
-    let url: String = format!("http://127.0.0.1:8080/user/{}/deck/", auth);
-    client.get(&url).send()
 }
 
 fn fire_player(i: usize, auth_clone: &String) {
