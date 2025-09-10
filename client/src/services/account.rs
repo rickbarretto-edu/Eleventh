@@ -9,12 +9,12 @@ pub fn signup(username: &str, password: &str) -> Result<String, String> {
 
 pub fn login(username: &str, password: &str) -> Result<String, String> {
     let url = "http://127.0.0.1:8080/accounts/login/";
-    let res = request_at(username, password, url)?;
+    let res = request_at(url, username, password)?;
     let json = humanized_result(res)?;
     auth_or_error(json, "Login failed")
 }
 
-fn request_at(username: &str, password: &str, url: &str) -> Result<reqwest::blocking::Response, String> {
+fn request_at(url: &str, username: &str, password: &str) -> Result<reqwest::blocking::Response, String> {
     let client = reqwest::blocking::Client::new();
     let res = client
         .post(url)
