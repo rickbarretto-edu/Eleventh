@@ -2,8 +2,8 @@ use cursive::views::{Dialog, SelectView};
 use cursive::Cursive;
 
 use crate::services;
+use super::Pairing;
 use crate::screens::MainMenu;
-use crate::screens::NamePlayers;
 
 
 #[allow(non_snake_case)]
@@ -41,7 +41,7 @@ fn on_back(app: &mut Cursive, auth_clone: String) {
 /// Open next page or display error when the user clicks in 'Go'
 fn on_go(app: &mut Cursive, auth: &String) {
     match services::championship::join(auth) {
-        Ok(_) => NamePlayers(app, auth.clone()),
+        Ok(_) => Pairing(app, auth.clone()),
         Err(err) => display_error(app, err)
     };
 }
