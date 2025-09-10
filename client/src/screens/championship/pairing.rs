@@ -1,12 +1,16 @@
 use cursive::Cursive;
 use cursive::views::Dialog;
-use std::time::{Duration, Instant};
+use std::time::{Duration};
 use std::thread;
+
+use crate::services;
 
 use super::NamePlayers;
 
-fn fetch(start: Instant) -> bool {
-    start.elapsed() >= Duration::from_millis(3500)
+fn fetch(auth: &String) -> bool {
+    services::championship::status(&auth).is_ok_and(|status| {
+        status.status == "paired"
+    })
 }
 
 #[allow(non_snake_case)]
@@ -21,12 +25,11 @@ pub fn Pairing(app: &mut Cursive, auth: String) {
 
     let sink = app.cb_sink().clone();
     let auth = auth.clone();
-    let start = Instant::now();
 
     thread::spawn(move || {
         loop {
             thread::sleep(Duration::from_secs(1));
-            if fetch(start) {
+            if fetch(&auth) {
                 let auth = auth.clone();
                 sink.send(Box::new(move |app: &mut Cursive| {
                     NamePlayers(app, auth.clone());
