@@ -17,17 +17,17 @@ pub fn MainMenu(app: &mut Cursive, auth: String) {
         .title("Main Menu")
         .button("Match", {
             let auth = auth.clone();
-            move |s| ChampionshipMenu(s, (*auth).clone())
+            move |app| ChampionshipMenu(app, (*auth).clone())
         })
         .button("Team", {
             let auth = auth.clone();
-            move |s| TeamScreen(s, (*auth).clone())
+            move |app| TeamScreen(app, (*auth).clone())
         })
         .button("Reward", {
             let auth = auth.clone();
-            move |s| RewardScreen(s, (*auth).clone())
+            move |app| RewardScreen(app, (*auth).clone())
         })
-        .button("Quit", |s| s.quit());
+        .button("Quit", |app| app.quit());
 
     app.add_layer(options);
 }
