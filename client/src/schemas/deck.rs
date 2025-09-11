@@ -4,7 +4,7 @@ use std::fmt::Display;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct DeckResponse {
     pub players: Vec<Player>,
     pub power_ups: Vec<(PowerUp, u32)>,

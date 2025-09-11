@@ -5,12 +5,13 @@ use cursive::{traits::*, Cursive};
 use std::sync::{Arc, Mutex};
 
 use crate::schemas::deck::DeckResponse;
-use crate::services;
+use crate::{schemas, services};
 use crate::screens;
 
 use super::Waiting;
 
 /// Players naming window
+#[allow(non_snake_case)]
 #[allow(non_snake_case)]
 pub fn NamePlayers(app: &mut Cursive, auth: String) {
     app.pop_layer();
@@ -36,6 +37,7 @@ pub fn NamePlayers(app: &mut Cursive, auth: String) {
     let confirm_auth = auth.clone();
     let confirm_players = chosen_players.clone();
     let confirm_powerup = chosen_powerup.clone();
+    let confirm_deck = deck.clone();
 
     let list = ListView::new()
         .child("Choose 5 Players", player_select.fixed_height(10))
@@ -46,14 +48,34 @@ pub fn NamePlayers(app: &mut Cursive, auth: String) {
         .button("Confirm", move |app| {
             let players = confirm_players.lock().unwrap();
             let power = confirm_powerup.lock().unwrap();
-    
+
             if players.len() == 5 && power.is_some() {
-                Waiting(app, confirm_auth.clone());
+                let team = schemas::championship::Team {
+                    named: players
+                        .iter()
+                        .map(|&idx| confirm_deck.players[idx].clone())
+                        .collect::<Vec<schemas::deck::Player>>(),
+                    helper: {
+                        let idx = power.unwrap();
+                        confirm_deck.power_ups[idx].0.clone()
+                    },
+                };
+
+                match services::championship::name(&confirm_auth, team) {
+                    Ok(resp) => {
+                        Info(app, &format!("Team named successfully: {}", resp));
+                        Waiting(app, confirm_auth.clone());
+                    }
+                    Err(e) => {
+                        Info(app, &format!("Failed to send team: {}", e));
+                    }
+                }
             } else {
                 Info(app, "You must pick exactly 5 players and 1 power-up!");
             }
-            })
-            .button("Back", move |app| {screens::MainMenu(app, auth.clone());
+        })
+        .button("Back", move |app| {
+            screens::MainMenu(app, auth.clone());
         });
 
     app.add_layer(main_dialog);

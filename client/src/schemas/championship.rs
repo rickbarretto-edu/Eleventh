@@ -17,6 +17,6 @@ pub struct MatchState {
 #[derive(Debug, Clone)]
 #[derive(Serialize)]
 pub struct Team {
-    named: Vec<Player>,
-    helper: PowerUp
+    pub named: Vec<Player>,
+    pub helper: PowerUp
 }
