@@ -8,11 +8,7 @@ use crate::schemas::deck::DeckResponse;
 use crate::services;
 use crate::screens;
 
-#[allow(non_snake_case)]
-fn ResultOfMatch(app: &mut Cursive, auth: String) {
-    app.pop_layer();
-    app.add_layer(Dialog::info(format!("Result page for {}", auth)));
-}
+use super::Waiting;
 
 /// Players naming window
 #[allow(non_snake_case)]
@@ -52,7 +48,7 @@ pub fn NamePlayers(app: &mut Cursive, auth: String) {
             let power = confirm_powerup.lock().unwrap();
     
             if players.len() == 5 && power.is_some() {
-                ResultOfMatch(app, confirm_auth.clone());
+                Waiting(app, confirm_auth.clone());
             } else {
                 Info(app, "You must pick exactly 5 players and 1 power-up!");
             }
