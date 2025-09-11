@@ -17,15 +17,17 @@ async fn join(
     let user = params.get("id").unwrap().clone();
     let mut matches = matches.lock().await;
 
-    let is_in_match = matches.values().any(|state| match state {
-        GameState::Created(c) => c.by == user,
-        GameState::Paired(p) => p.host == user || p.guest == user,
-        _ => false,
-    });
+    let to_remove: Vec<String> = matches.iter()
+        .filter_map(|(k, s)| match s {
+            GameState::Created(c) if c.by == user => Some(k.clone()),
+            GameState::Paired(p) if p.host == user || p.guest == user => Some(k.clone()),
+            GameState::Finished(_) => Some(k.clone()),
+            _ => None,
+        })
+        .collect();
 
-    if is_in_match {
-        let message = json!({"message": "Already in a match"});
-        return Response::unauthorized().json(&message);
+    for key in to_remove {
+        matches.remove(&key);
     }
 
     let host_key = matches.iter()
@@ -46,9 +48,8 @@ async fn join(
 
     let created = Match::new(user.clone());
     matches.insert(user.clone(), GameState::Created(created.clone()));
-    Response::unauthorized().json(&json!(GameResponse::from(&GameState::Created(created))))
+    Response::ok().json(&json!(GameResponse::from(&GameState::Created(created))))
 }
-
 
 
 async fn name(
