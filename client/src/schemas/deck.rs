@@ -13,9 +13,7 @@ pub struct DeckResponse {
     message: String,
 }
 
-#[derive(Debug, Clone)]
-#[derive(Serialize, Deserialize)]
-#[derive(PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct Player {
     name: String,
     position: String,
@@ -35,9 +33,7 @@ impl Display for Player {
     }
 }
 
-#[derive(Debug, Clone)]
-#[derive(Serialize, Deserialize)]
-#[derive(PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct PowerUp {
     name: String,
     effect: String,

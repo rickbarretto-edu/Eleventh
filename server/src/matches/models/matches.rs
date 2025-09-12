@@ -24,12 +24,11 @@ impl Created {
 pub struct Paired {
     pub host: String,
     pub host_team: Option<Team>,
-    pub guest: String, 
+    pub guest: String,
     pub guest_team: Option<Team>,
 }
 
 impl Paired {
-
     pub fn new(host: impl Into<String>, guest: impl Into<String>) -> Option<Self> {
         let host: String = host.into();
         let guest: String = guest.into();
@@ -37,7 +36,12 @@ impl Paired {
         if host == guest {
             None
         } else {
-            Some(Paired { host, guest, host_team: None, guest_team: None })
+            Some(Paired {
+                host,
+                guest,
+                host_team: None,
+                guest_team: None,
+            })
         }
     }
 
@@ -83,5 +87,5 @@ impl Paired {
 #[derive(Debug, Clone)]
 pub struct Finished {
     pub winner: String,
-    pub score: (usize, usize)
+    pub score: (usize, usize),
 }

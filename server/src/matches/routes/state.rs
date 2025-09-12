@@ -2,7 +2,6 @@ use serde::Serialize;
 
 use crate::matches::models::matches::{Created, Finished, Paired};
 
-
 #[derive(Clone)]
 pub enum GameState {
     Created(Created),

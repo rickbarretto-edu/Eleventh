@@ -6,18 +6,19 @@ use std::collections::HashMap;
 
 use quickapi::{Request, Response, Server};
 
-use crate::{matches::models::{matches::Match, teams::Team}, services::Services, Shared};
 use super::service::Matches;
+use crate::{
+    matches::models::{matches::Match, teams::Team},
+    services::Services,
+    Shared,
+};
 
-
-async fn join(
-    matches: Shared<Matches>,
-    params: HashMap<String, String>,
-) -> Response {
+async fn join(matches: Shared<Matches>, params: HashMap<String, String>) -> Response {
     let user = params.get("id").unwrap().clone();
     let mut matches = matches.lock().await;
 
-    let to_remove: Vec<String> = matches.iter()
+    let to_remove: Vec<String> = matches
+        .iter()
         .filter_map(|(k, s)| match s {
             GameState::Created(c) if c.by == user => Some(k.clone()),
             GameState::Paired(p) if p.host == user || p.guest == user => Some(k.clone()),
@@ -30,11 +31,10 @@ async fn join(
         matches.remove(&key);
     }
 
-    let host_key = matches.iter()
-        .find_map(|(k, s)| match s {
-            GameState::Created(_) => Some(k.clone()),
-            _ => None,
-        });
+    let host_key = matches.iter().find_map(|(k, s)| match s {
+        GameState::Created(_) => Some(k.clone()),
+        _ => None,
+    });
 
     if let Some(host_id) = host_key {
         if let GameState::Created(created) = matches.remove(&host_id).unwrap() {
@@ -51,7 +51,6 @@ async fn join(
     Response::ok().json(&json!(GameResponse::from(&GameState::Created(created))))
 }
 
-
 async fn name(
     matches: Shared<Matches>,
     request: Request,
@@ -60,14 +59,12 @@ async fn name(
     let mut matches = matches.lock().await;
 
     let user: String = params.get("id").expect("Have user ID").into();
-    let team: Team = serde_json::from_str(&request.body)
-        .expect("Have right body format");
+    let team: Team = serde_json::from_str(&request.body).expect("Have right body format");
 
-    let paired_key = matches.iter()
-        .find_map(|(k, s)| match s {
-            GameState::Paired(p) if p.host == user || p.guest == user => Some(k.clone()),
-            _ => None,
-        });
+    let paired_key = matches.iter().find_map(|(k, s)| match s {
+        GameState::Paired(p) if p.host == user || p.guest == user => Some(k.clone()),
+        _ => None,
+    });
 
     if let Some(key) = paired_key {
         if let GameState::Paired(mut paired) = matches.remove(&key).unwrap() {
@@ -90,12 +87,7 @@ async fn name(
     }))
 }
 
-
-
-async fn status(
-    matches: Shared<Matches>,
-    params: HashMap<String, String>,
-) -> Response {
+async fn status(matches: Shared<Matches>, params: HashMap<String, String>) -> Response {
     let user = params.get("id").expect("To have user ID").clone();
     let matches = matches.lock().await;
 
@@ -107,25 +99,24 @@ async fn status(
 
     match state {
         Some(current) => Response::ok().json(&json!(GameResponse::from(current))),
-        None => Response::not_found().json(&json!({"message": "no match"}))
+        None => Response::not_found().json(&json!({"message": "no match"})),
     }
 }
 
-
 pub fn route_match(app: &mut Server<Services>) {
     let services = app.services.clone();
-    
+
     app.post("/match/{id}/start/", move |_, params| {
         let matches = services.matches();
         join(matches, params)
     });
-    
+
     let services = app.services.clone();
     app.post("/match/{id}/name/", move |req, params| {
         let matches = services.matches();
         name(matches, req, params)
     });
-    
+
     let services = app.services.clone();
     app.get("/match/{id}/status/", move |_, params| {
         let matches = services.matches();

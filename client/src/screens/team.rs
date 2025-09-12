@@ -2,10 +2,10 @@ use cursive::views::{Dialog, ListView, ScrollView, TextView};
 use cursive::Cursive;
 use reqwest::blocking::Client;
 
-use crate::{screens, services};
 use crate::schemas::deck::DeckResponse;
 use crate::schemas::deck::Player;
 use crate::schemas::deck::PowerUp;
+use crate::{screens, services};
 
 #[allow(non_snake_case)]
 pub fn TeamScreen(app: &mut Cursive, auth: String) {
@@ -30,7 +30,9 @@ pub fn TeamScreen(app: &mut Cursive, auth: String) {
     app.add_layer(
         Dialog::around(ScrollView::new(list).scroll_y(true))
             .title("Team Screen")
-            .button("Back to Main", move |s| screens::MainMenu(s, auth_clone.clone())),
+            .button("Back to Main", move |s| {
+                screens::MainMenu(s, auth_clone.clone())
+            }),
     );
 }
 

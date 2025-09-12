@@ -1,12 +1,11 @@
 /// Name Players & Power-up to use in your next match
-
 use cursive::views::{Dialog, ListView, ScrollView, SelectView};
 use cursive::{traits::*, Cursive};
 use std::sync::{Arc, Mutex};
 
 use crate::schemas::deck::DeckResponse;
-use crate::{schemas, services};
 use crate::screens;
+use crate::{schemas, services};
 
 use super::Waiting;
 
@@ -100,39 +99,32 @@ fn deck_of(app: &mut Cursive, auth: &String) -> Option<DeckResponse> {
 
 #[allow(non_snake_case)]
 fn PowerupSelect(chosen_powerup: &Arc<Mutex<Option<usize>>>) -> SelectView<usize> {
-    SelectView::<usize>::new()
-        .on_submit({
-            let chosen_powerup = chosen_powerup.clone();
-            move |app, idx| {
-                *chosen_powerup.lock().unwrap() = Some(*idx);
-                Info(app, &format!("Selected power-up #{}", idx));
-            }
-        })
+    SelectView::<usize>::new().on_submit({
+        let chosen_powerup = chosen_powerup.clone();
+        move |app, idx| {
+            *chosen_powerup.lock().unwrap() = Some(*idx);
+            Info(app, &format!("Selected power-up #{}", idx));
+        }
+    })
 }
-
 
 #[allow(non_snake_case)]
 fn DeckSelection(chosen_players: &Arc<Mutex<Vec<usize>>>) -> SelectView<usize> {
-    SelectView::<usize>::new()
-        .on_submit({
-            let chosen_players = chosen_players.clone();
-            move |siv, idx| {
-                let mut chosen = chosen_players.lock().unwrap();
-                if chosen.contains(idx) {
-                    Info(siv, "Already selected this player");
-                } else if chosen.len() >= 5 {
-                    Info(siv, "You can only choose 5 players");
-                } else {
-                    chosen.push(*idx);
-                    let text = format!(
-                        "Added player #{} ({} chosen so far)",
-                        idx,
-                        chosen.len()
-                    );
-                    Info(siv, &text);
-                }
+    SelectView::<usize>::new().on_submit({
+        let chosen_players = chosen_players.clone();
+        move |siv, idx| {
+            let mut chosen = chosen_players.lock().unwrap();
+            if chosen.contains(idx) {
+                Info(siv, "Already selected this player");
+            } else if chosen.len() >= 5 {
+                Info(siv, "You can only choose 5 players");
+            } else {
+                chosen.push(*idx);
+                let text = format!("Added player #{} ({} chosen so far)", idx, chosen.len());
+                Info(siv, &text);
             }
-        })
+        }
+    })
 }
 
 #[allow(non_snake_case)]

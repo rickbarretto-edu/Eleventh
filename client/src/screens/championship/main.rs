@@ -1,10 +1,9 @@
 use cursive::views::{Dialog, SelectView};
 use cursive::Cursive;
 
-use crate::services;
 use super::Pairing;
 use crate::screens::MainMenu;
-
+use crate::services;
 
 #[allow(non_snake_case)]
 pub fn ChampionshipMenu(app: &mut Cursive, auth: String) {
@@ -42,13 +41,12 @@ fn on_back(app: &mut Cursive, auth_clone: String) {
 fn on_go(app: &mut Cursive, auth: &String) {
     match services::championship::join(auth) {
         Ok(_) => Pairing(app, auth.clone()),
-        Err(err) => display_error(app, err)
+        Err(err) => display_error(app, err),
     };
 }
 
 /// Display request error to end-user
 fn display_error(app: &mut Cursive, err: String) {
-    let error = Dialog::info(err)
-        .title("Error");
+    let error = Dialog::info(err).title("Error");
     app.add_layer(error);
 }

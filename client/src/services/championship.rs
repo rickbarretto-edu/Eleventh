@@ -8,10 +8,7 @@ pub fn join(auth: &String) -> Result<String, String> {
     let client = Client::new();
     let url = format!("http://127.0.0.1:8080/match/{}/start/", auth);
 
-    let response = client
-        .post(&url)
-        .header("Authorization", auth)
-        .send();
+    let response = client.post(&url).header("Authorization", auth).send();
 
     match response {
         Ok(resp) => match resp.text() {
@@ -39,7 +36,6 @@ pub fn status(auth: &String) -> Result<MatchState, String> {
     }
 }
 
-
 /// Name a team for a Match
 pub fn name(auth: &String, team: Team) -> Result<String, String> {
     let client = Client::new();
@@ -59,4 +55,3 @@ pub fn name(auth: &String, team: Team) -> Result<String, String> {
         Err(e) => Err(format!("Request error: {}", e)),
     }
 }
-

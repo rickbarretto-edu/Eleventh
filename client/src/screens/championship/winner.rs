@@ -1,11 +1,13 @@
-use cursive::Cursive;
 use cursive::views::{Dialog, TextView};
-use std::time::{Duration};
-use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
+use cursive::Cursive;
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
 use std::thread;
+use std::time::Duration;
 
 use crate::services;
-
 
 #[allow(non_snake_case)]
 pub fn Waiting(app: &mut Cursive, auth: String) {
@@ -41,7 +43,8 @@ pub fn Waiting(app: &mut Cursive, auth: String) {
 
                     sink.send(Box::new(move |app: &mut Cursive| {
                         Winner(app, message);
-                    })).unwrap();
+                    }))
+                    .unwrap();
                     break;
                 }
             }
@@ -49,14 +52,15 @@ pub fn Waiting(app: &mut Cursive, auth: String) {
     });
 }
 
-
 #[allow(non_snake_case)]
 fn Winner(app: &mut Cursive, message: String) {
     app.pop_layer();
 
     let view = Dialog::around(TextView::new(message))
         .title("Winner")
-        .button("Close", |app| {app.pop_layer();});
+        .button("Close", |app| {
+            app.pop_layer();
+        });
 
     app.add_layer(view);
 }

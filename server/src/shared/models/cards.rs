@@ -17,9 +17,7 @@ const SPECIAL_CARD_NAMES: &[(&str, &str)] = &[
     ("Dribble Mastery", "Increase attack chance"),
 ];
 
-#[derive(Debug, Clone)]
-#[derive(Serialize, Deserialize)]
-#[derive(PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct PlayerCard {
     pub name: String,
     pub position: String,
@@ -57,9 +55,7 @@ impl PlayerCard {
     }
 }
 
-#[derive(Debug, Clone)]
-#[derive(Serialize, Deserialize)]
-#[derive(PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct SpecialCard {
     pub name: String,
     pub effect: String,

@@ -3,8 +3,8 @@ use cursive::view::Resizable;
 use cursive::views::{Button, Dialog, EditView, LinearLayout, TextView};
 use cursive::Cursive;
 
-use crate::services;
 use crate::screens;
+use crate::services;
 
 #[allow(non_snake_case)]
 pub fn AccountMenu(app: &mut Cursive) {

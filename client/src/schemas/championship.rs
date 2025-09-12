@@ -4,7 +4,6 @@ use serde::Serialize;
 use super::deck::Player;
 use super::deck::PowerUp;
 
-
 #[derive(Deserialize)]
 pub struct MatchState {
     pub status: String,
@@ -14,9 +13,8 @@ pub struct MatchState {
     pub winner: Option<String>,
 }
 
-#[derive(Debug, Clone)]
-#[derive(Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Team {
     pub named: Vec<Player>,
-    pub helper: PowerUp
+    pub helper: PowerUp,
 }

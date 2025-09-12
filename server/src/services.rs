@@ -11,7 +11,7 @@ pub struct Services {
     pub accounts: Arc<Mutex<Accounts>>,
     pub inventories: Arc<Mutex<Inventories>>,
     pub rewarding: Arc<Mutex<Rewarding>>,
-    pub matches: Arc<Mutex<Matches>>
+    pub matches: Arc<Mutex<Matches>>,
 }
 
 pub fn inject<T>(service: T) -> Arc<Mutex<T>> {

@@ -6,8 +6,6 @@ use server::services::Services;
 #[cfg(test)]
 use speculate::speculate;
 
-
-
 pub fn services() -> Services {
     use rand::rngs::StdRng;
     use rand::SeedableRng;
@@ -22,14 +20,13 @@ pub fn services() -> Services {
         accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
         rewarding: inject(Rewarding::new(rng)),
-        matches: inject(Matches::new())
+        matches: inject(Matches::new()),
     }
 }
 
 fn block_on<F: std::future::Future>(future: F) -> F::Output {
     tokio::runtime::Runtime::new().unwrap().block_on(future)
 }
-
 
 speculate! {
 

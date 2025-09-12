@@ -22,7 +22,7 @@ pub fn services() -> Services {
         accounts: inject(Accounts::new()),
         inventories: inject(Inventories::new()),
         rewarding: inject(Rewarding::new(rng)),
-        matches: inject(Matches::new())
+        matches: inject(Matches::new()),
     }
 }
 
