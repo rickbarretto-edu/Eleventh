@@ -6,8 +6,8 @@ use crate::models::cards::SpecialCard;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Team {
-    named: Vec<PlayerCard>,
-    helper: SpecialCard,
+    pub named: Vec<PlayerCard>,
+    pub helper: SpecialCard,
 }
 
 impl Team {
