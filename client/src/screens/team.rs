@@ -5,6 +5,7 @@ use reqwest::blocking::Client;
 use crate::schemas::deck::DeckResponse;
 use crate::schemas::deck::Player;
 use crate::schemas::deck::PowerUp;
+use crate::services::server_url;
 use crate::{screens, services};
 
 #[allow(non_snake_case)]
@@ -70,7 +71,12 @@ fn PowerItem(power: &PowerUp, count: &u32) -> TextView {
     TextView::new(power_info)
 }
 
+fn fire_url(user: &str, index: usize) -> String {
+    let base = format!("http://{}/", server_url());
+    format!("{}/user/{}/deck/fire/{}", base, user, index)
+}
+
 fn fire_player(i: usize, auth_clone: &String) {
-    let url: String = format!("http://server:8080/user/{}/deck/fire/{}", auth_clone, i);
+    let url = fire_url(&auth_clone, i);
     let _ = Client::new().delete(&url).send();
 }
