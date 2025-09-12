@@ -25,6 +25,8 @@ services:
     image: eleventh/client:latest
     depends_on:
       - server
+    environment:
+      - ELEVENTH_ADDRESS="server:8080"
     networks:
       - game_net
     stdin_open: true  # Allows the usage of terminal, 
