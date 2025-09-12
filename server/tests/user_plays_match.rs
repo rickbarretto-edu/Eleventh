@@ -54,12 +54,19 @@ speculate! {
             assert_eq!(game["guest"], "2");
             assert_eq!(game["status"], "paired");
         }
-
+        
+        /// Explanation:
+        /// Instead of deny the player to join the match,
+        /// This behavior removes him from the latest one and migrates him
+        /// to a new match.
+        /// 
+        /// This is not easy to test due to encapsulation, the way this was done,
+        /// this logic was not exposed to the API user, working as a black-box.
         it "user can join to only one match at time" {
             let _ = block_on(app.simulate("POST", "/match/1/start/", ""));
-            let denied = block_on(app.simulate("POST", "/match/1/start/", ""));
+            let not_denied = block_on(app.simulate("POST", "/match/1/start/", ""));
 
-            assert_eq!(denied.status, 401);
+            assert_eq!(not_denied.status, 200);
         }
     }
 
