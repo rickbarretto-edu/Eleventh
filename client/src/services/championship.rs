@@ -2,12 +2,17 @@ use reqwest::blocking::Client;
 
 use crate::schemas::championship::MatchState;
 use crate::schemas::championship::Team;
+use crate::services::server_url;
+
+fn match_url(user: &str, action: &str) -> String {
+    let base = format!("http://{}", server_url());
+    format!("{}/match/{}/{}", base, user, action)
+}
 
 /// Join a player to a match
 pub fn join(auth: &String) -> Result<String, String> {
     let client = Client::new();
-    let url = format!("http://server:8080/match/{}/start/", auth);
-
+    let url = match_url(auth, "start");
     let response = client.post(&url).header("Authorization", auth).send();
 
     match response {
@@ -22,8 +27,7 @@ pub fn join(auth: &String) -> Result<String, String> {
 /// Fetches the state of the current match of the player
 pub fn status(auth: &String) -> Result<MatchState, String> {
     let client = Client::new();
-    let url = format!("http://server:8080/match/{}/status/", auth);
-
+    let url = match_url(auth, "status");
     let response = client.get(&url).send();
 
     match response {
@@ -39,8 +43,7 @@ pub fn status(auth: &String) -> Result<MatchState, String> {
 /// Name a team for a Match
 pub fn name(auth: &String, team: Team) -> Result<String, String> {
     let client = Client::new();
-    let url = format!("http://server:8080/match/{}/name/", auth);
-
+    let url = match_url(auth, "name");
     let response = client
         .post(&url)
         .header("Authorization", auth)
