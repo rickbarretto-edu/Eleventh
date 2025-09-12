@@ -3,7 +3,7 @@
 {
 	"name": "Rust",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/rust:1-1-bullseye"
+	"image": "mcr.microsoft.com/devcontainers/rust:1-1-bullseye",
 
 	// Use 'mounts' to make the cargo cache persistent in a Docker Volume.
 	// "mounts": [go
@@ -15,13 +15,15 @@
 	// ]
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
+	"features": {
+    	"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+	"forwardPorts": [8080],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "rustc --version",
+	"postCreateCommand": "sudo apt-get update && sudo apt-get install -y docker-compose-plugin",
 
 	// Configure tool-specific properties.
 	// "customizations": {},
