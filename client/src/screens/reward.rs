@@ -3,6 +3,8 @@ use cursive::Cursive;
 use reqwest::blocking;
 use serde::Deserialize;
 
+use crate::services::server_url;
+
 use super::MainMenu;
 
 #[derive(Debug, Clone, Deserialize)]
@@ -29,11 +31,15 @@ struct RewardResponse {
     error: Option<String>,
 }
 
+fn reward_url(user: &str) -> String {
+    format!("http://{}/user/{}/deck/claim", server_url(), user)
+}
+
 #[allow(non_snake_case)]
 pub fn RewardScreen(app: &mut Cursive, auth: String) {
     app.pop_layer();
 
-    let url = format!("http://server:8080/user/{}/deck/claim", auth);
+    let url = reward_url(&auth);
     let response = blocking::get(&url);
 
     if response.is_err() {
