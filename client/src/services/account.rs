@@ -1,13 +1,19 @@
+use crate::services::server_url;
+
+fn accounts_url(path: &str) -> String {
+    format!("https://{}/{}", server_url(), path)
+}
+
 pub fn signup(username: &str, password: &str) -> Result<String, String> {
-    let url = "http://server:8080/accounts/create/";
-    let res = request_at(url, username, password)?;
+    let url = accounts_url("create");
+    let res = request_at(&url, username, password)?;
     let json = humanized_result(res)?;
     auth_or_error(json, "Signup failed")
 }
 
 pub fn login(username: &str, password: &str) -> Result<String, String> {
-    let url = "http://server:8080/accounts/login/";
-    let res = request_at(url, username, password)?;
+    let url = accounts_url("login");
+    let res = request_at(&url, username, password)?;
     let json = humanized_result(res)?;
     auth_or_error(json, "Login failed")
 }
