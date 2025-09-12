@@ -6,28 +6,55 @@
 Players build their own dream team using collectible cards, manage tactics, and compete in tactical duels against other managers. 
 
 
-## Running the system
+## Usage
 
+### Development
 
-### Starting the server
+To use the system locally without Docker, see the following instructions.
+This is needed to ensure portability, mainly for systems that can't run Docker,
+and also quick development, where build time counts a lot.
 
+**Starting the server**
 ```sh
 $ cargo run -p server
 ```
 
-### Starting the client
+**Starting the client** (Do for every client)
 
 ```sh
 $ cargo run -p eleventh
 ```
 
-### Running tests
+**Running tests**
 
 ```sh
 $ cargo test
 ```
 
-## Manually testing the system
+### Production
+
+Required by the problem, the production environment is Docker-based,
+where the server and each client are into their own containers.
+
+**Building the whole system**
+
+```sh
+$ docker compose build
+```
+
+**Starting the server**
+
+```sh
+$ docker compose run --rm server
+```
+
+**Starting the client** (for each one)
+
+```sh
+$ docker compose run --rm client
+```
+
+## Manually testing the system routes
 
 If you want to know if the system works well with external tools, you may use `curl` for any HTTP endpoint declared.
 Remember, if you need to change the method, use `-X <METHOD>` and a body, use `-d <BODY>`.
