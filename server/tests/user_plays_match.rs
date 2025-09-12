@@ -81,6 +81,57 @@ speculate! {
         it "status is initiated" {
             assert_eq!(game["status"], "paired");
         }
-    }
 
+        it "has some winner and a score after both players choose" {
+            
+            use server::matches::models::teams::Team;
+            use server::models::cards::PlayerCard;
+            use server::models::cards::SpecialCard;
+            
+            use rand::rngs::StdRng;
+            use rand::SeedableRng;
+            
+            let mut rng = StdRng::from_os_rng();
+
+            // prepare teams
+            let team1 = Team {
+                named: vec![
+                    PlayerCard::random(&mut rng),
+                    PlayerCard::random(&mut rng),
+                    PlayerCard::random(&mut rng),
+                    PlayerCard::random(&mut rng),
+                    PlayerCard::random(&mut rng),
+                ],
+                helper: SpecialCard::random(&mut rng),
+            };
+
+            let team2 = Team {
+                named: vec![
+                    PlayerCard::random(&mut rng),
+                    PlayerCard::random(&mut rng),
+                    PlayerCard::random(&mut rng),
+                    PlayerCard::random(&mut rng),
+                    PlayerCard::random(&mut rng),
+                ],
+                helper: SpecialCard::random(&mut rng),
+            };
+
+            // player 1 chooses
+            let body1 = serde_json::to_string(&team1).unwrap();
+            let resp1 = block_on(app.simulate("POST", "/match/1/name/", &body1));
+            assert_eq!(resp1.status, 200);
+
+            // player 2 chooses
+            let body2 = serde_json::to_string(&team2).unwrap();
+            let resp2 = block_on(app.simulate("POST", "/match/2/name/", &body2));
+            assert_eq!(resp2.status, 200);
+
+            // check final state
+            let status = block_on(app.simulate("POST", "/match/1/status/", ""));
+            let game: Value = serde_json::from_str(&status.body).unwrap();
+
+            assert!(game["winner"].is_string(), "winner should be decided");
+            assert!(game["score"].is_object(), "score should be available");
+        }
+    }
 }
