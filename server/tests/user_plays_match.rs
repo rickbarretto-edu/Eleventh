@@ -40,7 +40,7 @@ speculate! {
             let created = block_on(app.simulate("POST", "/match/1/start/", ""));
             let game: Value = serde_json::from_str(&created.body).unwrap();
 
-            assert_eq!(created.status, 401);
+            assert_eq!(created.status, 200);
             assert_eq!(game["status"], "pairing");
             assert_eq!(game["host"], "1");
         }
