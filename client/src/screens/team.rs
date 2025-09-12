@@ -71,6 +71,6 @@ fn PowerItem(power: &PowerUp, count: &u32) -> TextView {
 }
 
 fn fire_player(i: usize, auth_clone: &String) {
-    let url: String = format!("http://127.0.0.1:8080/user/{}/deck/fire/{}", auth_clone, i);
+    let url: String = format!("http://server:8080/user/{}/deck/fire/{}", auth_clone, i);
     let _ = Client::new().delete(&url).send();
 }

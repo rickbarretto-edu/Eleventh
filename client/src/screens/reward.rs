@@ -33,7 +33,7 @@ struct RewardResponse {
 pub fn RewardScreen(app: &mut Cursive, auth: String) {
     app.pop_layer();
 
-    let url = format!("http://127.0.0.1:8080/user/{}/deck/claim", auth);
+    let url = format!("http://server:8080/user/{}/deck/claim", auth);
     let response = blocking::get(&url);
 
     if response.is_err() {

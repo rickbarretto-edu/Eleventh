@@ -6,7 +6,7 @@ use crate::schemas::championship::Team;
 /// Join a player to a match
 pub fn join(auth: &String) -> Result<String, String> {
     let client = Client::new();
-    let url = format!("http://127.0.0.1:8080/match/{}/start/", auth);
+    let url = format!("http://server:8080/match/{}/start/", auth);
 
     let response = client.post(&url).header("Authorization", auth).send();
 
@@ -22,7 +22,7 @@ pub fn join(auth: &String) -> Result<String, String> {
 /// Fetches the state of the current match of the player
 pub fn status(auth: &String) -> Result<MatchState, String> {
     let client = Client::new();
-    let url = format!("http://127.0.0.1:8080/match/{}/status/", auth);
+    let url = format!("http://server:8080/match/{}/status/", auth);
 
     let response = client.get(&url).send();
 
@@ -39,7 +39,7 @@ pub fn status(auth: &String) -> Result<MatchState, String> {
 /// Name a team for a Match
 pub fn name(auth: &String, team: Team) -> Result<String, String> {
     let client = Client::new();
-    let url = format!("http://127.0.0.1:8080/match/{}/name/", auth);
+    let url = format!("http://server:8080/match/{}/name/", auth);
 
     let response = client
         .post(&url)
