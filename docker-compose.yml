@@ -13,6 +13,8 @@ services:
     image: eleventh/server:latest
     ports:
       - "8080:8080"
+    environment:
+      - ELEVENTH_ADDRESS="0.0.0.0:8080"
     networks:
       - game_net
 

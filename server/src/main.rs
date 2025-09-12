@@ -19,7 +19,10 @@ use server::services::Services;
 
 #[tokio::main]
 async fn main() {
-    let rng = StdRng::from_os_rng();
+    let url: String = std::env::var("ELEVENTH_ADDRESS")
+        .unwrap_or("127.0.0.1:8080".into());
+
+        let rng = StdRng::from_os_rng();
 
     let services = Services {
         accounts: inject(Accounts::new()),
@@ -34,5 +37,5 @@ async fn main() {
     route_decks(&mut app);
     route_match(&mut app);
 
-    app.run("0.0.0.0:8080").await;
+    app.run(&url).await;
 }
