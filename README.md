@@ -6,6 +6,14 @@
 Players build their own dream team using collectible cards, manage tactics, and compete in tactical duels against other managers. 
 
 
+## PBL Context
+
+This project was developed for the subject TEC502 – Concurrency & Connectivity, which is taught using a Problem-Based Learning (PBL) approach.
+
+In PBL, students work in groups to solve open-ended problems, progressing step by step through research, discussion, and implementation. This project in specific is individual, but sessions are organized in group to share experiences and brainstorming.
+
+Because of this nature, I've created the `.project/` folder that have the sessions summaries, goals and others.
+
 ## Usage
 
 ### Development
