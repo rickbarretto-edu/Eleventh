@@ -15,6 +15,7 @@ This is needed to ensure portability, mainly for systems that can't run Docker,
 and also quick development, where build time counts a lot.
 
 **Starting the server**
+
 ```sh
 $ cargo run -p server
 ```
