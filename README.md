@@ -61,7 +61,7 @@ To run stress test, read the [Faint!'s documentation](./faint/Readme.md), this w
 ## Manually testing the system routes
 
 If you want to know if the system works well with external tools, you may use `curl` for any HTTP endpoint declared.
-Remember, if you need to change the method, use `-X <METHOD>` and a body, use `-d <BODY>`.
+Remember, if you need to change the method, use `-X <METHOD>` and a body, use `-d <BODY>`. Make sure you have your server running locally.
 
 ### Account Creation Example
 
