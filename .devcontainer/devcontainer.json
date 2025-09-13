@@ -26,7 +26,7 @@
 	"forwardPorts": [8080],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "docker --version",
+	"postCreateCommand": "apt-get update && apt-get install -y openssl && apt-get install -y pkg-config",
 
 	// Configure tool-specific properties.
 	// "customizations": {},
