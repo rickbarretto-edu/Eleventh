@@ -38,6 +38,11 @@ where the server and each client are into their own containers.
 
 **Building the whole system**
 
+You can't just use `docker compose up`, and instead, you need to build it before
+actually run. This happens because the peers doesn't interact with them automatically,
+clients needs to interact via terminal (so this needs a user to control it).
+Due to this nature, you need to build it, and then run each on their own terminal.
+
 ```sh
 $ docker compose build
 ```
