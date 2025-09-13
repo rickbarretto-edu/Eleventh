@@ -54,6 +54,10 @@ $ docker compose run --rm server
 $ docker compose run --rm client
 ```
 
+## Stress test
+
+To run stress test, read the [Faint!'s documentation](./faint/Readme.md), this will give you the complete documentation of the CLI and also examples of usage. Make sure you're running your server locally for that. If you want to, enable OS tune for high concurrency by executing the script `tune.sh`.
+
 ## Manually testing the system routes
 
 If you want to know if the system works well with external tools, you may use `curl` for any HTTP endpoint declared.
