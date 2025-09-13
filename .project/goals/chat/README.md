@@ -1,5 +1,8 @@
 # How to run
 
+This is the proof-of concept I've made for the week 0, 
+but this also accomplishes the week 1 goal.
+
 ## 1. Start Docker Daemon
 
 To start Docker Daemon, open Docker Desktop first.
