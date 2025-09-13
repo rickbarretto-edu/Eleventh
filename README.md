@@ -55,6 +55,14 @@ $ docker compose run --rm server
 
 **Starting the client** (for each one)
 
+> [!TIP]
+> If you're using a terminal emulator that supports split terminals, just do this.
+The TUI simply resizes itself to adapt to the terminal size, so I hope there is 
+no problem doing it if the horizontal size is enough.
+> 
+> VsCode, Windows Terminal have support to split it. This would improve your workflow for testing.
+On VsCode, I generally put the server on top and two clients side-by-side on bottom.
+
 ```sh
 $ docker compose run --rm client
 ```
