@@ -68,7 +68,7 @@ type Report = {
 
 function help() {
     return `
-Usage: deno run --allow-net script.ts [options] <url>
+Usage: deno run faint [options] <url>
 
 Options:
   -h, --help            Show this help message
