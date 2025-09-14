@@ -1,6 +1,7 @@
 pub mod account;
 pub mod championship;
 pub mod deck;
+pub mod ping;
 
 /// Returns the Eleventh's Server URL
 /// 
