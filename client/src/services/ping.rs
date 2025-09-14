@@ -4,7 +4,7 @@ use crate::services::server_url;
 
 
 fn ping_url(path: &str) -> String {
-    format!("https://{}/{}", server_url(), path)
+    format!("http://{}/{}", server_url(), path)
 }
 
 pub fn ping(timeout: usize) -> Result<Duration, String> {
