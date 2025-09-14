@@ -4,7 +4,7 @@ extern crate speculate;
 use speculate::speculate;
 
 use quickapi::server::Server;
-use server::deck::route_decks;
+use server::ping::route_ping;
 
 use server::services::Services;
 
@@ -35,7 +35,7 @@ speculate! {
 
     before {
         let mut app = Server::new(services());
-        route_decks(&mut app);
+        route_ping(&mut app);
     }
 
     it "ping should respond with pong" {
