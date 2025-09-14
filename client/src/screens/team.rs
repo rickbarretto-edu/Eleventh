@@ -1,11 +1,9 @@
 use cursive::views::{Dialog, ListView, ScrollView, TextView};
 use cursive::Cursive;
-use reqwest::blocking::Client;
 
 use crate::schemas::deck::DeckResponse;
 use crate::schemas::deck::Player;
 use crate::schemas::deck::PowerUp;
-use crate::services::server_url;
 use crate::{screens, services};
 
 #[allow(non_snake_case)]
@@ -59,7 +57,7 @@ fn CardItem(i: usize, player: &Player, auth_clone: String) -> Dialog {
     let player_info = format!("{}", player);
 
     Dialog::around(TextView::new(player_info)).button("Remove", move |s| {
-        fire_player(i, &auth_clone);
+        services::deck::fire_player(i, &auth_clone);
         s.pop_layer();
         TeamScreen(s, auth_clone.clone());
     })
@@ -71,12 +69,3 @@ fn PowerItem(power: &PowerUp, count: &u32) -> TextView {
     TextView::new(power_info)
 }
 
-fn fire_url(user: &str, index: usize) -> String {
-    let base = format!("http://{}/", server_url());
-    format!("{}/user/{}/deck/fire/{}", base, user, index)
-}
-
-fn fire_player(i: usize, auth_clone: &String) {
-    let url = fire_url(&auth_clone, i);
-    let _ = Client::new().delete(&url).send();
-}
