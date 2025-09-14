@@ -3,14 +3,12 @@ use std::time::{Duration, Instant};
 use crate::services::server_url;
 
 
-fn ping_url(path: &str) -> String {
-    format!("http://{}/{}", server_url(), path)
+fn ping_url() -> String {
+    format!("http://{}/ping", server_url())
 }
 
 pub fn ping(timeout: usize) -> Result<Duration, String> {
-    let url = ping_url("ping");
-    let response = reqwest::blocking::get(&url).map_err(|_| "Failed to send request")?;
-    
+    let url = ping_url();    
     let client = reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(timeout as u64))
         .build()
