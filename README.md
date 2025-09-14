@@ -1,6 +1,6 @@
-<h1 align="center">⚽ Eleventh 🃏</h1>
+<h1 align="center">Eleventh</h1>
 
-<p align="center">Only 11 wins.</p>
+<p align="center">⚽ Only 11 wins 🃏</p>
 
 <p align="center">
     <img src=".project/images/cover.png" alt="Eleventh Cover" width="400" style="max-width:100%;">
