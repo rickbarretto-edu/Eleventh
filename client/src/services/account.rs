@@ -1,7 +1,7 @@
 use crate::services::server_url;
 
 fn accounts_url(path: &str) -> String {
-    format!("http://{}/{}", server_url(), path)
+    format!("http://{}/accounts/{}", server_url(), path)
 }
 
 pub fn signup(username: &str, password: &str) -> Result<String, String> {
