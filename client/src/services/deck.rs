@@ -8,7 +8,7 @@ fn deck_url(user: &str, action: &str) -> String {
 
 pub fn list(auth: &String) -> Result<reqwest::blocking::Response, reqwest::Error> {
     let client = Client::new();
-    let url = deck_url("", auth);
+    let url = deck_url(auth, "");
     client.get(&url).send()
 }
 
