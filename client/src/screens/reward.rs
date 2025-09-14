@@ -1,6 +1,5 @@
 use cursive::views::{Dialog, TextView};
 use cursive::Cursive;
-use reqwest::blocking;
 use serde::Deserialize;
 
 use crate::services::server_url;
