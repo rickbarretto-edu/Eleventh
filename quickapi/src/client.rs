@@ -34,6 +34,12 @@ impl Client {
         self.request(&req)
     }
 
+    pub fn delete(&self, path: &str) -> Response {
+        let path = format!("/{}", path.trim_start_matches('/'));
+        let req = Request::new("DELETE", &path, "");
+        self.request(&req)
+    }
+
     fn request(&self, req: &Request) -> Response {
         let mut stream = TcpStream::connect(self.url()).expect("Failed to connect to server");
         let raw_request: String = req.to_string();

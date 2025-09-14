@@ -82,7 +82,7 @@ pub fn NamePlayers(app: &mut Cursive, auth: String) {
 
 fn deck_of(app: &mut Cursive, auth: &String) -> Option<DeckResponse> {
     let deck: DeckResponse = match services::deck::list(auth) {
-        Ok(resp) => match resp.json() {
+        Ok(resp) => match serde_json::from_str::<DeckResponse>(&resp.body) {
             Ok(json) => json,
             Err(_) => {
                 Info(app, "Failed to parse deck JSON");

@@ -37,7 +37,7 @@ pub fn TeamScreen(app: &mut Cursive, auth: String) {
 
 fn deck_of(app: &mut Cursive, auth: &String) -> Option<DeckResponse> {
     let deck: DeckResponse = match services::deck::list(auth) {
-        Ok(resp) => match resp.json() {
+        Ok(resp) => match serde_json::from_str::<DeckResponse>(&resp.body) {
             Ok(json) => json,
             Err(_) => {
                 app.add_layer(Dialog::info("Failed to parse deck JSON"));
@@ -57,7 +57,7 @@ fn CardItem(i: usize, player: &Player, auth_clone: String) -> Dialog {
     let player_info = format!("{}", player);
 
     Dialog::around(TextView::new(player_info)).button("Remove", move |s| {
-        services::deck::fire_player(i, &auth_clone);
+        let _ = services::deck::fire_player(i, &auth_clone);
         s.pop_layer();
         TeamScreen(s, auth_clone.clone());
     })
@@ -68,4 +68,3 @@ fn PowerItem(power: &PowerUp, count: &u32) -> TextView {
     let power_info = format!("{}x : {}", count, power);
     TextView::new(power_info)
 }
-
