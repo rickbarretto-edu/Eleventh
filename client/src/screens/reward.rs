@@ -3,6 +3,7 @@ use cursive::Cursive;
 use serde::Deserialize;
 
 use crate::services::server_url;
+use quickapi::Client;
 
 use super::MainMenu;
 
@@ -30,23 +31,27 @@ struct RewardResponse {
     error: Option<String>,
 }
 
-fn reward_url(user: &str) -> String {
-    format!("http://{}/user/{}/deck/claim", server_url(), user)
+fn reward_path(user: &str) -> String {
+    format!("user/{}/deck/claim", user)
 }
 
 #[allow(non_snake_case)]
 pub fn RewardScreen(app: &mut Cursive, auth: String) {
     app.pop_layer();
 
-    let url = reward_url(&auth);
-    let response = blocking::get(&url);
+    let client = Client::new(&server_url());
+    let path = reward_path(&auth);
+    let response = client.get(&path);
 
-    if response.is_err() {
-        let message = response.err().unwrap();
-        return ErrorDialog(app, auth, format!("Request failed: {}", message));
+    if response.status >= 400 {
+        let error_msg = match serde_json::from_str::<serde_json::Value>(&response.body) {
+            Ok(val) => val.get("error").and_then(|e| e.as_str()).unwrap_or("Unknown error").to_string(),
+            Err(_) => "Unknown error".to_string(),
+        };
+        return ErrorDialog(app, auth, error_msg);
     }
 
-    let reward = response.unwrap().json::<RewardResponse>();
+    let reward = serde_json::from_str::<RewardResponse>(&response.body);
 
     if reward.is_err() {
         return ErrorDialog(app, auth.clone(), "Failed to parse server response".into());
