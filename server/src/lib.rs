@@ -7,6 +7,7 @@ use serde_json::json;
 pub mod account;
 pub mod deck;
 pub mod matches;
+pub mod ping;
 pub mod services;
 pub mod shared;
 

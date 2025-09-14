@@ -9,6 +9,7 @@ use server::account::route_account;
 use server::deck::route_decks;
 use server::matches::route_match;
 use server::matches::Matches;
+use server::ping::route_ping;
 
 // Services
 use server::account::Accounts;
@@ -36,6 +37,7 @@ async fn main() {
     route_account(&mut app);
     route_decks(&mut app);
     route_match(&mut app);
+    route_ping(&mut app);
 
     app.run(&url).await;
 }
