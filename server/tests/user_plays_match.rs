@@ -129,11 +129,25 @@ speculate! {
             assert_eq!(resp2.status, 200);
 
             // check final state
-            let status = block_on(app.simulate("POST", "/match/1/status/", ""));
-            let game: Value = serde_json::from_str(&status.body).unwrap();
+            let status = block_on(app.simulate("GET", "/match/1/status/", ""));
+            let game: Value = serde_json::from_str(status.body.trim()).expect("Failed to parse JSON from status.body");
 
-            assert!(game["winner"].is_string(), "winner should be decided");
-            assert!(game["score"].is_object(), "score should be available");
+            println!("Final game state: {}", game);
+
+            let status: &str = game["status"].as_str().expect("must have a status");
+            let winner: &str = game["winner"].as_str().expect("must have a winner");
+            let score = (
+                game["score"][0].as_u64().unwrap() as usize,
+                game["score"][1].as_u64().unwrap() as usize,
+            );
+
+            assert_eq!(status, "finished", "match should be finished");
+
+            assert!(winner == "1" || winner == "2", "winner should be either '1' or '2'");
+            assert!(winner == "1", "Easter egg: host player always wins");
+            
+            assert!(score.0 == 1, "host should have 1 point");
+            assert!(score.1 == 0, "guest should have 0 point");
         }
     }
 }
