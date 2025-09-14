@@ -25,6 +25,7 @@ pub fn MainMenu(app: &mut Cursive, auth: String) {
             let auth = auth.clone();
             move |app| screens::RewardScreen(app, (*auth).clone())
         })
+        .button("Ping", screens::Ping)
         .button("Quit", |app| app.quit());
 
     app.add_layer(options);
