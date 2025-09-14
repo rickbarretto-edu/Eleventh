@@ -65,6 +65,28 @@ impl ResponseBuilder {
 }
 
 impl Response {
+
+    pub fn from_raw(raw: &str) -> Option<Response> {
+        let (mut lines, status, reason) = parse_header(raw)?;
+
+        let mut content_type = "text/plain".to_string();
+        let mut content_length = 0;
+
+        for line in &mut lines {
+            if line.is_empty() { break; }
+            parse_meta(&mut content_type, &mut content_length, line)?;
+        }
+
+        let body: String = lines.collect::<Vec<&str>>().join("\n");
+        if body.len() != content_length { return None; }
+        Some(Response {
+            status,
+            reason,
+            body,
+            content_type,
+        })
+    }
+
     pub fn custom(status: u16, reason: &str) -> ResponseBuilder {
         ResponseBuilder {
             status,
@@ -118,6 +140,27 @@ impl Response {
             content_type: "text/plain".into(),
         }
     }
+}
+
+fn parse_meta(content_type: &mut String, content_length: &mut usize, line: &str) -> Option<()> {
+    let mut header_parts = line.splitn(2, ':');
+    let header_name = header_parts.next()?.trim();
+    let header_value = header_parts.next()?.trim();
+    Some(match header_name.to_lowercase().as_str() {
+        "content-type" => *content_type = header_value.to_string(),
+        "content-length" => *content_length = header_value.parse().ok()?,
+        _ => {}
+    })
+}
+
+fn parse_header(raw: &str) -> Option<(std::str::Lines<'_>, u16, String)> {
+    let mut lines = raw.lines();
+    let status_line = lines.next()?;
+    let mut status_parts = status_line.splitn(3, ' ');
+    let _http_version = status_parts.next()?;
+    let status = status_parts.next()?.parse().ok()?;
+    let reason = status_parts.next()?.to_string();
+    Some((lines, status, reason))
 }
 
 impl ToString for Response {
