@@ -1,15 +1,14 @@
+#[cfg(test)]
+extern crate speculate;
+#[cfg(test)]
+use speculate::speculate;
+
 use serde_json::json;
 
 use quickapi::server::Server;
 use server::account::route_account;
 use server::matches::Matches;
 use server::services::Services;
-
-#[cfg(test)]
-extern crate speculate;
-
-#[cfg(test)]
-use speculate::speculate;
 
 fn block_on<F: std::future::Future>(future: F) -> F::Output {
     tokio::runtime::Runtime::new().unwrap().block_on(future)

@@ -1,10 +1,12 @@
 #[cfg(test)]
 extern crate speculate;
+#[cfg(test)]
+use speculate::speculate;
+
 use serde_json::Value;
 use server::matches::Matches;
 use server::services::Services;
-#[cfg(test)]
-use speculate::speculate;
+
 
 pub fn services() -> Services {
     use rand::rngs::StdRng;

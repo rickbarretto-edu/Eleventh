@@ -1,10 +1,13 @@
+#[cfg(test)]
+extern crate speculate;
+#[cfg(test)]
+use speculate::speculate;
+
 use quickapi::server::Server;
 use server::deck::route_decks;
 
 use server::matches::Matches;
 use server::services::Services;
-
-use speculate::speculate;
 
 pub fn services() -> Services {
     use rand::rngs::StdRng;
