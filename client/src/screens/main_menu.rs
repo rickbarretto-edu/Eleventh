@@ -12,7 +12,7 @@ pub fn MainMenu(app: &mut Cursive, auth: String) {
     let auth = Arc::new(auth);
 
     let options = Dialog::text("Main Menu")
-        .title("Main Menu")
+        .title("Eleventh")
         .button("Match", {
             let auth = auth.clone();
             move |app| screens::ChampionshipMenu(app, (*auth).clone())
