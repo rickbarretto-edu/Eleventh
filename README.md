@@ -14,12 +14,12 @@ Players build their own dream team using collectible cards, manage tactics, and 
 
 <p align="center">
     <img src=".project/images/main-menu.png" alt="Menu" width="400" style="max-width:100%;">
-    <p>Eleventh's Main Menu</p>
+    <p align="center">Eleventh's Main Menu</p>
 </p>
 
 <p align="center">
     <img src=".project/images/multiplayer.png" alt="1v1 Match" width="400" style="max-width:100%;">
-    <p>1v1 multiplayer match</p>
+    <p align="center">1v1 multiplayer match</p>
 </p>
 
 
