@@ -12,15 +12,15 @@ Players build their own dream team using collectible cards, manage tactics, and 
 
 ## At A Glance
 
-<p align="center">
+<figure style="text-align:center;">
     <img src=".project/images/main-menu.png" alt="Menu" width="400" style="max-width:100%;">
-    Eleventh's Main Menu
-</p>
+    <figcaption>Eleventh's Main Menu</figcaption>
+</figure>
 
-<p align="center">
+<figure style="text-align:center;">
     <img src=".project/images/multiplayer.png" alt="1v1 Match" width="400" style="max-width:100%;">
-    1v1 multiplayer match
-</p>
+    <figcaption>1v1 multiplayer match</figcaption>
+</figure>
 
 
 ## PBL Context
