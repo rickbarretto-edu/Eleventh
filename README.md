@@ -10,6 +10,19 @@
 Players build their own dream team using collectible cards, manage tactics, and compete in tactical duels against other managers. 
 
 
+## At A Glance
+
+<p align="center">
+    <img src=".project/images/main-menu.png" alt="Menu" width="400" style="max-width:100%;">
+    Eleventh's Main Menu
+</p>
+
+<p align="center">
+    <img src=".project/images/multiplayer.png" alt="1v1 Match" width="400" style="max-width:100%;">
+    1v1 multiplayer match
+</p>
+
+
 ## PBL Context
 
 This project was developed for the subject TEC502 – Concurrency & Connectivity, which is taught using a Problem-Based Learning (PBL) approach.
@@ -19,10 +32,6 @@ In PBL, students work in groups to solve open-ended problems, progressing step b
 Because of this nature, I've created the `.project/` folder that have the sessions summaries, goals and others.
 
 ## Usage
-
-![Main Menu](./.project/images/main-menu.png)
-
-![1v1 Match](./.project/images/multiplayer.png)
 
 ### Development
 
