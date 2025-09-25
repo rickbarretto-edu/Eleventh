@@ -10,17 +10,18 @@
 Players build their own dream team using collectible cards, manage tactics, and compete in tactical duels against other managers. 
 
 
-## At A Glance
+## Notice
 
-<p align="center">
-    <img src=".project/images/main-menu.png" alt="Menu" width="400" style="max-width:100%;">
-    <p align="center">Eleventh's Main Menu</p>
-</p>
+This is the 2nd version of this project and this is under maintenance.
+Since the 2nd problem of the PBL differs a lot in architecture from the 1st one,
+this is needed a new major version with possible breaking changes.
 
-<p align="center">
-    <img src=".project/images/multiplayer.png" alt="1v1 Match" width="400" style="max-width:100%;">
-    <p align="center">1v1 multiplayer match</p>
-</p>
+Now, this is possible to use HTTP frameworks, so QuickAPI will be deprecated.
+Since the focus now is fault-tolerant system, I'll choose Typescript (Deno) or Elixir
+to handle this correctly.
+
+If you need to see the old project, open the `v1.0.0` tag version,
+open on Github or do this using git commands.
 
 
 ## PBL Context
