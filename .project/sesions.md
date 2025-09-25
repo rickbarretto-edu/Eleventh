@@ -1,109 +1,41 @@
 # PBL Session Summaries
 
-## Week 1 — 14/08/2025
+## Week 0 — 23/09/2025
 
 **Facts**
 
-* The choice of game is free, with a focus on 1×1 duels (e.g., checkers).
-* Use of Docker for environment containerization.
-* Frameworks are allowed (except for communication, which must use native sockets).
+* The game must move to a distributed system with multiple servers.
+* No single point of failure — the system should keep running even if one server fails.
+* Use **Docker** for servers and clients.
+* **Server–Server:** REST API.
+* **Server–Client:** Publisher–Subscriber model.
+* Card packs must be managed fairly and without duplication.
+* Matches should work across servers (1×1 duels).
+* The system must be tested for concurrency and failures.
 
 **Ideas**
 
-* Structure of multiple rooms, each with 2 players.
-* Pairing modes: random or by invitation/code.
-* Card system for gameplay (using mutex for concurrency).
-* Checkers as a prototype to validate communication.
-* Avoid microservices, prioritizing a simpler solution.
+* Each game server runs in Docker, handles local matches, connects to clients (pub-sub), and communicates with other servers (REST).
+* Pub-Sub: topics for matches, lobby, and inventory/trade.
+* REST: endpoints for matchmaking, syncing, and heartbeat.
+* Matchmaking: handshake + confirmation, fallback if a server fails.
+* Fault tolerance: heartbeats, retries, two-phase commit, and replaying events.
 
 **Questions**
 
-* Concurrency: where should mutual exclusion be applied and how to prove absence of race conditions?
-* Transport protocols and message format with native sockets.
-* Minimum level of interface (CLI or simple windows).
-* Use of native socket library (blocking, timeout, multiplexing).
-* Which programming language best facilitates the use of native sockets.
+* What is a REST API?
+* What is pub-sub and which tech should we use (WebSockets, MQTT, NATS)?
+* How do clients log in and join matches?
+* How do we identify matches (IDs)?
+* What is the message format (JSON)?
+* What is idempotency and how do we avoid duplicates?
+* How to avoid giving the same card pack twice?
+* What happens if a server crashes mid-match?
+* How do servers find each other?
+* What logs do we need?
 
 **Goals**
 
-* Study and apply Docker.
-* Prove communication between two containers using sockets.
-
----
-
-## Week 2 — 19/08/2025
-
-**Facts**
-
-* No facts were defined.
-
-**Ideas**
-
-* Use of *goroutines* (Go) to handle multiple concurrent clients.
-* Asynchronous programming to manage simultaneous connections.
-* Interface suggestions: Charmy (Go), Ncurses, Rich (Python), Web.
-* Use of WebSockets.
-* Data persistence for login and saving cards.
-
-**Questions**
-
-* Which transport and application protocols are most suitable for each part of the game?
-
-**Goals**
-
-* Create an architecture diagram for client-server interaction and rooms.
-* Outline rules and flow of a simple game as a prototype.
-* Implement a chat system between two clients connected via the server.
-
----
-
-## Week 3 — 26/08/2025
-
-**Facts**
-
-* No facts were defined.
-
-**Ideas**
-
-* Data persistence structure.
-* Token-based user verification.
-* Automated login using JSON/TXT file.
-* Use of *Make*.
-* Receive loop: if it ends, close connection.
-* Open connection only to send a request, then close to avoid too many threads.
-* Load balancing.
-
-**Questions**
-
-* How to detect if a client disconnects from the server?
-* Is it viable and efficient to keep each player in a dedicated thread on the server?
-* How does a server actually work?
-
-**Goals**
-
-* Provide a description and rules of the proposed game.
-* Implement a structure that supports multiple users connected to the server without issues.
-
----
-
-## Week 4 — 02/09/2025
-
-**Facts**
-
-* No facts were defined.
-
-**Ideas**
-
-* Use of WebSockets for the web interface.
-* Use of “/command” for chat-based commands.
-* State machine for client to wait for server responses.
-* Client with 2 threads: one for player I/O, another for server I/O.
-
-**Questions**
-
-* No questions were defined.
-
-**Goals**
-
-* Finish the game.
-
+* Study the **Byzantine Generals Problem** (consensus and fault tolerance).
+* Learn and apply **pub-sub** for Server–Client communication. (Development)
+* Define topics, message format, and events.
