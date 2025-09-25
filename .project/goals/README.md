@@ -10,7 +10,7 @@ Some (most) of them are not included here, but internally on the source code of 
 
 ## All Goals
 
-### Week 0
+### Week 1
 
 **Development**
 
