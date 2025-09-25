@@ -14,6 +14,9 @@ Some (most) of them are not included here, but internally on the source code of 
 
 **Development**
 
+* Create a simple publisher-subscriber proof of concept using Docker.
 
 **Session**
+
+* Study Byzantine Generals Problem, consensus and fault tolerance.
 
