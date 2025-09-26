@@ -16,6 +16,8 @@ Some (most) of them are not included here, but internally on the source code of 
 
 * Create a simple publisher-subscriber proof of concept using Docker.
 
+See [`pubsub`](./pubsub/README.md)
+
 **Session**
 
 * Study Byzantine Generals Problem, consensus and fault tolerance.
