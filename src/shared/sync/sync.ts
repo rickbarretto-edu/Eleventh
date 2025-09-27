@@ -12,26 +12,22 @@ type SyncPayload = {
 }
 
 export class Sync<T> {
-    #database: Deno.Kv
+    #database: Deno.Kv | null = null
     #self: Peer | null = null
     #peers: Peer[] = []
 
-    private constructor(kv: Deno.Kv) {
-        this.#database = kv
-    }
-
-    static new() {
-        return (async () => new Sync(await Deno.openKv()))()
-    }
-
-    static from<T>(kv: Deno.Kv): Sync<T> {
-        return new Sync(kv)
-    }
-
-    at(peer: Peer): Sync<T> {
-        this.peer(peer)
+    private constructor(peer: Peer) {
+        this.#peers.push(peer)
         this.#self = peer
         this.route()
+    }
+
+    static at<T>(peer: Peer): Sync<T> {
+        return new Sync(peer)
+    }
+
+    usingKV<T>(kv: Deno.Kv): Sync<T> {
+        this.#database = kv
         return this
     }
 
@@ -69,7 +65,7 @@ export class Sync<T> {
                 if (Array.isArray(payload.records)) {
                     for (const rec of payload.records) {
                         if (!rec || !Array.isArray(rec.key)) continue;
-                        await this.#database.set(rec.key, rec.value);
+                        await this.#database?.set(rec.key, rec.value);
                         recordsWritten++;
                     }
                 }
