@@ -20,8 +20,8 @@ export class Sync<T> {
         this.#database = kv
     }
 
-    static async new() {
-        return new Sync(await Deno.openKv())
+    static new() {
+        return (async () => new Sync(await Deno.openKv()))()
     }
 
     static from<T>(kv: Deno.Kv): Sync<T> {
