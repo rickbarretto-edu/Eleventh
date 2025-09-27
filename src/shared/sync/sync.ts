@@ -115,6 +115,14 @@ export class Sync<T> {
         return this.#peers.find(p => p.host === peer.host && p.port === peer.port);
     }
 
+    joinTo(peer: Peer) {
+        fetch(`http://${peer.host}:${peer.port}/join`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(this.self)
+        }).catch(() => undefined)
+    }
+
     get peers() {
         return this.#peers
     }
