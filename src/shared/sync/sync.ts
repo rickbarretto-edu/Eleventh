@@ -123,6 +123,20 @@ export class Sync<T> {
         }).catch(() => undefined)
     }
 
+    cluster() {
+        (async () => {
+            await Promise.all(Array.from(this.#peers).map(async (p) => {
+                try {
+                    const res = await fetch(`http://${p.host}:${p.port}/health`);
+                    const status = res.ok ? "ok" : `error ${res.status}`;
+                    console.log(`${p.id}@${p.host}:${p.port}: ${status}`);
+                } catch {
+                    console.log(`${p.id}@${p.host}:${p.port}: offline`);
+                }
+            }));
+        })();
+    }
+
     get peers() {
         return this.#peers
     }
