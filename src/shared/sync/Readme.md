@@ -56,6 +56,11 @@ exit using ctrl+d, ctrl+c, or close()
 > import { Sync } from "./Sync.ts"
 ✅ Granted read access to "...\eleventh\src\shared\sync\Sync.ts".
 undefined
+```
+
+Defining new peers:
+
+```ts
 > const p1 = { host: "localhost", port: 4001, id: "Node 1" }
 undefined
 > const p2 = { host: "localhost", port: 4002, id: "Node 2" }
@@ -74,15 +79,31 @@ undefined
 ✅ Granted net access to "localhost:4003".
 Listening on http://[::1]:4003/
 undefined
+```
+
+Checking clusters:
+
+```ts
 > n1.peers
 [ { host: "localhost", port: 4001, id: "Node 1" } ]
 > n2.peers
 [ { host: "localhost", port: 4002, id: "Node 2" } ]
 > n3.peers
 [ { host: "localhost", port: 4003, id: "Node 3" } ]
+> n1.cluster()
+undefined
+> Node 1@localhost:4001: ok
+> n2.cluster()
+undefined
+> Node 2@localhost:4002: ok
 > n3.cluster()
 undefined
 > Node 3@localhost:4003: ok
+```
+
+Joining Node 2 to Node 1:
+
+```ts
 > n2.join(p1)
 undefined
 > n1.peers
@@ -109,6 +130,11 @@ undefined
 > Node 3@localhost:4003: ok
 
 undefined
+```
+
+Joining Node 3 to Cluster:
+
+```ts
 > n3.join(p2)
 undefined
 > n2.cluster()
