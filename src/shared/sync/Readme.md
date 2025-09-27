@@ -49,114 +49,93 @@ $ curl -X GET 127.0.0.1:4002/peers
 
 ## Running on REPL
 
-```ts
+To start the Repl:
+
+```sh
+$ cd /src/shared/sync
 $ deno repl --unstable-kv
-Deno 2.2.8
-exit using ctrl+d, ctrl+c, or close()
-> import { Sync } from "./Sync.ts"
-✅ Granted read access to "...\eleventh\src\shared\sync\Sync.ts".
-undefined
+```
+
+> Note: I've formmated the output, for better understanding.
+
+```ts
+import { Sync } from "./Sync.ts"
 ```
 
 Defining new peers:
 
 ```ts
-> const p1 = { host: "localhost", port: 4001, id: "Node 1" }
-undefined
-> const p2 = { host: "localhost", port: 4002, id: "Node 2" }
-undefined
-> const p3 = { host: "localhost", port: 4003, id: "Node 3" }
-undefined
-> const n1 = Sync.at(p1)
-✅ Granted net access to "localhost:4001".
-Listening on http://[::1]:4001/
-undefined
-> const n2 = Sync.at(p2)
-✅ Granted net access to "localhost:4002".
-Listening on http://[::1]:4002/
-undefined
-> const n3 = Sync.at(p3)
-✅ Granted net access to "localhost:4003".
-Listening on http://[::1]:4003/
-undefined
+const p1 = { host: "localhost", port: 4001, id: "Node 1" }
+const p2 = { host: "localhost", port: 4002, id: "Node 2" }
+const p3 = { host: "localhost", port: 4003, id: "Node 3" }
+
+const n1 = Sync.at(p1)
+// Listening on http://[::1]:4001/
+
+const n2 = Sync.at(p2)
+// Listening on http://[::1]:4002/
+
+const n3 = Sync.at(p3)
+// Listening on http://[::1]:4003/
 ```
 
 Checking clusters:
 
 ```ts
-> n1.peers
-[ { host: "localhost", port: 4001, id: "Node 1" } ]
-> n2.peers
-[ { host: "localhost", port: 4002, id: "Node 2" } ]
-> n3.peers
-[ { host: "localhost", port: 4003, id: "Node 3" } ]
-> n1.cluster()
-undefined
-> Node 1@localhost:4001: ok
-> n2.cluster()
-undefined
-> Node 2@localhost:4002: ok
-> n3.cluster()
-undefined
-> Node 3@localhost:4003: ok
+n1.peers
+// [ { host: "localhost", port: 4001, id: "Node 1" } ]
+n2.peers
+// [ { host: "localhost", port: 4002, id: "Node 2" } ]
+n3.peers
+// [ { host: "localhost", port: 4003, id: "Node 3" } ]
+
+n1.cluster()
+// Node 1@localhost:4001: ok
+n2.cluster()
+// Node 2@localhost:4002: ok
+n3.cluster()
+// Node 3@localhost:4003: ok
 ```
 
 Joining Node 2 to Node 1:
 
 ```ts
-> n2.join(p1)
-undefined
-> n1.peers
-[
-  { host: "localhost", port: 4001, id: "Node 1" },
-  { host: "localhost", port: 4002, id: "Node 2" }
-]
-> n1.cluster
-[Function: cluster]
-> n1.cluster()
-undefined
-> Node 1@localhost:4001: ok
-Node 2@localhost:4002: ok
+n2.join(p1)
+n1.peers
+// [
+//   { host: "localhost", port: 4001, id: "Node 1" },
+//   { host: "localhost", port: 4002, id: "Node 2" }
+// ]
 
-undefined
-> n2.cluster()
-undefined
-> Node 2@localhost:4002: ok
-Node 1@localhost:4001: ok
+n1.cluster()
+// Node 1@localhost:4001: ok
+// Node 2@localhost:4002: ok
 
-undefined
-> n3.cluster()
-undefined
-> Node 3@localhost:4003: ok
+n2.cluster()
+// Node 2@localhost:4002: ok
+// Node 1@localhost:4001: ok
 
-undefined
+n3.cluster()
+// Node 3@localhost:4003: ok
 ```
 
 Joining Node 3 to Cluster:
 
 ```ts
-> n3.join(p2)
-undefined
-> n2.cluster()
-undefined
-> Node 2@localhost:4002: ok
-Node 1@localhost:4001: ok
-Node 3@localhost:4003: ok
+n3.join(p2)
 
-undefined
-> n1.cluster()
-undefined
-> Node 1@localhost:4001: ok
-Node 2@localhost:4002: ok
-Node 3@localhost:4003: ok
+n2.cluster()
+// Node 2@localhost:4002: ok
+// Node 1@localhost:4001: ok
+// Node 3@localhost:4003: ok
 
-undefined
-> n3.cluster()
-undefined
-> Node 3@localhost:4003: ok
-Node 2@localhost:4002: ok
-Node 1@localhost:4001: ok
+n1.cluster()
+// Node 1@localhost:4001: ok
+// Node 2@localhost:4002: ok
+// Node 3@localhost:4003: ok
 
-undefined
->
+n3.cluster()
+// Node 3@localhost:4003: ok
+// Node 2@localhost:4002: ok
+// Node 1@localhost:4001: ok
 ```
