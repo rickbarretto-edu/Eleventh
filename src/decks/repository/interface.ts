@@ -2,8 +2,7 @@ import { Card } from "../models/cards.ts";
 import { Deck } from "../models/deck.ts";
 
 
-
-interface DecksRepository {
+export interface DecksRepository {
 
     // Create a new deck for the given owner with a standard set of cards
     from(cards: Card[]): Promise<void>
