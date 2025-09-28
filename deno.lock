@@ -12,7 +12,9 @@
     "jsr:@std/fmt@~1.0.2": "1.0.8",
     "jsr:@std/internal@^1.0.10": "1.0.10",
     "jsr:@std/text@~1.0.7": "1.0.16",
-    "jsr:@std/uuid@^1.0.9": "1.0.9"
+    "jsr:@std/uuid@^1.0.9": "1.0.9",
+    "npm:@trpc/client@^11.6.0": "11.6.0_@trpc+server@11.6.0__typescript@5.8.3_typescript@5.8.3",
+    "npm:@trpc/server@^11.6.0": "11.6.0_typescript@5.8.3"
   },
   "jsr": {
     "@cliffy/command@1.0.0-rc.8": {
@@ -72,6 +74,24 @@
       ]
     }
   },
+  "npm": {
+    "@trpc/client@11.6.0_@trpc+server@11.6.0__typescript@5.8.3_typescript@5.8.3": {
+      "integrity": "sha512-DyWbYk2hd50BaVrXWVkaUnaSwgAF5g/lfBkXtkF1Aqlk6BtSzGUo3owPkgqQO2I5LwWy1+ra9TsSfBBvIZpTwg==",
+      "dependencies": [
+        "@trpc/server",
+        "typescript"
+      ]
+    },
+    "@trpc/server@11.6.0_typescript@5.8.3": {
+      "integrity": "sha512-skTso0AWbOZck40jwNeYv++AMZXNWLUWdyk+pB5iVaYmEKTuEeMoPrEudR12VafbEU6tZa8HK3QhBfTYYHDCdg==",
+      "dependencies": [
+        "typescript"
+      ]
+    },
+    "typescript@5.8.3": {
+      "integrity": "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="
+    }
+  },
   "redirects": {
     "https://deno.land/std/uuid/v4.ts": "https://deno.land/std@0.224.0/uuid/v4.ts",
     "https://deno.land/std/uuid/v5.ts": "https://deno.land/std@0.224.0/uuid/v5.ts"
@@ -89,7 +109,9 @@
       "jsr:@cliffy/command@^1.0.0-rc.8",
       "jsr:@hono/hono@^4.9.9",
       "jsr:@std/assert@1",
-      "jsr:@std/uuid@^1.0.9"
+      "jsr:@std/uuid@^1.0.9",
+      "npm:@trpc/client@^11.6.0",
+      "npm:@trpc/server@^11.6.0"
     ]
   }
 }
