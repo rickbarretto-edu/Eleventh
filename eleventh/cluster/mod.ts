@@ -1,31 +1,33 @@
-
+import { Hono } from "@hono";
 
 export class Cluster {
     private id: string;
-    private host: string;
-    private port: number;
     private nodes: Array<{ host: string; port: number }> = [];
 
     constructor(public options: {id: string}) {
         this.id = options.id;
-        this.host = "localhost";
-        this.port = 4000;
+    }
+
+    app(): Hono {
+        const app = new Hono()
+
+        app.get("/", (c) => {
+            return c.json({ id: this.id, nodes: this.nodes });
+        })
+
+        return app
     }
 
     at(host: string, port: number) {
-        this.host = host;
-        this.port = port;
-        return this;
+        const hostname = host
+        const app = this.app()
+        Deno.serve({ hostname, port }, app.fetch)
+        return this
     }
 
     join(host: string, port: number) {
         this.nodes.push({ host, port });
         return this;
-    }
-
-    async listen() {
-        console.log(`Listening on ${this.host}:${this.port}`);
-        return;
     }
 
 }

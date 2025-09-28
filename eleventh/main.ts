@@ -16,9 +16,6 @@ const initCluster = async () => {
         cluster.join(host, parseInt(port))
     }
 
-    await cluster.listen();
-    console.log(`Node ID: ${id}`)
-
 }
 
 
