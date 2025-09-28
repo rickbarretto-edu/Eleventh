@@ -8,16 +8,6 @@ export class Cluster {
         this.id = options.id;
     }
 
-    app(): Hono {
-        const app = new Hono()
-
-        app.get("/", (c) => {
-            return c.json({ id: this.id, nodes: this.nodes });
-        })
-
-        return app
-    }
-
     at(host: string, port: number) {
         const hostname = host
         const app = this.app()
@@ -28,6 +18,17 @@ export class Cluster {
     join(host: string, port: number) {
         this.nodes.push({ host, port });
         return this;
+    }
+
+
+    private app(): Hono {
+        const app = new Hono()
+
+        app.get("/", (c) => {
+            return c.json({ id: this.id, nodes: this.nodes });
+        })
+
+        return app
     }
 
 }
