@@ -41,21 +41,18 @@ Deno.test("three servers can join into a cluster mesh", async () => {
     const controllers = peers.map(p => serve(p))
 
     try {
-        // wait briefly for servers to be ready
         await sleepFor(200)
 
         const apis = peers.map(p => wsApi(p))
         await attachMesh(apis, peers);
         await waitForClusterSetup(apis)
 
-        // verify each server sees all three peers
         for (const api of apis) {
             const p = await api.peers
             expect(p.length).toBe(3)
 
-            // ensure every configured peer is present
             for (const expected of peers) {
-                const found = p.some(x => x.host === expected.host && x.port === expected.port)
+                const found = isPresent(p, expected)
                 expect(found).toBe(true)
             }
         }
@@ -67,6 +64,14 @@ Deno.test("three servers can join into a cluster mesh", async () => {
     } finally {
         // stop servers
         controllers.forEach(c => c.abort())
+    }
+
+    function isPresent(target: Peer, cluster: Peer[]) {
+        const samePort = (p: Peer): boolean => p.port === target.port
+        const sameHost = (p: Peer): boolean => p.host === target.host
+        const samePeer = (p: Peer): boolean => sameHost(p) && samePort(p)
+
+        return cluster.some(p => samePeer(p));
     }
 })
 
