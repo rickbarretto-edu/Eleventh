@@ -45,14 +45,7 @@ Deno.test("three servers can join into a cluster mesh", async () => {
         await sleepFor(200)
 
         const apis = peers.map(p => wsApi(p))
-
-        // Attach every server to every other server to form a full mesh
-        for (let i = 0; i < apis.length; i++) {
-            for (let j = 0; j < peers.length; j++) {
-                if (i === j) continue
-                await apis[i].attach(peers[j])
-            }
-        }
+        await attachMesh(apis, peers);
 
         // wait until all servers report 3 peers or timeout
         await waitAllHaveThree(apis)
@@ -78,3 +71,21 @@ Deno.test("three servers can join into a cluster mesh", async () => {
         controllers.forEach(c => c.abort())
     }
 })
+
+async function attachMesh(
+    apis: {
+        peers: Promise<Peer[]>
+        attach(peer: Peer): Promise<void>
+        disconnect(peer: Peer): Promise<void> 
+        [Symbol.dispose]?: () => void
+    }[], 
+    peers: Peer[]
+) {
+    for (let current = 0; current < apis.length; current++) {
+        for (let target = 0; target < peers.length; target++) {
+            if (current !== target) {
+                await apis[current].attach(peers[target]);
+            }
+        }
+    }
+}
