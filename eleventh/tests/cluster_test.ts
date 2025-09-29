@@ -21,16 +21,11 @@ function sleepFor(ms: number): Promise<void> {
 async function waitAllHaveThree(apis: ReturnType<typeof wsApi>[], timeoutMs = 2000) {
     const deadline = Date.now() + timeoutMs
 
-    async function allHaveThree(): Promise<boolean> {
-        for (const api of apis) {
-            const p = await api.peers
-            if (p.length !== 3) return false
-        }
-        return true
+    function allHaveThree(): boolean {
+        return apis.every(async api => (await api.peers).length === 3)
     }
 
-    while (Date.now() < deadline) {
-        if (await allHaveThree()) return
+    while (Date.now() < deadline && !allHaveThree()) {
         await sleepFor(50)
     }
 }
