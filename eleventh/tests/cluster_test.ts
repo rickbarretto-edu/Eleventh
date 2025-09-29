@@ -18,7 +18,7 @@ function sleepFor(ms: number): Promise<void> {
     return new Promise(res => setTimeout(res, ms))
 }
 
-async function waitAllHaveThree(apis: ReturnType<typeof wsApi>[], timeoutMs = 2000) {
+async function waitForClusterSetup(apis: ReturnType<typeof wsApi>[], timeoutMs = 2000) {
     const deadline = Date.now() + timeoutMs
 
     function areAllUp(apis: ReturnType<typeof wsApi>[]): boolean {
@@ -46,9 +46,7 @@ Deno.test("three servers can join into a cluster mesh", async () => {
 
         const apis = peers.map(p => wsApi(p))
         await attachMesh(apis, peers);
-
-        // wait until all servers report 3 peers or timeout
-        await waitAllHaveThree(apis)
+        await waitForClusterSetup(apis)
 
         // verify each server sees all three peers
         for (const api of apis) {
