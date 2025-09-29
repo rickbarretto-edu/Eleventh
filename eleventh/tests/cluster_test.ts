@@ -58,7 +58,7 @@ Deno.test("three servers can join into a cluster mesh", async () => {
         }
 
         for (const api of apis) {
-            try { api[Symbol.dispose]?.() } catch (_e) { /* ignore */}
+            try { api[Symbol.dispose]?.() } catch (_e) { /* ignore */ }
         }
     } finally {
         controllers.forEach(c => c.abort())
