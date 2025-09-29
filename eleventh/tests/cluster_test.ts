@@ -52,7 +52,7 @@ Deno.test("three servers can join into a cluster mesh", async () => {
             expect(p.length).toBe(3)
 
             for (const expected of peers) {
-                const found = isPresent(p, expected)
+                const found = isPresent(expected, p)
                 expect(found).toBe(true)
             }
         }
