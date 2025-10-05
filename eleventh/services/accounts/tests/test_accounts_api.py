@@ -2,11 +2,10 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from eleventh.services.accounts import api
-from eleventh.services.accounts.repo import InMemoryAccounts
 
 
 def create_client() -> TestClient:
-    """Create a TestClient with a fresh InMemoryAccounts instance attached to the API module."""
+    """Create a TestClient for the API."""
     app = FastAPI()
     app.include_router(api.route)
     return TestClient(app)
