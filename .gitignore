@@ -10,3 +10,6 @@ logs/
 # Rust
 Cargo.lock
 target/
+
+# Python
+__pycache__/
