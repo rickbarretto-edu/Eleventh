@@ -39,3 +39,34 @@
 * Study the **Byzantine Generals Problem** (consensus and fault tolerance).
 * Learn and apply **pub-sub** for Server–Client communication. (Development)
 * Define topics, message format, and events.
+
+Here’s a concise, consistent summary for **Session 2**, following the same format and tone as your Week 1 entry:
+
+---
+
+## Week 2 — 29/09/2025
+
+**Facts**
+
+* **Inter-server communication** remains essential for matches between players connected to different servers.
+
+**Ideas**
+
+* Use MQTT for client–server interactions thought pub-sub pattern.
+* **Fail Over** mechanism implementation
+* Design a **distributed consistency model** for the global state of cards to prevent duplication or loss.
+* Introduce a **leader election mechanism** (e.g., Bully, Raft, or Paxos) for coordination and fault management.
+* Explore distributed concurrency control (locks, transactions, eventual consistency).
+
+**Questions**
+
+* How to implement **leader election** effectively in a distributed environment?
+* How to manage **race conditions and consistency** across multiple servers?
+* How does **MQTT architecture** work in detail (broker, publisher, subscriber, topics, QoS)?
+* Should we keep the current **TCP/HTTP layer** or migrate fully to MQTT for certain communications?
+
+**Goals**
+
+* Research and propose **data consistency mechanisms** for distributed card state management.
+* **Implement inter-server communication** to synchronize matches and game state.
+* (Optional) Create a **proof of concept** demonstrating full communication flow between two clients routed via MQTT brokers and intermediate servers.
