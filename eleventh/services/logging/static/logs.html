@@ -27,73 +27,56 @@
 <body>
     <h1>Application Logs</h1>
     <div class="controls">
-        <button id="pauseBtn">Pause</button>
-        <button id="clearBtn">Clear</button>
-        <label>Poll interval: <input id="interval" type="number" value="1000" step="250" min="200"> ms</label>
+        <!-- Simplified: no controls -->
     </div>
     <pre id="logArea">(loading...)</pre>
 
     <script>
-        const logArea = document.getElementById("logArea")
-        const pauseBtn = document.getElementById("pauseBtn")
-        const clearBtn = document.getElementById("clearBtn")
-        const intervalInput = document.getElementById("interval")
 
-        let paused = false
-        let etag = null
-        let timer = null
+        class LogArea {
+            // self: HTMLElement
+            // logs: string[]
 
-        pauseBtn.addEventListener("click", () => {
-            paused = !paused
-            pauseBtn.textContent = paused ? "Resume" : "Pause"
-            paused ? stop() : start()
-        })
-
-        clearBtn.addEventListener("click", async () => {
-            logArea.textContent = ""
-        })
-
-        function render(logs) {
-            if (!Array.isArray(logs)) {
-                logArea.textContent = JSON.stringify(logs, null, 2)
-                return
+            constructor(elementId) {
+                this.self = document.getElementById(elementId)
+                this.logs = []
             }
-            logArea.textContent = logs.join("\n")
-        }
 
-        async function fetchLogs() {
-            try {
-                const res = await fetch("/log")
-                
-                if (!res.ok) {
-                    throw new Error("Failed to fetch logs")
-                }
-
-                const data = await res.json()
-                render(data.logs || [])
-            } catch (err) {
-                console.error(err)
+            append(line) {
+                if (this.logs.length === 0) { this.self.textContent = "" }
+                this.logs.push(line)
+                this.self.textContent = this.logs.join('\n')
             }
         }
 
-        function start() {
-            stop()
-            fetchLogs()
-            timer = setInterval(fetchLogs, Number(intervalInput.value) || 1000)
+        const logArea = new LogArea("logArea")
+
+        function handleMessage(event) {
+            if (line = event.data) {
+                logArea.append(line)
+            }
         }
 
-        function stop() { 
-            if (timer) { 
-                clearInterval(timer)
-                timer = null 
-            } 
+        function buildWsUrl() {
+            const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
+            return `${protocol}://${location.host}/log/ws`
         }
 
-        intervalInput.addEventListener("change", () => {
-            if (!paused) start()
-        })
+        let socket = null
+        function connect() {
+            if (socket) return
+            const url = buildWsUrl()
+            socket = new WebSocket(url)
+            socket.addEventListener("open", () => console.debug("logs ws open"))
+            socket.addEventListener("message", handleMessage)
+            socket.addEventListener("close", () => {
+                socket = null
+                setTimeout(connect, 1000)
+            })
+            socket.addEventListener("error", (ev) => console.error("logs ws error", ev))
+        }
 
-        start()
+        connect()
     </script>
 </body>
 </html>

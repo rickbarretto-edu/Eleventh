@@ -1,12 +1,15 @@
+import asyncio
+import contextlib
 import json
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, WebSocket, WebSocketDisconnect
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from jinja2 import TemplateNotFound
+from starlette.templating import _TemplateResponse
 
 from eleventh.services.logging.repo import InMemoryLogs, Logs
 
@@ -47,7 +50,7 @@ async def write_log(message: str | dict[str, Any], logs: Logs = Depends(get_logs
 
 
 @route.get("/ui")
-async def view_logs_ui(request: Request):
+async def view_logs_ui(request: Request) -> HTMLResponse:
     """Serve a simple webpage that shows logs and updates in real time (polling)."""
 
     try:
@@ -56,3 +59,17 @@ async def view_logs_ui(request: Request):
         return HTMLResponse("<h1>Logs UI not found</h1>", status_code=404)
 
     return templates.TemplateResponse("logs.html", {"request": request})
+
+
+@route.websocket("/ws")
+async def websocket_logs(ws: WebSocket, logs: Logs = Depends(get_logs)) -> None:
+    """WebSocket endpoint for real-time log updates."""
+    await ws.accept()
+    with contextlib.suppress(WebSocketDisconnect):
+        queue = await logs.subscribe()
+        try:
+            while True:
+                line = await queue.get()
+                await ws.send_text(line)
+        finally:
+            await logs.unsubscribe(queue)

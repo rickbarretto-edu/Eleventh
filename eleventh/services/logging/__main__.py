@@ -11,7 +11,7 @@ Now, open your browser to `http://localhost:8001/log/ui` to see the logs UI.
 
 To manually publish a log message, use `curl` or similar:
 
-        curl -X POST "http://localhost:8001/log/" -d '"Your log message here"'
+        curl -X POST "http://localhost:8001/log/" -d "Your log message here"
 """
 
 from fastapi import FastAPI
