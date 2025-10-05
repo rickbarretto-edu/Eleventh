@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Logs</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding: 1rem;
+        }
+        pre {
+            background: #0b1020;
+            color: #dbeafe;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow: auto;
+            max-height: 70vh;
+        }
+        .controls {
+            margin-bottom: 0.5rem;
+        }
+        button {
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Application Logs</h1>
+    <div class="controls">
+        <button id="pauseBtn">Pause</button>
+        <button id="clearBtn">Clear</button>
+        <label>Poll interval: <input id="interval" type="number" value="1000" step="250" min="200"> ms</label>
+    </div>
+    <pre id="logArea">(loading...)</pre>
+
+    <script>
+        const logArea = document.getElementById("logArea")
+        const pauseBtn = document.getElementById("pauseBtn")
+        const clearBtn = document.getElementById("clearBtn")
+        const intervalInput = document.getElementById("interval")
+
+        let paused = false
+        let etag = null
+        let timer = null
+
+        pauseBtn.addEventListener("click", () => {
+            paused = !paused
+            pauseBtn.textContent = paused ? "Resume" : "Pause"
+            paused ? stop() : start()
+        })
+
+        clearBtn.addEventListener("click", async () => {
+            logArea.textContent = ""
+        })
+
+        function render(logs) {
+            if (!Array.isArray(logs)) {
+                logArea.textContent = JSON.stringify(logs, null, 2)
+                return
+            }
+            logArea.textContent = logs.join("\n")
+        }
+
+        async function fetchLogs() {
+            try {
+                const res = await fetch("/log")
+                
+                if (!res.ok) {
+                    throw new Error("Failed to fetch logs")
+                }
+
+                const data = await res.json()
+                render(data.logs || [])
+            } catch (err) {
+                console.error(err)
+            }
+        }
+
+        function start() {
+            stop()
+            fetchLogs()
+            timer = setInterval(fetchLogs, Number(intervalInput.value) || 1000)
+        }
+
+        function stop() { 
+            if (timer) { 
+                clearInterval(timer)
+                timer = null 
+            } 
+        }
+
+        intervalInput.addEventListener("change", () => {
+            if (!paused) start()
+        })
+
+        start()
+    </script>
+</body>
+</html>
