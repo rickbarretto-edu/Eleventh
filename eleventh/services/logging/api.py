@@ -1,15 +1,12 @@
-
-
 import json
+from pathlib import Path
 from typing import Any
-from fastapi import APIRouter, Depends, FastAPI, Request
+
+from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from jinja2 import TemplateNotFound
-from pathlib import Path
-
-from fastapi.testclient import TestClient
 
 from eleventh.services.logging.repo import InMemoryLogs, Logs
 
