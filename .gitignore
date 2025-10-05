@@ -3,6 +3,7 @@
 
 # Personal
 .snippet/
+.project/private
 log
 logs/
 
