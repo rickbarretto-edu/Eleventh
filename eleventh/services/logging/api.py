@@ -11,6 +11,7 @@ from jinja2 import TemplateNotFound
 
 from eleventh.services.logging.repo import InMemoryLogs, Logs
 
+__all__ = ["route"]
 
 route = APIRouter(
     prefix="/log",
