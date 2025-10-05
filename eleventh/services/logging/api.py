@@ -1,4 +1,3 @@
-import asyncio
 import contextlib
 import json
 from pathlib import Path
@@ -9,7 +8,6 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from jinja2 import TemplateNotFound
-from starlette.templating import _TemplateResponse
 
 from eleventh.services.logging.repo import InMemoryLogs, Logs
 
