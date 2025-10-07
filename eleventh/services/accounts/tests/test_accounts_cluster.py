@@ -46,8 +46,9 @@ def test_cluster_creation():
     for app, address in cluster:
         with TestClient(app) as client:
             resp = client.get("/accounts/cluster/status/")
-            assert resp.status_code == 200
             data = resp.json()
+
+            assert resp.status_code == 200
             assert data["address"] == address
             assert set(data["peers"]) == set(addresses)
 
