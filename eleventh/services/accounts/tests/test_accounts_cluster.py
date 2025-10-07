@@ -49,8 +49,8 @@ def test_cluster_creation():
             data = resp.json()
 
             assert resp.status_code == 200
-            assert data["address"] == address
-            assert set(data["peers"]) == set(addresses)
+            assert set(map(lambda p: p["address"], data["peers"])) == set(addresses)
+            assert all(map(lambda p: p["status"] == 200, data["peers"]))
 
 
 def test_cluster_syncing():
