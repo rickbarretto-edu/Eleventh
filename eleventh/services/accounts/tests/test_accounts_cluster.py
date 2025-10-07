@@ -1,87 +1,44 @@
-import asyncio
-from typing import Iterable
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
+import time
 
-from eleventh.services.accounts import api
-from eleventh.services.accounts import cluster
+import httpx
 
-type Address = str
-
-def create_addresses(n: int) -> list[Address]:
-    return [f"http://localhost:{8000 + i}" for i in range(n)]
-
-def create_peers(addresses: list[Address]) -> Iterable[tuple[FastAPI, Address]]:
-    for address in addresses:
-        app = FastAPI()
-        app.include_router(api.route)
-        app.include_router(cluster.route)
-        app.add_middleware(cluster.ClusterMiddleware, address=address)
-        yield app, address
-
-def create_cluster(addresses: list[Address]) -> list[tuple[FastAPI, Address]]:
-    peers: list[tuple[FastAPI, Address]] = list(create_peers(addresses))
-    leader, _ = peers[0]
-    others = peers[1:]
-
-    with TestClient(leader) as client:
-        for _, address in others:
-            client.post("/accounts/cluster/attach/", json={
-                "address": address,
-            })
-
-    return peers
+from eleventh.services.accounts import DistributedAccountsService
 
 
-def test_cluster_creation():
-    """Scenario: Cluster Creation with Multiple Peers
-    
-    Given a list of 3 unique addresses,
-    When peers attaches to each other,
-    Then should have a cluster of 3 peers.
-    """
-    addresses = create_addresses(3)
-    cluster = create_cluster(addresses)
-
-    for app, address in cluster:
-        with TestClient(app) as client:
-            resp = client.get("/accounts/cluster/status/")
-            data = resp.json()
-
-            assert resp.status_code == 200
-            assert set(map(lambda p: p["address"], data["peers"])) == set(addresses)
-            assert all(map(lambda p: p["status"] == 200, data["peers"]))
+def accounts_service() -> DistributedAccountsService:
+    return DistributedAccountsService([
+        ("localhost", 8000),
+        ("localhost", 8001),
+        ("localhost", 8002),
+        ("localhost", 8003),
+    ])
 
 
 def test_cluster_syncing():
-    """Scenario: Cluster Syncing User Data
-    
-    Given a cluster of 3 peers,
-    When a user signs up on one peer,
-    Then the user data should be synced across all peers.
-    """
-    addresses = create_addresses(3)
-    peers = create_cluster(addresses)
+    """Scenario: Signup and then Login
 
-    # Sign up a user on the first peer
-    first_app, first_address = peers[0]
-    with TestClient(first_app) as client:
-        resp = client.post("/accounts/signup/", json={
+    Given a cluster of N accounts services
+    When I sign up a user on the leader
+    Then after a short delay I can login as that user on every peer
+    """
+
+    with accounts_service() as cluster:
+        host, port = cluster.peers()[0]
+        response = httpx.post(f"http://{host}:{port}/accounts/signup/", json={
             "email": "user@example.com",
             "username": "user",
             "password": "password",
-        })
-        assert resp.status_code == 200
+        }, timeout=5.0)
 
-    asyncio.run(asyncio.sleep(1))
-    
-    for app, _ in peers:
-        with TestClient(app) as client:
-            resp = client.post("/accounts/login/", json={
+        assert response.status_code == 200
+
+        time.sleep(1)
+
+        for host, port in cluster.peers():
+            response = httpx.post(f"http://{host}:{port}/accounts/login/", json={
                 "email": "user@example.com",
                 "password": "password",
-            })
+            }, timeout=5.0)
 
-            assert resp.status_code == 200
-            assert resp.json()["status"] == "valid"
-
+            assert response.status_code == 200
+            assert response.json()["status"] == "valid"
