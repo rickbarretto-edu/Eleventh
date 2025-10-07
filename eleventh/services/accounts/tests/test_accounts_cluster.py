@@ -21,12 +21,13 @@ def create_peers(addresses: list[Address]) -> Iterable[tuple[FastAPI, Address]]:
 
 def create_cluster(addresses: list[Address]) -> list[tuple[FastAPI, Address]]:
     peers: list[tuple[FastAPI, Address]] = list(create_peers(addresses))
+    leader, _ = peers[0]
+    others = peers[1:]
 
-    for app, address in peers:
-        with TestClient(app) as client:
-            client.post("/accounts/cluster/join/", json={
+    with TestClient(leader) as client:
+        for _, address in others:
+            client.post("/accounts/cluster/attach/", json={
                 "address": address,
-                "peers": [addr for addr in addresses if addr != address],
             })
 
     return peers
@@ -40,16 +41,7 @@ def test_cluster_creation():
     Then should have a cluster of 3 peers.
     """
     addresses = create_addresses(3)
-    cluster = create_peers(addresses)
-
-    for app, address in cluster:
-        with TestClient(app) as client:
-            resp = client.post("/accounts/cluster/join/", json={
-                "address": address,
-                "peers": [addr for addr in addresses if addr != address],
-            })
-            assert resp.status_code == 200
-            assert resp.json() == {"status": "joined", "peers": 2}
+    cluster = create_cluster(addresses)
 
     for app, address in cluster:
         with TestClient(app) as client:
@@ -57,7 +49,7 @@ def test_cluster_creation():
             assert resp.status_code == 200
             data = resp.json()
             assert data["address"] == address
-            assert set(data["peers"]) == set(addr for addr in addresses if addr != address)
+            assert set(data["peers"]) == set(addresses)
 
 
 def test_cluster_syncing():
