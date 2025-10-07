@@ -85,8 +85,10 @@ def test_cluster_syncing():
     for app, _ in peers:
         with TestClient(app) as client:
             resp = client.post("/accounts/login/", json={
-                "username": "user",
+                "email": "user@example.com",
                 "password": "password",
             })
+
             assert resp.status_code == 200
+            assert resp.json()["status"] == "valid"
 
