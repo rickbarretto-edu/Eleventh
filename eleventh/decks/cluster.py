@@ -44,7 +44,7 @@ def extract_host_port(address: str) -> tuple[str, int]:
     return host, port
 
 
-async def run_server(host: str, port: int, address: str):
+async def run_server(host: str, port: int, address: str, all_addresses: list[str]):
     """Run a single uvicorn server instance.
     
     Parameters
@@ -52,16 +52,17 @@ async def run_server(host: str, port: int, address: str):
     host: Host to bind to
     port: Port to bind to
     address: Full address URL for cluster identification
+    all_addresses: All addresses in the cluster for peer configuration
     """
     # Create a new FastAPI app instance for this server
     # This ensures each server has its own state
-    from eleventh.decks.app import app as base_app
+    from eleventh.decks.app import create_app
     
-    # Store the node address in the app state
-    base_app.state.node_address = address
+    # Create app with cluster plugin
+    app = create_app(node_address=address, nodes=all_addresses)
     
     config = uvicorn.Config(
-        app=base_app,
+        app=app,
         host=host,
         port=port,
         log_level="info",
@@ -85,7 +86,7 @@ async def start_cluster(addresses: list[str]):
         host, port = extract_host_port(address)
         print(f"Starting deck service on {address}...")
         
-        task = asyncio.create_task(run_server(host, port, address))
+        task = asyncio.create_task(run_server(host, port, address, addresses))
         tasks.append(task)
     
     try:
