@@ -3,9 +3,14 @@
 
 # Personal
 .snippet/
+.project/private
 log
 logs/
 
 # Rust
 Cargo.lock
 target/
+
+# Python
+__pycache__/
+lab/
