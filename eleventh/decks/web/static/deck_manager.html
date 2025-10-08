@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Deck Manager - Eleventh</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/alpinejs@3.13.3/dist/cdn.min.js" defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.75rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.75rem;
+        }
+        
+        .user-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .user-input input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .user-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        
+        .deck-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .card-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .card-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        .card-item.ATK {
+            border-left: 6px solid #eb3349;
+        }
+        
+        .card-item.MID {
+            border-left: 6px solid #667eea;
+        }
+        
+        .card-item.DEF {
+            border-left: 6px solid #11998e;
+        }
+        
+        .card-item.GK {
+            border-left: 6px solid #ffd700;
+        }
+        
+        .card-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-position {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-position.ATK {
+            background: #eb3349;
+            color: white;
+        }
+        
+        .card-position.MID {
+            background: #667eea;
+            color: white;
+        }
+        
+        .card-position.DEF {
+            background: #11998e;
+            color: white;
+        }
+        
+        .card-position.GK {
+            background: #ffd700;
+            color: #2d3748;
+        }
+        
+        .card-power {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #764ba2;
+            margin-top: 0.5rem;
+        }
+        
+        .card-id {
+            font-size: 0.75rem;
+            color: #718096;
+            font-family: monospace;
+            margin-top: 0.5rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .card-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            flex: 1;
+        }
+        
+        .add-card-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .add-card-form input,
+        .add-card-form select {
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .add-card-form input:focus,
+        .add-card-form select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #667eea;
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body x-data="deckManager()" x-init="init()">
+    <div class="container">
+        <h1>Deck Manager</h1>
+        
+        <div class="card">
+            <h2>Select User</h2>
+            <div class="user-input">
+                <input 
+                    type="text" 
+                    x-model="userId"
+                    placeholder="Enter User ID (UUID)"
+                    @keyup.enter="loadDeck()"
+                />
+                <button class="btn btn-primary" @click="loadDeck()">Load Deck</button>
+            </div>
+            <div 
+                x-show="alert.show" 
+                x-transition
+                class="alert"
+                :class="alert.type === 'success' ? 'alert-success' : 'alert-error'"
+                x-text="alert.message"
+            ></div>
+        </div>
+        
+        <div x-show="deckLoaded" x-transition style="display: none;">
+            <div class="card">
+                <h2>Deck Statistics</h2>
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" x-text="stats.totalCards">0</div>
+                        <div class="stat-label">Total Cards</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" x-text="stats.totalPower">0</div>
+                        <div class="stat-label">Total Power</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" x-text="stats.avgPower">0</div>
+                        <div class="stat-label">Avg Power</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>My Cards</h2>
+                <div x-show="loading" class="loading">Loading cards...</div>
+                <div class="deck-grid">
+                    <template x-if="cards.length === 0 && !loading">
+                        <p style="text-align: center; color: #718096; padding: 2rem;">
+                            No cards in this deck yet.
+                        </p>
+                    </template>
+                    <template x-for="card in cards" :key="card.id">
+                        <div class="card-item" :class="card.position">
+                            <div class="card-name" x-text="card.name"></div>
+                            <span class="card-position" :class="card.position" x-text="card.position"></span>
+                            <div class="card-power">⚡ <span x-text="card.power"></span></div>
+                            <div class="card-id">ID: <span x-text="card.id"></span></div>
+                            <div class="card-actions">
+                                <button 
+                                    class="btn btn-danger btn-small" 
+                                    @click="sellCard(card.id, card.name)"
+                                    hx-post=":hx-url"
+                                    hx-vals='{"card": ":card-id"}'
+                                    hx-swap="none"
+                                >
+                                    Sell
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function deckManager() {
+            return {
+                userId: '{{ user_id if user_id else "" }}',
+                cards: [],
+                loading: false,
+                deckLoaded: false,
+                alert: {
+                    show: false,
+                    message: '',
+                    type: 'success'
+                },
+                stats: {
+                    totalCards: 0,
+                    totalPower: 0,
+                    avgPower: 0
+                },
+                
+                init() {
+                    if (this.userId) {
+                        this.loadDeck();
+                    }
+                },
+                
+                showAlert(message, type = 'success') {
+                    this.alert = { show: true, message, type };
+                    setTimeout(() => {
+                        this.alert.show = false;
+                    }, 5000);
+                },
+                
+                async loadDeck() {
+                    if (!this.userId.trim()) {
+                        this.showAlert('Please enter a user ID', 'error');
+                        return;
+                    }
+                    
+                    this.loading = true;
+                    this.deckLoaded = true;
+                    
+                    try {
+                        const response = await fetch(`/api/deck/${this.userId}`);
+                        
+                        if (!response.ok) {
+                            throw new Error('Failed to load deck');
+                        }
+                        
+                        this.cards = await response.json();
+                        this.updateStats();
+                        this.showAlert(`Loaded deck for user ${this.userId}`, 'success');
+                    } catch (error) {
+                        console.error('Error loading deck:', error);
+                        this.showAlert('Error loading deck. Please try again.', 'error');
+                        this.cards = [];
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                async sellCard(cardId, cardName) {
+                    if (!confirm(`Are you sure you want to sell ${cardName}?`)) {
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch(`/api/deck/${this.userId}/sell`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ card: cardId })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error('Failed to sell card');
+                        }
+                        
+                        this.showAlert(`Sold ${cardName}!`, 'success');
+                        await this.loadDeck();
+                    } catch (error) {
+                        console.error('Error selling card:', error);
+                        this.showAlert('Error selling card. Please try again.', 'error');
+                    }
+                },
+                
+                updateStats() {
+                    this.stats.totalCards = this.cards.length;
+                    this.stats.totalPower = this.cards.reduce((sum, card) => sum + card.power, 0);
+                    this.stats.avgPower = this.stats.totalCards > 0 
+                        ? Math.round(this.stats.totalPower / this.stats.totalCards) 
+                        : 0;
+                }
+            };
+        }
+    </script>
+</body>
+</html>
