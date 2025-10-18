@@ -39,7 +39,7 @@ Service
 Claim Rewards
 -------------
 
-    $ curl -X POST https://127.0.0.1:8001/api/claim?n=5
+    $ curl -X POST https://127.0.0.1:8011/api/claim?n=5
     { 
         "status": "success", 
         "cards": [ 
@@ -58,25 +58,25 @@ Management
 Attach Peer
 -----------
 
-    $ curl -X POST https://127.0.0.1:8001/cluster/attach -d '{"peer":"127.0.0.1:8002"}' -H "Content-Type: application/json"
-    { "status": "success", "attached_peer": "127.0.0.1:8002" }
-    $ curl -X POST https://127.0.0.1:8001/cluster/attach -d '{"peer":"127.0.0.1:8003"}' -H "Content-Type: application/json"
-    { "status": "success", "attached_peer": "127.0.0.1:8003" }
-    
+    $ curl -X POST https://127.0.0.1:8011/cluster/attach -d '{"peer":"127.0.0.1:8012"}' -H "Content-Type: application/json"
+    { "status": "success", "attached_peer": "127.0.0.1:8012" }
+    $ curl -X POST https://127.0.0.1:8011/cluster/attach -d '{"peer":"127.0.0.1:8013"}' -H "Content-Type: application/json"
+    { "status": "success", "attached_peer": "127.0.0.1:8013" }
+
 Detach Peer
 -----------
 
-    $ curl -X POST https://127.0.0.1:8001/cluster/detach -d '{"peer":"127.0.0.1:8002"}' -H "Content-Type: application/json"
-    { "status": "success", "detached_peer": "127.0.0.1:8002" }
-    
+    $ curl -X POST https://127.0.0.1:8011/cluster/detach -d '{"peer":"127.0.0.1:8012"}' -H "Content-Type: application/json"
+    { "status": "success", "detached_peer": "127.0.0.1:8012" }
+
 Cluster Health
 --------------
 
-    $ curl https://127.0.0.1:8001/cluster/health
+    $ curl https://127.0.0.1:8011/cluster/health
     { 
         "peers": [
-            {"address": "127.0.0.1:8002", "status": "active"}, 
-            {"address": "127.0.0.1:8003", "status": "inactive"}
+            {"address": "127.0.0.1:8012", "status": "active"}, 
+            {"address": "127.0.0.1:8013", "status": "inactive"}
         ]
     }
 
