@@ -24,7 +24,7 @@ You can also see the log of the system and add cards as well.
 As User
 ~~~~~~~
 
-As User, you can manage your rewards.
+As User, you can manage your cards.
 And this is visible for everyone in the cluster and you can check this as an admin.
 
 
