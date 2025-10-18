@@ -1,16 +1,16 @@
 from fastapi import APIRouter
 
-router = APIRouter(
+service = APIRouter(
     prefix="/api",
 )
 
-@router.get("/claim")
+@service.get("/claim")
 async def claim(n: int):
     cards = [{"id": i, "name": f"Card {i}", "power": i * 5} for i in range(1, n + 1)]
     return {"status": "success", "cards": cards}
 
 
-@router.post("/store")
+@service.post("/store")
 async def store(cards: list[dict]):
     # Here you would normally store the cards in a database or similar
     return {"status": "success", "stored_cards": cards}
