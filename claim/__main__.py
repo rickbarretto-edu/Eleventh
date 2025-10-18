@@ -84,11 +84,7 @@ Cluster Health
 
 from __future__ import annotations
 
-from fastapi import FastAPI
+from claim.cli import app
 
-
-app = FastAPI(
-    title="Rewarding Claim Service", 
-    version="0.1.0",
-    debug=True,
-)
+if __name__ == "__main__":
+    app()
