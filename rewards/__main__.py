@@ -51,12 +51,7 @@ Cluster Health
 """
 
 from __future__ import annotations
+from rewards.cli import app
 
-from fastapi import FastAPI
-
-
-app = FastAPI(
-    title="Rewarding Generation Service", 
-    version="0.1.0",
-    debug=True,
-)
+if __name__ == "__main__":
+    app()
