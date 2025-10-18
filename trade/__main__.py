@@ -89,13 +89,13 @@ Propose a Trade
 Accept a Trade
 --------------
 
-    $ curl -X POST https://127.0.0.1:8031/api/rick/trade/accept?id=1
+    $ curl -X POST https://127.0.0.1:8031/api/rick/trade/accept?trade_id=1
     { "status": "success", "message": "Trade accepted" }
 
 Reject a Trade
 --------------
 
-    $ curl -X POST https://127.0.0.1:8031/api/rick/trade/reject?id=1
+    $ curl -X POST https://127.0.0.1:8031/api/rick/trade/reject?trade_id=1
     { "status": "success", "message": "Trade rejected" }
 
 
