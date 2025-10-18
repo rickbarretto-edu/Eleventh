@@ -1,31 +1,23 @@
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import Literal
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
 
-from rewards.usecase.generate import Card, Cluster, RewardingGeneration
+from rewards.usecase.generate import Card, RewardingGeneration
 
 __all__ = ["service"]
 
 service = APIRouter(prefix="/api")
 
 
-# ========== ========== Dependencies ========== ==========
-
-def get_cluster():
-    pass
-
-
 # ========== ========== HTTP Endpoints ========== ==========
 
 
 @service.get("/reward")
-async def generate(n: int, cluster: Annotated[Cluster, Depends(get_cluster)]):
-    use_case = RewardingGeneration(
-        cluster=cluster
-    )
+async def generate(n: int):
+    use_case = RewardingGeneration()
 
     cards = use_case.generate(n)
     return RewardsOut.from_model(cards)

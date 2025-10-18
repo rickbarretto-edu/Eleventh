@@ -1,11 +1,4 @@
-
-
-from typing import Protocol
 import attrs
-
-class Cluster(Protocol):
-    pass
-
 
 @attrs.frozen
 class Card:
@@ -16,7 +9,6 @@ class Card:
 
 @attrs.frozen
 class RewardingGeneration:
-    cluster: Cluster
 
     def generate(self, /, amount: int) -> list[Card]:
         return [
