@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 
+from rewards.service.api import service
+from rewards.service.web import pages
+
 __all__ = ["app"]
 
 app = FastAPI(
@@ -7,3 +10,6 @@ app = FastAPI(
     version="0.1.0",
     debug=True,
 )
+
+app.include_router(service)
+app.include_router(pages)
