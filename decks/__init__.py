@@ -100,7 +100,7 @@ from fastapi import FastAPI
 
 
 app = FastAPI(
-    title="Rewarding Claim Service", 
+    title="Deck Management Service", 
     version="0.1.0",
     debug=True,
 )
