@@ -96,11 +96,8 @@ Cluster Health
 
 from __future__ import annotations
 
-from fastapi import FastAPI
+from decks.cli import app
 
 
-app = FastAPI(
-    title="Deck Management Service", 
-    version="0.1.0",
-    debug=True,
-)
+if __name__ == "__main__":
+    app()
