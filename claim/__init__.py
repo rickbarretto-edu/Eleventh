@@ -5,9 +5,9 @@ At A Glance
 
 Run this using:
 
-    $ python -m rewards --host 127.0.0.1 --port 8011
-    $ python -m rewards --host 127.0.0.1 --port 8012
-    $ python -m rewards --host 127.0.0.1 --port 8013
+    $ python -m claim --host 127.0.0.1 --port 8011
+    $ python -m claim --host 127.0.0.1 --port 8012
+    $ python -m claim --host 127.0.0.1 --port 8013
     
 
 You can open the browser in the following URLs:
