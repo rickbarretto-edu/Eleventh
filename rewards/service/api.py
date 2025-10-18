@@ -1,10 +1,57 @@
-from fastapi import APIRouter
+from __future__ import annotations
 
-service = APIRouter(
-    prefix="/api"
-)
+from typing import Annotated, Literal
+
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
+
+from rewards.usecase.generate import Card, Cluster, RewardingGeneration
+
+__all__ = ["service"]
+
+service = APIRouter(prefix="/api")
+
+
+# ========== ========== Dependencies ========== ==========
+
+def get_cluster():
+    pass
+
+
+# ========== ========== HTTP Endpoints ========== ==========
+
 
 @service.get("/reward")
-async def generate(n: int):
-    rewards = [{"id": i, "name": f"Reward {i}", "value": i * 10} for i in range(1, n + 1)]
-    return {"status": "success", "rewards": rewards}
+async def generate(n: int, cluster: Annotated[Cluster, Depends(get_cluster)]):
+    use_case = RewardingGeneration(
+        cluster=cluster
+    )
+
+    cards = use_case.generate(n)
+    return RewardsOut.from_model(cards)
+
+
+# ========== ========== Json Schema ========== ==========
+
+class CardOut(BaseModel):
+    id: str
+    name: str
+    value: int
+
+    @classmethod
+    def from_model(cls, model: Card) -> CardOut:
+        return cls(id=model.id, name=model.name, value=model.value)
+
+class RewardsOut(BaseModel):
+    status: Literal["success", "failure"]
+    rewards: list[CardOut]
+
+    @classmethod
+    def from_model(cls, models: list[Card]) -> RewardsOut:
+        if not models:
+            return cls(status="failure", rewards=[])
+
+        return cls(
+            status="success",
+            rewards=[CardOut.from_model(m) for m in models]
+        )
