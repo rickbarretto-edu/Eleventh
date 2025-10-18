@@ -52,6 +52,13 @@ Claim Rewards
     }
 
 
+
+Store Rewards
+-------------
+
+    $ curl -X POST https://127.0.0.1:8011/api/store -d '{"cards":[{"id":1,"name":"Card 1","power":15},{"id":2,"name":"Card 2","power":10},{"id":3,"name":"Card 3","power":20},{"id":4,"name":"Card 4","power":25},{"id":5,"name":"Card 5","power":30}]}'
+
+    
 Management
 ~~~~~~~~~~
 
