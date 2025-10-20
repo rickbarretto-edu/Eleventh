@@ -3,8 +3,10 @@ from cyclopts import App as CliApp
 from fastapi import FastAPI
 import uvicorn
 
-from node.model import Cluster
-from node.router import router as cluster_router
+from node.cluster.model import Cluster
+from node.cluster.router import router as cluster_router
+
+__all__ = ["plug_cluster"]
 
 def plug_cluster(cli: CliApp, webserver: FastAPI):
 

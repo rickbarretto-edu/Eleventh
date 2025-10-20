@@ -1,7 +1,10 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from node.model import Cluster
+from node.cluster.model import Cluster
+
+
+__all__ = ["router"]
 
 def router(cluster: Cluster) -> APIRouter:
     router = APIRouter(prefix="/cluster")

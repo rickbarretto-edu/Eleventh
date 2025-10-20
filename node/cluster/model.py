@@ -4,6 +4,8 @@ import attrs
 import httpx
 
 
+__all__ = ["Cluster"]
+
 @attrs.define
 class Cluster:
     nodes: set[str] = attrs.field(factory=set)
