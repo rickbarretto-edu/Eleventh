@@ -32,7 +32,7 @@ Generate 500 Cards
 from cyclopts import App as Cyclopts
 from fastapi import FastAPI
 
-from node.plugin import plug_cluster
+from plugins.cluster import plug_cluster
 from rewards.service.api import service
 from rewards.service.web import pages
 
