@@ -16,6 +16,7 @@ def plug_cluster(cli: CliApp, webserver: FastAPI):
         -----
             start Node1@127.0.0.1:8000
             start Node2@127.0.0.1:8001 --join 127.0.0.1:8000
+            start Node2@127.0.0.1:8002 --join 127.0.0.1:8000
         """
         loop = asyncio.get_event_loop()
         host, port = node.split("@")[1].split(":")
