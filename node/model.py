@@ -11,8 +11,10 @@ class Cluster:
 
     async def join_cluster(self, cluster_node: str, peer: str):
         async with httpx.AsyncClient(timeout=3, base_url=cluster_node) as client:
-            _ = await client.post("/cluster/join", json={ "peer": peer })
-    
+            response = await client.post("/cluster/join", json={ "peer": peer })
+            nodes: list[str] = response.json()["nodes"]
+            self.nodes.union(set(nodes))
+
     def on_add(self, peer: str):
         """On new requested to be added to the current Node."""
         self.nodes.add(peer)
