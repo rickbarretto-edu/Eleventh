@@ -4,7 +4,7 @@ from fastapi import FastAPI
 import uvicorn
 
 from node.model import Cluster
-from node.router import router as cluster
+from node.router import router as cluster_router
 
 def plug_cluster(cli: CliApp, webserver: FastAPI):
 
@@ -20,11 +20,13 @@ def plug_cluster(cli: CliApp, webserver: FastAPI):
         """
         loop = asyncio.get_event_loop()
         host, port = node.split("@")[1].split(":")
-        join_list = [join] if join else []
+        
+        cluster = Cluster({node})
     
-        loop.run_until_complete(Cluster.join_cluster())
-        loop.run_until_complete(join_peers(node, join_list))    
-        print(f"Node {node} started. Known peers: {PEERS}")
+        if join:
+            loop.run_until_complete(cluster.join_cluster(join, node))
+        
+        print(f"[INFO] Node {node} started. Known nodes: {cluster.nodes}")
 
-        webserver.include_router(cluster)
+        webserver.include_router(cluster_router(cluster))
         uvicorn.run(webserver, host=host, port=int(port))
