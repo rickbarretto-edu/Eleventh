@@ -25,4 +25,4 @@ async def add_node_individually(join: Join):
 
 @router.get("/nodes")
 async def list_all_nodes():
-    return {"nodes": cluster}
+    return { "nodes": cluster.nodes }
