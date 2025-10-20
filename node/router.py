@@ -1,22 +1,29 @@
+from typing import Literal
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from node import peers
+from node.model import Cluster
 
 router = APIRouter(prefix="/cluster")
+cluster = Cluster()
 
-class JoinRequest(BaseModel):
-    peer: str
-    no_spread: bool
+class Join(BaseModel):
+    node: str
 
 @router.post("/join")
-async def join_cluster(req: JoinRequest):
-    """Add a new peer dynamically"""
-    if req.peer not in peers.PEERS:
-        peers.PEERS.append(req.peer)
-        print(f"New peer joined: {req.peer}")
-    return {"peers": peers.PEERS}
+async def join_cluster(join: Join):
+    """Add a new node dynamically"""
+    await cluster.on_join_cluster(join.node)
+    return { "status": f"Node {join.node} joined the cluster!" }
 
-@router.get("/peers")
-async def list_peers():
-    return {"peers": peers.PEERS}
+
+@router.post("/node/add")
+async def add_node_individually(join: Join):
+    """Add a new node to an individual node"""
+    cluster.on_add(join.node)
+    return { "status": f"node {join.node} added." }
+
+
+@router.get("/nodes")
+async def list_all_nodes():
+    return {"nodes": cluster}
