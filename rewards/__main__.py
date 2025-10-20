@@ -27,31 +27,28 @@ Generate 500 Cards
 
     $ curl -X POST https://127.0.0.1:8001/api/create?n=500
 
-
-Management
-~~~~~~~~~~
-
-Attach Peer
------------
-
-    $ curl -X POST https://127.0.0.1:8001/cluster/attach -d '{"peer":"127.0.0.1:8002"}' -H "Content-Type: application/json"
-    $ curl -X POST https://127.0.0.1:8001/cluster/attach -d '{"peer":"127.0.0.1:8003"}' -H "Content-Type: application/json"
-
-Detach Peer
------------
-
-    $ curl -X POST https://127.0.0.1:8001/cluster/detach -d '{"peer":"127.0.0.1:8002"}' -H "Content-Type: application/json"
-
-Cluster Health
---------------
-
-    $ curl https://127.0.0.1:8001/cluster/health
-    { "peers": [{"address": "127.0.0.1:8002", "status": "active"}, {"address": "127.0.0.1:8003", "status": "inactive"}] }
-
 """
 
-from __future__ import annotations
-from rewards.cli import app
+from cyclopts import App as Cyclopts
+from fastapi import FastAPI
+
+from node.plugin import plug_cluster
+from rewards.service.api import service
+from rewards.service.web import pages
+
+webapp = FastAPI(
+    title="Rewarding Generation Service", 
+    version="0.1.0",
+    debug=True,
+)
+cli = Cyclopts(
+    "rewards", 
+    help="Rewarding Generation Service."
+)
+
+webapp.include_router(service)
+webapp.include_router(pages)
+plug_cluster(cli, webapp)
 
 if __name__ == "__main__":
-    app()
+    cli()

@@ -1,7 +1,7 @@
 from cyclopts import App
 import uvicorn
 
-from node.cli import Peer
+from node.peers import Peer
 from decks.api import app as deck_app
 
 __all__ = ["app"]
