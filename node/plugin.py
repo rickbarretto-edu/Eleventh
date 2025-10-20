@@ -3,7 +3,7 @@ from cyclopts import App as CliApp
 from fastapi import FastAPI
 import uvicorn
 
-from node.peers import join_peers, PEERS
+from node.model import Cluster
 from node.router import router as cluster
 
 def plug_cluster(cli: CliApp, webserver: FastAPI):
@@ -22,6 +22,7 @@ def plug_cluster(cli: CliApp, webserver: FastAPI):
         host, port = node.split("@")[1].split(":")
         join_list = [join] if join else []
     
+        loop.run_until_complete(Cluster.join_cluster())
         loop.run_until_complete(join_peers(node, join_list))    
         print(f"Node {node} started. Known peers: {PEERS}")
 

@@ -13,8 +13,7 @@ class Join(BaseModel):
 async def join_cluster(join: Join):
     """Add a new node dynamically"""
     await cluster.on_join_cluster(join.node)
-    return { "status": f"Node {join.node} joined the cluster!" }
-
+    return { "nodes": cluster.nodes }
 
 @router.post("/node/add")
 async def add_node_individually(join: Join):

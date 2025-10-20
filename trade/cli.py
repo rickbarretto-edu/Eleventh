@@ -1,7 +1,7 @@
 from cyclopts import App
 import uvicorn
 
-from node.peers import Peer
+from node.model import Peer
 from trade.api import app as trade_app
 
 __all__ = ["app"]

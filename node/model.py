@@ -8,7 +8,7 @@ import httpx
 @attrs.define
 class Cluster:
     nodes: set[str] = attrs.field(factory=set)
-    
+
     async def join_cluster(self, cluster_node: str, peer: str):
         async with httpx.AsyncClient(timeout=3, base_url=cluster_node) as client:
             _ = await client.post("/cluster/join", json={ "peer": peer })
