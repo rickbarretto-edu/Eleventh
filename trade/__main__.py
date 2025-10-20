@@ -98,41 +98,28 @@ Reject a Trade
     $ curl -X POST https://127.0.0.1:8031/api/rick/trade/reject?trade_id=1
     { "status": "success", "message": "Trade rejected" }
 
-
-Management
-~~~~~~~~~~
-
-Attach Peer
------------
-
-    $ curl -X POST https://127.0.0.1:8031/cluster/attach -d '{"peer":"127.0.0.1:8032"}' -H "Content-Type: application/json"
-    { "status": "success", "attached_peer": "127.0.0.1:8032" }
-    $ curl -X POST https://127.0.0.1:8031/cluster/attach -d '{"peer":"127.0.0.1:8033"}' -H "Content-Type: application/json"
-    { "status": "success", "attached_peer": "127.0.0.1:8033" }
-    
-Detach Peer
------------
-
-    $ curl -X POST https://127.0.0.1:8031/cluster/detach -d '{"peer":"127.0.0.1:8032"}' -H "Content-Type: application/json"
-    { "status": "success", "detached_peer": "127.0.0.1:8032" }
-    
-Cluster Health
---------------
-
-    $ curl https://127.0.0.1:8031/cluster/health
-    { 
-        "peers": [
-            {"address": "127.0.0.1:8032", "status": "active"}, 
-            {"address": "127.0.0.1:8033", "status": "inactive"}
-        ]
-    }
-
 """
 
-from __future__ import annotations
+from cyclopts import App as Cyclopts
+from fastapi import FastAPI
 
-from trade.cli import app
+from plugins.cluster import plug_cluster
+from trade.service.api import service
+from trade.service.web import pages
 
+webapp = FastAPI(
+    title="Card Trading Service", 
+    version="0.1.0",
+    debug=True,
+)
+cli = Cyclopts(
+    "trade", 
+    help="Card Trading Service."
+)
+
+webapp.include_router(service)
+webapp.include_router(pages)
+plug_cluster(cli, webapp)
 
 if __name__ == "__main__":
-    app()
+    cli()

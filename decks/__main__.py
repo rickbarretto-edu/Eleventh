@@ -63,41 +63,28 @@ Get Deck
         ] 
     }
 
-
-Management
-~~~~~~~~~~
-
-Attach Peer
------------
-
-    $ curl -X POST https://127.0.0.1:8021/cluster/attach -d '{"peer":"127.0.0.1:8022"}' -H "Content-Type: application/json"
-    { "status": "success", "attached_peer": "127.0.0.1:8022" }
-    $ curl -X POST https://127.0.0.1:8021/cluster/attach -d '{"peer":"127.0.0.1:8023"}' -H "Content-Type: application/json"
-    { "status": "success", "attached_peer": "127.0.0.1:8023" }
-    
-Detach Peer
------------
-
-    $ curl -X POST https://127.0.0.1:8021/cluster/detach -d '{"peer":"127.0.0.1:8022"}' -H "Content-Type: application/json"
-    { "status": "success", "detached_peer": "127.0.0.1:8022" }
-    
-Cluster Health
---------------
-
-    $ curl https://127.0.0.1:8021/cluster/health
-    { 
-        "peers": [
-            {"address": "127.0.0.1:8022", "status": "active"}, 
-            {"address": "127.0.0.1:8023", "status": "inactive"}
-        ]
-    }
-
 """
 
-from __future__ import annotations
+from cyclopts import App as Cyclopts
+from fastapi import FastAPI
 
-from decks.cli import app
+from plugins.cluster import plug_cluster
+from decks.service.api import service
+from decks.service.web import pages
 
+webapp = FastAPI(
+    title="Deck Management Service", 
+    version="0.1.0",
+    debug=True,
+)
+cli = Cyclopts(
+    "decks", 
+    help="Deck Management Service."
+)
+
+webapp.include_router(service)
+webapp.include_router(pages)
+plug_cluster(cli, webapp)
 
 if __name__ == "__main__":
-    app()
+    cli()

@@ -58,40 +58,28 @@ Store Rewards
 
     $ curl -X POST https://127.0.0.1:8011/api/store -d '{"cards":[{"id":1,"name":"Card 1","power":15},{"id":2,"name":"Card 2","power":10},{"id":3,"name":"Card 3","power":20},{"id":4,"name":"Card 4","power":25},{"id":5,"name":"Card 5","power":30}]}'
 
-    
-Management
-~~~~~~~~~~
-
-Attach Peer
------------
-
-    $ curl -X POST https://127.0.0.1:8011/cluster/attach -d '{"peer":"127.0.0.1:8012"}' -H "Content-Type: application/json"
-    { "status": "success", "attached_peer": "127.0.0.1:8012" }
-    $ curl -X POST https://127.0.0.1:8011/cluster/attach -d '{"peer":"127.0.0.1:8013"}' -H "Content-Type: application/json"
-    { "status": "success", "attached_peer": "127.0.0.1:8013" }
-
-Detach Peer
------------
-
-    $ curl -X POST https://127.0.0.1:8011/cluster/detach -d '{"peer":"127.0.0.1:8012"}' -H "Content-Type: application/json"
-    { "status": "success", "detached_peer": "127.0.0.1:8012" }
-
-Cluster Health
---------------
-
-    $ curl https://127.0.0.1:8011/cluster/health
-    { 
-        "peers": [
-            {"address": "127.0.0.1:8012", "status": "active"}, 
-            {"address": "127.0.0.1:8013", "status": "inactive"}
-        ]
-    }
-
 """
 
-from __future__ import annotations
+from cyclopts import App as Cyclopts
+from fastapi import FastAPI
 
-from claim.cli import app
+from plugins.cluster import plug_cluster
+from claim.service.api import service
+from claim.service.web import pages
+
+webapp = FastAPI(
+    title="Reward Claim Service", 
+    version="0.1.0",
+    debug=True,
+)
+cli = Cyclopts(
+    "claim", 
+    help="Reward Claim Service."
+)
+
+webapp.include_router(service)
+webapp.include_router(pages)
+plug_cluster(cli, webapp)
 
 if __name__ == "__main__":
-    app()
+    cli()
