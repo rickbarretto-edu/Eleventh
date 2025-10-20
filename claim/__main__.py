@@ -5,10 +5,10 @@ At A Glance
 
 Run this using:
 
-    $ python -m claim --host 127.0.0.1 --port 8011
-    $ python -m claim --host 127.0.0.1 --port 8012
-    $ python -m claim --host 127.0.0.1 --port 8013
-    
+    $ poetry run python -m claim Node1@127.0.0.1:8011
+    $ poetry run python -m claim Node2@127.0.0.1:8012 --join 127.0.0.1:8011
+    $ poetry run python -m claim Node3@127.0.0.1:8013 --join 127.0.0.1:8011
+
 
 You can open the browser in the following URLs:
 - http://127.0.0.1:8011: For user interface.

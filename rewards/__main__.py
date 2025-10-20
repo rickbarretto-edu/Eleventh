@@ -5,9 +5,9 @@ At A Glance
 
 Run this using:
 
-    $ python -m rewards --host 127.0.0.1 --port 8001
-    $ python -m rewards --host 127.0.0.1 --port 8002
-    $ python -m rewards --host 127.0.0.1 --port 8003
+    $ poetry run python -m rewards Node1@127.0.0.1:8001
+    $ poetry run python -m rewards Node2@127.0.0.1:8002 --join 127.0.0.1:8001
+    $ poetry run python -m rewards Node3@127.0.0.1:8003 --join 127.0.0.1:8001
 
 
 Open https://127.0.0.1:8001/admin on Browser and connect to other peers.

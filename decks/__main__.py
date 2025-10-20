@@ -5,9 +5,9 @@ At A Glance
 
 Run this using:
 
-    $ python -m decks --host 127.0.0.1 --port 8021
-    $ python -m decks --host 127.0.0.1 --port 8022
-    $ python -m decks --host 127.0.0.1 --port 8023
+    $ poetry run python -m decks Node1@127.0.0.1:8021
+    $ poetry run python -m decks Node2@127.0.0.1:8022 --join 127.0.0.1:8021
+    $ poetry run python -m decks Node3@127.0.0.1:8023 --join 127.0.0.1:8021
     
 
 You can open the browser in the following URLs:

@@ -5,10 +5,10 @@ At A Glance
 
 Run this using:
 
-    $ python -m trade --host 127.0.0.1 --port 8031
-    $ python -m trade --host 127.0.0.1 --port 8032
-    $ python -m trade --host 127.0.0.1 --port 8033
-    
+    $ poetry run python -m trade Node1@127.0.0.1:8031
+    $ poetry run python -m trade Node2@127.0.0.1:8032 --join 127.0.0.1:8031
+    $ poetry run python -m trade Node3@127.0.0.1:8033 --join 127.0.0.1:8031
+
 
 You can open the browser in the following URLs:
 - http://127.0.0.1:8031: For user interface.
