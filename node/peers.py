@@ -12,12 +12,3 @@ async def notify_peer(peer: str, new_peer: str):
     except Exception as e:
         print(f"Failed to notify peer {peer}: {e}")
 
-async def join_peers(new_peer: str, existing: list[str] | None = None):
-    """Join an existing cluster if provided, or start fresh."""
-    global PEERS
-    if existing:
-        for peer in existing:
-            await notify_peer(peer, new_peer)
-        PEERS.extend(existing)
-    if new_peer not in PEERS:
-        PEERS.append(new_peer)
