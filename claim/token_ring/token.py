@@ -4,6 +4,7 @@ from fastapi import BackgroundTasks
 
 from claim.token_ring.model import State
 
+
 async def receive_token(state: State, background: BackgroundTasks):
     """Receive a token ring in background."""
 
@@ -26,10 +27,14 @@ async def handle_token(state: State):
         match action:
             case "store":
                 state.shared_list.append(value)
-                print(f"[Node {state.config.node_id}] Stored '{value}'. List={state.shared_list}")
+                print(
+                    f"[Node {state.config.node_id}] Stored '{value}'. List={state.shared_list}"
+                )
             case "claim" if state.shared_list:
                 removed = state.shared_list.pop(0)
-                print(f"[Node {state.config.node_id}] Discarted '{removed}'. List={state.shared_list}")
+                print(
+                    f"[Node {state.config.node_id}] Discarted '{removed}'. List={state.shared_list}"
+                )
             case _:
                 pass
 
@@ -45,7 +50,9 @@ async def pass_token(state: State):
     async with httpx.AsyncClient() as client:
         try:
             _ = await client.post(f"{state.config.next_node}/receive_token", timeout=5)
-            print(f"[Node {state.config.node_id}] Passed token → {state.config.next_node}")
+            print(
+                f"[Node {state.config.node_id}] Passed token → {state.config.next_node}"
+            )
             state.config.has_token = False
         except Exception as e:
             print(f"[Node {state.config.node_id}] Failed to pass token: {e}")

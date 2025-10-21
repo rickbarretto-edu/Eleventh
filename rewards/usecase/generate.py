@@ -1,5 +1,6 @@
 import attrs
 
+
 @attrs.frozen
 class Card:
     id: str
@@ -9,9 +10,8 @@ class Card:
 
 @attrs.frozen
 class RewardingGeneration:
-
     def generate(self, /, amount: int) -> list[Card]:
         return [
-            Card(id=str(i), name=f"Reward {i}", value=i * 10) 
+            Card(id=str(i), name=f"Reward {i}", value=i * 10)
             for i in range(1, amount + 1)
         ]

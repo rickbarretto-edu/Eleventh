@@ -25,6 +25,7 @@ async def generate(n: int):
 
 # ========== ========== Json Schema ========== ==========
 
+
 class CardOut(BaseModel):
     id: str
     name: str
@@ -33,6 +34,7 @@ class CardOut(BaseModel):
     @classmethod
     def from_model(cls, model: Card) -> CardOut:
         return cls(id=model.id, name=model.name, value=model.value)
+
 
 class RewardsOut(BaseModel):
     status: Literal["success", "failure"]
@@ -43,7 +45,4 @@ class RewardsOut(BaseModel):
         if not models:
             return cls(status="failure", rewards=[])
 
-        return cls(
-            status="success",
-            rewards=[CardOut.from_model(m) for m in models]
-        )
+        return cls(status="success", rewards=[CardOut.from_model(m) for m in models])

@@ -4,12 +4,15 @@ from typing import Literal
 import attrs
 from pydantic import BaseModel
 
+
 class Config(BaseModel):
     node_id: int
     next_node: str
     has_token: bool = False
-    
+
+
 type Action = Literal["claim", "store"]
+
 
 @attrs.define
 class State:

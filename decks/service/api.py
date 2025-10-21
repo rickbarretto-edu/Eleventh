@@ -1,9 +1,8 @@
 from fastapi import APIRouter
 
 
-service = APIRouter(
-    prefix="/api"
-)
+service = APIRouter(prefix="/api")
+
 
 @service.get("/{user}/deck")
 async def list_cards(user: str):

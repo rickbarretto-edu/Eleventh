@@ -45,31 +45,31 @@ List My Trades
 --------------
 
     $ curl https://127.0.0.1:8031/api/rick/trades
-    { 
-        "status": "success", 
+    {
+        "status": "success",
         "proposals": [
-            { 
-                "id": 1, 
+            {
+                "id": 1,
                 "to": "morty",
-                "wants": { "id": 2, "name": "Card 2", "power": 10 }, 
-                "card": { "id": 2, "name": "Card 2", "power": 12 }, 
-                "status": "pending" 
+                "wants": { "id": 2, "name": "Card 2", "power": 10 },
+                "card": { "id": 2, "name": "Card 2", "power": 12 },
+                "status": "pending"
             },
-            { 
+            {
                 "id": 2,
-                "to": "summer", 
-                "wants": { "id": 3, "name": "Card 3", "power": 21 }, 
-                "card": { "id": 3, "name": "Card 3", "power": 20 }, 
-                "status": "accepted" 
+                "to": "summer",
+                "wants": { "id": 3, "name": "Card 3", "power": 21 },
+                "card": { "id": 3, "name": "Card 3", "power": 20 },
+                "status": "accepted"
             }
         ],
         "received": [
-            { 
-                "id": 3, 
+            {
+                "id": 3,
                 "from": "beth",
-                "wants": { "id": 4, "name": "Card 4", "power": 26 }, 
-                "card": { "id": 4, "name": "Card 4", "power": 25 }, 
-                "status": "pending" 
+                "wants": { "id": 4, "name": "Card 4", "power": 26 },
+                "card": { "id": 4, "name": "Card 4", "power": 25 },
+                "status": "pending"
             }
         ],
     }
@@ -108,14 +108,11 @@ from trade.service.api import service
 from trade.service.web import pages
 
 webapp = FastAPI(
-    title="Card Trading Service", 
+    title="Card Trading Service",
     version="0.1.0",
     debug=True,
 )
-cli = Cyclopts(
-    "trade", 
-    help="Card Trading Service."
-)
+cli = Cyclopts("trade", help="Card Trading Service.")
 
 webapp.include_router(service)
 webapp.include_router(pages)

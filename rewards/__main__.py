@@ -37,14 +37,11 @@ from rewards.service.api import service
 from rewards.service.web import pages
 
 webapp = FastAPI(
-    title="Rewarding Generation Service", 
+    title="Rewarding Generation Service",
     version="0.1.0",
     debug=True,
 )
-cli = Cyclopts(
-    "rewards", 
-    help="Rewarding Generation Service."
-)
+cli = Cyclopts("rewards", help="Rewarding Generation Service.")
 
 webapp.include_router(service)
 webapp.include_router(pages)
