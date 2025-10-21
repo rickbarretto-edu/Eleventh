@@ -66,6 +66,6 @@ async def claim(state: State, amount: int) -> ClaimResponse:
         print(
             f"[Node {state.config.node_id}] Direct pop '{value}'. List={state.shared_list}"
         )
-        return ClaimSuccess(claimed=value)
+        return ClaimSuccess(claim=value)
     except Exception as e:
         return ClaimFail(message=str(e))
