@@ -35,9 +35,11 @@ class OwnerNotFound(KeyError):
 class CardStock:
     available: list[Card] = attrs.field(factory=list)
     owned: dict[Owner, list[Card]] = attrs.field(factory=dict)
+    history: list[str] = attrs.field(factory=list, init=False)
 
     def store(self, cards: list[Card]):
         self.available.extend(cards)
+        self.history.append(f"[STORE] {cards}")
 
     def claim(self, by: Owner, amount: int = 1):
         owner = by
@@ -47,6 +49,7 @@ class CardStock:
         claimed = self.available[:amount]
         del self.available[:amount]
         self.owned[owner].extend([card for card in claimed])
+        self.history.append(f"[CLAIM] {claimed} by {owner}")
 
     def of(self, owner: Owner) -> Iterable[Card]:
         try:
