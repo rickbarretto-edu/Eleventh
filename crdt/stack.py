@@ -28,7 +28,7 @@ class Stack[T]:
     def __attrs_post_init__(self):
         self.clock = ActionSequence(self.node)
 
-    def push(self, values: Iterable[T]) -> None:
+    def push(self, *values: Iterable[T]) -> None:
         """Push a new item onto the stack.
 
         Parameters

@@ -7,7 +7,7 @@ def test_push_single_value():
     assert stack.is_empty(), "Stack should be empty initially"
     assert len(stack) == 0, "Stack length should be 0 initially"
 
-    stack.push(["x"])
+    stack.push("x")
     assert not stack.is_empty(), "Stack should not be empty after push"
     assert len(stack) == 1, "Stack length should be 1 after one push"
 
@@ -24,7 +24,7 @@ def test_push_single_value():
 
 def test_push_multiple_values_and_pop_order():
     stack = Stack(node="n")
-    stack.push([1, 2, 3])
+    stack.push(1, 2, 3)
 
     assert list(stack.values()) == [1, 2, 3]
 
@@ -38,7 +38,7 @@ def test_push_multiple_values_and_pop_order():
 
 def test_item_ids_and_clock_increment():
     stack = Stack(node="X")
-    stack.push(["a", "b"])
+    stack.push("a", "b")
 
     assert len(stack) == 2
     assert stack.items[0].id.node == "X", "Node ID should match"
@@ -49,22 +49,13 @@ def test_item_ids_and_clock_increment():
     assert stack.items[1].id.clock >= 1, "Clock should start at 1"
 
 
-def test_push_empty_iterable_noop():
-    stack = Stack(node="empty")
-    stack.push([])
-
-    assert stack.is_empty()
-    assert stack.peek() is None
-    assert stack.pop() is None
-
-
 def test_merge_adds_missing_items_and_sorts():
 
     rick = Stack[str](node="Rick")
-    rick.push(["Morty", "Summer"])
+    rick.push("Morty", "Summer")
 
     sanchez = Stack[str](node="Rick")
-    sanchez.push(["Morty", "Summer", "Beth"])
+    sanchez.push("Morty", "Summer", "Beth")
 
     rick.merge(sanchez)
 
@@ -74,10 +65,10 @@ def test_merge_adds_missing_items_and_sorts():
 
 def test_merge_propagates_deletion():
     rick = Stack[str](node="Rick")
-    rick.push(["Morty", "Summer"])
+    rick.push("Morty", "Summer")
 
     sanchez = Stack[str](node="Rick")
-    sanchez.push(["Morty", "Summer"])
+    sanchez.push("Morty", "Summer")
     sanchez.pop()
 
     # Pre-Merge
